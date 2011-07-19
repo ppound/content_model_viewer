@@ -153,7 +153,25 @@ function content_model_viewer_purge_object($pid) {
  * @return string
  */
 function content_model_viewer_add_datastream($pid) {
-  
+  $values = $_POST;
+  $dsid = $_POST['dsid'];
+  $label = $_POST['label'];
+  $control = $_POST['control_group'];
+  $mime = $_POST['mime_type'];
+  $file = array_shift($_FILES);
+  if ($file['type'] != $mime) {
+    return array(
+      'success' => FALSE,
+      'msg' => 'Mime type of file does not match the mime type specified.'
+    );
+  }
+  else {
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    $item = new Fedora_Item($pid);
+    $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, $mime, $control);
+    $message = $success ? 'Successfully added datastream.' : 'Failed to add datastream.';
+    json_encode(array('success' => $success, 'msg' => $message));
+  }
 }
 
 /**
