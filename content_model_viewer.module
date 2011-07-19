@@ -6,4 +6,200 @@
  * @file
  *
  */
+/**
+ * Constants
+ */
+define("PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS", 'View Objects & Datastreams');
+define("PERM_CONTENT_MODEL_VIEWER_MODIFY_OBJECT_PROPERTIES", 'Modify Object Properties');
+define("PERM_CONTENT_MODEL_VIEWER_PURGE_OBJECTS", 'Purge Objects');
+define("PERM_CONTENT_MODEL_VIEWER_ADD_DATASTREAMS", 'Add Datastreams');
+define("PERM_CONTENT_MODEL_VIEWER_PURGE_DATASTREAMS", 'Purge Datastreams');
+define("PERM_CONTENT_MODEL_VIEWER_DOWNLOAD_DATASTREAMS", 'Download Datastreams');
+define("PERM_CONTENT_MODEL_VIEWER_MODIFY_DATASTEAM_PROPERTIES", 'Modify Datastream Properties');
 
+/**
+ * Implements Menu Hook. Registers Menus.
+ */
+function content_model_viewer_menu() {
+  $items['viewer/%'] = array(
+    'title' => 'Content Model Viewer',
+    'description' => 'Allows users to view Fedora Objects.',
+    'page callback' => 'content_model_viewer',
+    'page arguments' => array(1),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['viewer/%/properties'] = array(
+    'page callback' => 'content_model_viewer_properties',
+    'page arguments' => array(1),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_MODIFY_OBJECT_PROPERTIES),
+    'type' => MENU_CALLBACK,
+  );
+  $items['viewer/%/datastreams'] = array(
+    'page callback' => 'content_model_viewer_datastreams',
+    'page arguments' => array(1),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
+    'type' => MENU_CALLBACK,
+  );
+  $items['viewer/%/purge'] = array(
+    'page callback' => 'content_model_viewer_purge_object',
+    'page arguments' => array(1),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_PURGE_OBJECTS),
+    'type' => MENU_CALLBACK,
+  );
+  $items['viewer/%/add'] = array(
+    'page callback' => 'content_model_viewer_add_datastream',
+    'page arguments' => array(1),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_ADD_DATASTREAMS),
+    'type' => MENU_CALLBACK,
+  );
+  $items['viewer/%/%/purge'] = array(
+    'page callback' => 'content_model_viewer_purge_datastream',
+    'page arguments' => array(1, 2),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_PURGE_DATASTREAMS),
+    'type' => MENU_CALLBACK,
+  );
+  $items['viewer/%/%/download'] = array(
+    'page callback' => 'content_model_viewer_download_datastream',
+    'page arguments' => array(1, 2),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_DOWNLOAD_DATASTREAMS),
+    'type' => MENU_CALLBACK,
+  );
+  $items['viewer/%/%/view'] = array(
+    'page callback' => 'content_model_viewer_view_datastream',
+    'page arguments' => array(1, 2),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
+    'type' => MENU_CALLBACK,
+  );
+  $items['viewer/%/%/properties'] = array(
+    'page callback' => 'content_model_viewer_properties',
+    'page arguments' => array(1, 2),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_MODIFY_DATASTEAM_PROPERTIES),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_perm. Register permissions.
+ * 
+ * @return array
+ */
+function content_model_viewer_perm() {
+  return array(
+    PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS,
+    PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS,
+    PERM_CONTENT_MODEL_VIEWER_MODIFY_OBJECT_PROPERTIES,
+    PERM_CONTENT_MODEL_VIEWER_PURGE_OBJECTS,
+    PERM_CONTENT_MODEL_VIEWER_ADD_DATASTREAMS,
+    PERM_CONTENT_MODEL_VIEWER_PURGE_DATASTREAMS,
+    PERM_CONTENT_MODEL_VIEWER_DOWNLOAD_DATASTREAMS,
+    PERM_CONTENT_MODEL_VIEWER_MODIFY_DATASTEAM_PROPERTIES
+  );
+}
+
+/**
+ * Implements Hook Theme. Registers themes.
+ *
+ * @return array
+ */
+function content_model_viewer_theme() {
+  return array(
+    'content_model_viewer' => array(
+      'arguments' => array(),
+      'template' => 'Viewer',
+    ),
+  );
+}
+
+/**
+ * Renders the Viewer for a given pid if possible.
+ * 
+ * @param string $pid 
+ */
+function content_model_viewer($pid) {
+  return theme('content_model_viewer');
+}
+
+/**
+ * Gets/sets the properties of the object identified by $pid.
+ * 
+ * @param string $pid 
+ * 
+ * @return string
+ */
+function content_model_viewer_properties($pid) {
+  
+}
+
+/**
+ * Purges the object identified by $pid.
+ * 
+ * The user will be redirected to the sites home page.
+ * 
+ * @param string $pid 
+ * 
+ * @return string
+ */
+function content_model_viewer_purge_object($pid) {
+  
+}
+
+/**
+ * Adds a datastream to the object identified by $pid.
+ * 
+ * @param string $pid 
+ * 
+ * @return string
+ */
+function content_model_viewer_add_datastream($pid) {
+  
+}
+
+/**
+ * Purges the given datastream ($dsid) from the object identified by $pid.
+ * 
+ * @param string $pid 
+ * @param string $dsid
+ * 
+ * @return string
+ */
+function content_model_viewer_purge_datastream($pid, $dsid) {
+  
+}
+
+/**
+ * Downloads the given datastream ($dsid) from the object identified by $pid.
+ * 
+ * @param string $pid 
+ * @param string $dsid
+ * 
+ * @return string
+ */
+function content_model_viewer_download_datastream($pid, $dsid) {
+  
+}
+
+/**
+ * Renders the viewer for the given datastream ($dsid) from the object identified by $pid.
+ * 
+ * @param string $pid 
+ * @param string $dsid
+ * 
+ * @return string
+ */
+function content_model_viewer_view_datastream($pid, $dsid) {
+  
+}
+
+/**
+ * Gets/set the properties of the given datastream ($dsid) from the object identified by $pid.
+ * 
+ * @param string $pid 
+ * @param string $dsid
+ * 
+ * @return string
+ */
+function content_model_viewer_datastream_properties($pid, $dsid) {
+  
+}
