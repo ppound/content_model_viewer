@@ -23,8 +23,8 @@ define("PERM_CONTENT_MODEL_VIEWER_MODIFY_DATASTEAM_PROPERTIES", 'Modify Datastre
  */
 function content_model_viewer_menu() {
   $items['viewer/%'] = array(
-    'title' => 'Content Model Viewer',
-    'description' => 'Allows users to view Fedora Objects.',
+    'title' => t('Content Model Viewer'),
+    'description' => t('Allows users to view Fedora Objects.'),
     'page callback' => 'content_model_viewer',
     'page arguments' => array(1),
     'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
@@ -137,9 +137,12 @@ function content_model_viewer_properties($pid) {
     return json_encode(array('success' => TRUE, 'data' => $properties));
   }
   else {
+    $label = $_POST['label'];
+    $owner = $_POST['owner'];
+    $state = $_POST['state'];
     $object_properties = new ObjectProperties($pid);
-    $success = $object_properties->setProperties();
-    $message = $success ? 'Successfuly modified object properties' : 'Failed to modify object properties';
+    $success = $object_properties->setProperties($label, $owner, $state);
+    $message = $success ? t('Successfuly modified object properties') : t('Failed to modify object properties');
     $properties = $object_properties->getProperties();
     return json_encode(array('success' => TRUE, 'msg' => $message, 'data' => $properties));
   }
@@ -158,7 +161,7 @@ function content_model_viewer_purge_object($pid) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $item = new Fedora_Item($pid);
   $success = $item->purge();
-  $message = $success ? 'Successfuly deleted object' : 'Failed to delete object';
+  $message = $success ? t('Successfuly deleted object') : t('Failed to delete object');
   return json_encode(array('success' => $success, 'msg' => $message));
 }
 
@@ -177,14 +180,14 @@ function content_model_viewer_add_datastream($pid) {
   $mime = $_POST['mime_type'];
   $file = array_shift($_FILES);
   if ($file['type'] != $mime) {
-    $message = 'Mime type of file does not match the mime type specified.';
+    $message = t('Mime type of file does not match the mime type specified.');
     return json_encode(array('success' => FALSE, 'msg' => $message));
   }
   else {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     $item = new Fedora_Item($pid);
     $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, $mime, $control);
-    $message = $success ? 'Successfully added datastream.' : 'Failed to add datastream.';
+    $message = $success ? t('Successfully added datastream.') : t('Failed to add datastream.');
     return json_encode(array('success' => $success, 'msg' => $message));
   }
 }
@@ -201,7 +204,7 @@ function content_model_viewer_purge_datastream($pid, $dsid) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $item = new Fedora_Item($pid);
   $success = $item->purge_datastream($dsid);
-  $message = $success ? 'Successfully purged datastream.' : 'Failed to purge datastream.';
+  $message = $success ? t('Successfully purged datastream.') : t('Failed to purge datastream.');
   return json_encode(array('success' => $success, 'msg' => $message));
 }
 
@@ -239,5 +242,18 @@ function content_model_viewer_view_datastream($pid, $dsid) {
  * @return string
  */
 function content_model_viewer_datastream_properties($pid, $dsid) {
-  // @todo implement
+  module_load_include('inc', 'content_model_viewer', 'DatastreamProperties');
+  if (empty($_POST)) {
+    // @todo detect if the datastream doesn't exist and respond accordingly
+    $datastream_properties = new DatastreamProperties($pid);
+    $properties = $datastream_properties->getProperties();
+    return json_encode(array('success' => TRUE, 'data' => $properties));
+  }
+  else {
+    $datastream_properties = new DatastreamProperties($pid);
+    $success = $datastream_properties->setProperties(/* Determine the fields we want to pass here */);
+    $message = $success ? t('Successfuly modified datastream properties') : t('Failed to modify datastream properties');
+    $properties = $datastream_properties->getProperties();
+    return json_encode(array('success' => TRUE, 'msg' => $message, 'data' => $properties));
+  }
 }
