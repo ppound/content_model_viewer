@@ -161,9 +161,9 @@ class ObjectProperties {
       $this->label = $label;
       $this->owner = $owner;
       $this->state = $state;
-      return true;
+      return TRUE;
     }
-    return false;
+    return FALSE;
   }
 
   /**

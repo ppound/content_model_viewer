@@ -4,7 +4,7 @@
 
 /**
  * @file
- * 
+ *
  * Implements hooks and callbacks for this module.
  */
 /**
@@ -83,7 +83,7 @@ function content_model_viewer_menu() {
 
 /**
  * Implements hook_perm. Register permissions.
- * 
+ *
  * @return array
  */
 function content_model_viewer_perm() {
@@ -115,8 +115,8 @@ function content_model_viewer_theme() {
 
 /**
  * Renders the Viewer for a given pid if possible.
- * 
- * @param string $pid 
+ *
+ * @param string $pid
  */
 function content_model_viewer($pid) {
   return theme('content_model_viewer');
@@ -124,8 +124,8 @@ function content_model_viewer($pid) {
 
 /**
  * Gets/sets the properties of the object identified by $pid.
- * 
- * @param string $pid 
+ *
+ * @param string $pid
  * 
  * @return string
  */
@@ -150,11 +150,11 @@ function content_model_viewer_properties($pid) {
 
 /**
  * Purges the object identified by $pid.
- * 
+ *
  * The user will be redirected to the sites home page.
- * 
+ *
  * @param string $pid 
- * 
+ *
  * @return string
  */
 function content_model_viewer_purge_object($pid) {
@@ -167,9 +167,9 @@ function content_model_viewer_purge_object($pid) {
 
 /**
  * Adds a datastream to the object identified by $pid.
- * 
+ *
  * @param string $pid 
- * 
+ *
  * @return string
  */
 function content_model_viewer_add_datastream($pid) {
@@ -194,10 +194,10 @@ function content_model_viewer_add_datastream($pid) {
 
 /**
  * Purges the given datastream ($dsid) from the object identified by $pid.
- * 
+ *
  * @param string $pid 
  * @param string $dsid
- * 
+ *
  * @return string
  */
 function content_model_viewer_purge_datastream($pid, $dsid) {
@@ -210,23 +210,23 @@ function content_model_viewer_purge_datastream($pid, $dsid) {
 
 /**
  * Downloads the given datastream ($dsid) from the object identified by $pid.
- * 
+ *
  * @param string $pid 
  * @param string $dsid
- * 
+ *
  * @return string
  */
 function content_model_viewer_download_datastream($pid, $dsid) {
-  // @todo I think in the old version this went directly though islandora. 
-  // We'll change that so we have some extra control here.
+  module_load_include('inc', 'content_model_viewer', 'Download');
+  download_datastream($pid, $dsid);
 }
 
 /**
  * Renders the viewer for the given datastream ($dsid) from the object identified by $pid.
- * 
+ *
  * @param string $pid 
  * @param string $dsid
- * 
+ *
  * @return string
  */
 function content_model_viewer_view_datastream($pid, $dsid) {
@@ -235,10 +235,10 @@ function content_model_viewer_view_datastream($pid, $dsid) {
 
 /**
  * Gets/set the properties of the given datastream ($dsid) from the object identified by $pid.
- * 
+ *
  * @param string $pid 
  * @param string $dsid
- * 
+ *
  * @return string
  */
 function content_model_viewer_datastream_properties($pid, $dsid) {
