@@ -130,7 +130,19 @@ function content_model_viewer($pid) {
  * @return string
  */
 function content_model_viewer_properties($pid) {
-  // @todo implement
+  module_load_include('inc', 'content_model_viewer', 'ObjectProperties');
+  if (empty($_POST)) {
+    $object_properties = new ObjectProperties($pid);
+    $properties = $object_properties->getProperties();
+    return json_encode(array('success' => TRUE, 'data' => $properties));
+  }
+  else {
+    $object_properties = new ObjectProperties($pid);
+    $success = $object_properties->setProperties();
+    $message = $success ? 'Successfuly modified object properties' : 'Failed to modify object properties';
+    $properties = $object_properties->getProperties();
+    return json_encode(array('success' => TRUE, 'msg' => $message, 'data' => $properties));
+  }
 }
 
 /**

@@ -167,14 +167,20 @@ class ObjectProperties {
   }
 
   /**
-   * Gets the properties associated with this object as an array.
+   * Gets the properties associated with this object as an array with the following properties.
+   * 
+   * label, owner, state, created, modified
    * 
    * @return array
-   *  Returns the object properties in the following order.
-   *  array($label, $owner, $state, $creation_date, $last_modified_date);
    */
   public function getProperties() {
-    return array($this->label, $this->owner, $this->state, $this->created, $this->modified);
+    return array(
+      'label' => $this->label,
+      'owner' => $this->owner,
+      'state' => $this->state,
+      'created' => $this->created,
+      'modified' => $this->modified
+    );
   }
 
 }
