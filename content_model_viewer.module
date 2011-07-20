@@ -113,7 +113,7 @@ function content_model_viewer_perm() {
 function content_model_viewer_theme() {
   return array(
     'content_model_viewer' => array(
-      'arguments' => array(),
+      'arguments' => array('pid' => NULL),
       'template' => 'Viewer',
     ),
   );
@@ -125,7 +125,20 @@ function content_model_viewer_theme() {
  * @param string $pid
  */
 function content_model_viewer($pid) {
-  return theme('content_model_viewer');
+  global $base_url;
+  $path = drupal_get_path('module', 'content_model_viewer');
+  /* Load ExtJS */
+  $ext_path = $path . '/lib/ext';
+  drupal_add_js($ext_path . '/bootstrap.js');
+  drupal_add_js($ext_path . '/ext-all-dev.js');
+  drupal_add_css($ext_path . '/resources/css/ext-all-gray.css', 'theme', 'all');
+  //drupal_add_css($ext_path . '/resources/css/xtheme-gray.css', 'theme', 'all');
+  drupal_add_js("Ext.BLANK_IMAGE_URL='{$base_url}/{$ext_path}/resources/images/default/s.gif';", 'inline');
+  /* Load Viewer */
+  $js_path = $path . '/js';
+  drupal_add_js($js_path . '/ContentModelViewer.js');
+  /* @todo: Load required javascript for each datastream viewer */
+  return theme('content_model_viewer', $pid);
 }
 
 /**
