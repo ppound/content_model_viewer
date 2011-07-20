@@ -136,7 +136,6 @@ function content_model_viewer($pid) {
  * @return string
  */
 function content_model_viewer_overview($pid) {
-  // @todo Implement function.
   return '<div>Over View Panel</div>';
 }
 

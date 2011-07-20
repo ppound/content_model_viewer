@@ -66,7 +66,7 @@ class ObjectProperties {
    */
   public function __construct($pid) {
     $this->pid = $pid;
-    $this->item = new Fedora_Item($this->pid);
+    $this->item = new Fedora_Item($pid);
     $this->label = $this->getLabel();
     $this->owner = $this->getOwner();
     $this->state = $this->getState();
@@ -80,7 +80,7 @@ class ObjectProperties {
    * @return string
    */
   private function getLabel() {
-    return $item->objectProfile->objLabel;
+    return $this->item->objectProfile->objLabel;
   }
 
   /**
