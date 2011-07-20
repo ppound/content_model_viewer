@@ -42,6 +42,12 @@ function content_model_viewer_menu() {
     'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
     'type' => MENU_CALLBACK,
   );
+  $items['viewer/%/overview'] = array(
+    'page callback' => 'content_model_viewer_overview',
+    'page arguments' => array(1),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
+    'type' => MENU_CALLBACK,
+  );
   $items['viewer/%/purge'] = array(
     'page callback' => 'content_model_viewer_purge_object',
     'page arguments' => array(1),
@@ -120,6 +126,18 @@ function content_model_viewer_theme() {
  */
 function content_model_viewer($pid) {
   return theme('content_model_viewer');
+}
+
+/**
+ * Returns the HTML for overview panel in the viewer.
+ * 
+ * @param string $pid 
+ * 
+ * @return string
+ */
+function content_model_viewer_overview($pid) {
+  // @todo Implement function.
+  return '<div>Over View Panel</div>';
 }
 
 /**
