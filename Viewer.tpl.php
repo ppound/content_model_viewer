@@ -1,5 +1,14 @@
 <div id="content-model-viewer">
   <div style="display:none" id="properties">
-    <div id="pid"><?php echo $pid; ?></div>
+    <div id="pid"><?php print $pid; ?></div>
+    <div id="object_overview_url"><?php print check_url(url($paths['object']['overview'])); ?></div>
+    <div id="object_properties_url"><?php print check_url(url($paths['object']['properties'])); ?></div>
+    <div id="object_datastreams_url"><?php print check_url(url($paths['object']['datastreams'])); ?></div>
+    <div id="object_purge_url"><?php print check_url(url($paths['object']['purge'])); ?></div>
+    <div id="datastream_add_url"><?php print check_url(url($paths['datastream']['add'])); ?></div>
+    <div id="datastream_purge_url"><?php print check_url(url($paths['datastream']['purge'])); ?></div>
+    <div id="datastream_download_url"><?php print check_url(url($paths['datastream']['download'])); ?></div>
+    <div id="datastream_view_url"><?php print check_url(url($paths['datastream']['view'])); ?></div>
+    <div id="datastream_properties_url"><?php print check_url(url($paths['datastream']['properties'])); ?></div>
   </div>
 </div>

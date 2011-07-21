@@ -1,25 +1,27 @@
-var tabs = [];
-if(typeof OverviewPanel === 'function') {
-    tabs.push(new OverviewPanel);
-}
-if(typeof CollectionPanel === 'function') {
-    tabs.push(new CollectionPanel);
-}
-if(typeof ViewerPanel === 'function') {
-    tabs.push(new ViewerPanel);
-}
-if(typeof ManagePanel === 'function') {
-    tabs.push(new ManagePanel);
-}
-var ContentModelViewer = Ext.extend(Ext.tab.Panel, {
-    width: 800,
-    height: 600,
-    items: tabs
-});
+/**
+ * Display the viewer.
+ */
 Ext.onReady(function(){
     Ext.QuickTips.init();
-    var viewer = new ContentModelViewer({
-        renderTo: 'content-model-viewer'
+    var tabs = [];
+    // Create Tabs for each of the Panels if they are defined 
+    if(ContentModelViewer.widgets.OverviewPanel !== undefined) {
+        tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel'));
+    }
+    if(ContentModelViewer.widgets.CollectionPanel !== undefined) {
+        tabs.push(Ext.create('ContentModelViewer.widgets.CollectionPanel'));
+    }
+    if(ContentModelViewer.widgets.ViewerPanel !== undefined) {
+        tabs.push(Ext.create('ContentModelViewer.widgets.ViewerPanel'));
+    }
+    if(ContentModelViewer.widgets.ManagePanel !== undefined) {
+        tabs.push(Ext.create('ContentModelViewer.widgets.ManagePanel'));
+    }
+    var viewer = Ext.create('Ext.tab.Panel', {
+        width: 800,
+        height: 600,
+        renderTo: 'content-model-viewer',
+        items: tabs
     });
     viewer.show();
 });

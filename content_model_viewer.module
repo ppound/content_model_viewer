@@ -120,6 +120,30 @@ function content_model_viewer_theme() {
 }
 
 /**
+ * Sets up variables for the template.
+ * 
+ * @param array $variables
+ */
+function template_preprocess_content_model_viewer(array &$variables) {
+  $pid = $variables['pid'];
+  $variables['paths'] = array(
+    'object' => array(
+      'overview' => "viewer/$pid/overview",
+      'properties' => "viewer/$pid/properties",
+      'datastreams' => "viewer/$pid/datastreams",
+      'purge' => "viewer/$pid/purge"
+    ),
+    'datastream' => array(
+      'add' => "viewer/$pid/add",
+      'purge' => "viewer/$pid/dsid/purge",
+      'properties' => "viewer/dsid/properties",
+      'download' => "viewer/$pid/dsid/download",
+      'view' => "viewer/$pid/dsid/view"
+    )
+  );
+}
+
+/**
  * Renders the Viewer for a given pid if possible.
  *
  * @param string $pid
@@ -129,13 +153,18 @@ function content_model_viewer($pid) {
   $path = drupal_get_path('module', 'content_model_viewer');
   /* Load ExtJS */
   $ext_path = $path . '/lib/ext';
-  drupal_add_js($ext_path . '/bootstrap.js');
   drupal_add_js($ext_path . '/ext-all-dev.js');
   drupal_add_css($ext_path . '/resources/css/ext-all-gray.css', 'theme', 'all');
-  //drupal_add_css($ext_path . '/resources/css/xtheme-gray.css', 'theme', 'all');
-  drupal_add_js("Ext.BLANK_IMAGE_URL='{$base_url}/{$ext_path}/resources/images/default/s.gif';", 'inline');
   /* Load Viewer */
   $js_path = $path . '/js';
+  /* @todo Determine what widgits need to be defined. */
+  drupal_add_js($js_path . '/IncludeFirst.js');
+  drupal_add_js($js_path . '/FilesPanel.js'); /* Appears on the OverviewPanel and the Viewer Panel */
+  /* @todo Determine what panels to render */
+  drupal_add_js($js_path . '/OverviewPanel.js');
+  drupal_add_js($js_path . '/CollectionPanel.js');
+  drupal_add_js($js_path . '/ViewerPanel.js');
+  drupal_add_js($js_path . '/ManagePanel.js');
   drupal_add_js($js_path . '/ContentModelViewer.js');
   /* @todo: Load required javascript for each datastream viewer */
   return theme('content_model_viewer', $pid);
@@ -149,7 +178,8 @@ function content_model_viewer($pid) {
  * @return string
  */
 function content_model_viewer_overview($pid) {
-  return '<div>Over View Panel</div>';
+  echo '<div>Over View Panel</div>';
+  exit();
 }
 
 /**
@@ -261,6 +291,8 @@ function content_model_viewer_download_datastream($pid, $dsid) {
  */
 function content_model_viewer_view_datastream($pid, $dsid) {
   // @todo implement
+  echo '<div>Viewer Panel</div>';
+  exit();
 }
 
 /**
