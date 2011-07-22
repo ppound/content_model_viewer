@@ -1,0 +1,116 @@
+/* 
+    Document   : ADRBasic.inc
+    Created on : 4-Oct-2010, 4:00:18 PM
+    Author     : default
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+#playerFLV embed {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#playerFlexPaper embed {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.add-datastream-icon {
+    background-image:url(../images/icon/add.png);
+}
+
+.edit-datastream-icon {
+    background-image:url(../images/icon/edit.gif);
+}
+
+.view-datastream-icon {
+    background-image:url(../images/icon/view.gif);
+}
+
+.download-datastream-icon {
+    background-image:url(../images/icon/blue_down.png);
+}
+
+.remove-datastream-icon {
+    background-image:url(../images/icon/remove.png);
+}
+
+.adr-file {
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+.adr-file-selectable {
+
+}
+
+.adr-file .adr-file-label {
+    text-align: center;
+}
+
+.adr-file .adr-file-img {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    height: 96px;
+    width: 96px;
+}
+
+.adr-file .adr-file-dsid {
+    text-align: center;
+    font-size: 1.3em;
+}
+
+.adr-file .adr-file-controls {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.adr-file-controls .adr-file-view{
+    padding: 3px;
+}
+
+.adr-file-controls .adr-file-download {
+    padding: 3px;
+}
+
+.adr-edit-file {
+    float: left;
+    width: 200px;
+    height: 180px;
+    padding: 10px;
+}
+
+.adr-edit-file .adr-edit-file-label {
+    text-align: center;
+    font-size: 1.3em;
+}
+
+.adr-edit-file .adr-edit-file-img {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+    width: 128px;
+    height: 128px;
+    clip: rect(0px 128px 128px 0px);
+    display: block;
+}
+
+.adr-edit-file .adr-edit-file-dsid {
+    text-align: center;
+}
+
+#adr-manage-object-properties th {
+    padding-right: 10px;
+}
+
+.x-list-selected {
+    background-color: #ffff00;
+}
+
+.x-list-over {
+    background-color: #eeeebb;
+}

@@ -102,4 +102,27 @@ class DatastreamProperties {
     // @todo implement this class.
   }
 
+  public function getProperties() {
+    $data = array();
+    $count = 0;
+    $start = 0;
+    $limit = 5;
+    $end = (isset($limit)) ? $start + $limit : NULL;
+    foreach ($this->item->datastreams as $dsid => $attr) {
+      if ($count >= $start && (empty($end) || $count < $end)) {
+        $stream['dsid'] = $dsid;
+        $stream['label'] = $attr['label'];
+        $stream['state'] = 'A';
+        $stream['mime'] = $attr['MIMEType'];
+        $data[] = $stream;
+      }
+      $count++;
+    }
+    return array($data, $count);
+  }
+
+  public function setProperties(/* @todo determine what can be set */) {
+    
+  }
+
 }

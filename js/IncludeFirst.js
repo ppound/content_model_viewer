@@ -10,38 +10,6 @@ Ext.ns('ContentModelViewer.widgets');
  */
 Ext.onReady(function(){
     /**
-     * Define Models.
-     */
-    Ext.define('ContentModelViewer.models.FedoraObject', {
-        extend: 'Ext.data.Model',
-        fields: [
-            {name: 'label',  type: 'string'},
-            {name: 'state',   type: 'string'},
-            {name: 'owner', type: 'string'},
-            {name: 'created', type: 'string'},
-            {name: 'modified', type: 'string'},
-        ],
-        validations: [
-            {type: 'inclusion', field: 'state',   list: ['Active', 'Inactive', 'Deleted']},
-        ]
-        });
-    Ext.define('ContentModelViewer.models.Datastream', {
-        extend: 'Ext.data.Model',
-        fields: [
-            {name: 'dsid',  type: 'string'},
-            {name: 'label',  type: 'string'},
-            {name: 'state',   type: 'string'},
-            {name: 'created', type: 'string'},
-            {name: 'mime', type: 'string'},
-            {name: 'view', type: 'boolean'},
-            {name: 'download', type: 'boolean'},
-            {name: 'tn', type: 'string'}
-        ],
-        validations: [
-            {type: 'inclusion', field: 'state',   list: ['A', 'I']},
-        ]
-    });
-    /**
      * Set Properties
      */
     ContentModelViewer.properties.pid = $('#pid').text();
@@ -53,7 +21,7 @@ Ext.onReady(function(){
             purge: $('#object_purge_url').text()
         },
         datastream: {
-            add: $('#datastream_add_url').text(),
+            add: $('#datasƒtream_add_url').text(),
             purge: function(dsid) {
                 var url = $('#datastream_purge_url').text();
                 return url.replace('/dsid/', '/'+dsid+'/');
@@ -72,4 +40,100 @@ Ext.onReady(function(){
             }
         }
     };
+    /**
+     * Define Models.
+     */
+    Ext.define('ContentModelViewer.models.FedoraObject', {
+        extend: 'Ext.data.Model',
+        fields: [{
+            name: 'label',  
+            type: 'string'
+        }, {
+            name: 'state',   
+            type: 'string'
+        }, {
+            name: 'owner', 
+            type: 'string'
+        }, {
+            name: 'created', 
+            type: 'string'
+        }, {
+            name: 'modified', 
+            type: 'string'
+        },],
+        validations: [{
+            type: 'inclusion', 
+            field: 'state',   
+            list: ['Active', 'Inactive', 'Deleted']
+        }],
+        proxy: {
+            type: 'rest',
+            url : ContentModelViewer.properties.url.object.properties
+        }
+    });
+    Ext.define('ContentModelViewer.models.Datastream', {
+        extend: 'Ext.data.Model',
+        idProperty: 'dsid',
+        fields: [{
+            name: 'dsid',  
+            type: 'string'
+        }, {
+            name: 'label',  
+            type: 'string'
+        }, {
+            name: 'state',   
+            type: 'string'
+        }, {
+            name: 'created', 
+            type: 'string'
+        }, {
+            name: 'mime', 
+            type: 'string'
+        }, {
+            name: 'view', 
+            type: 'boolean'
+        }, {
+            name: 'download', 
+            type: 'boolean'
+        }, {
+            name: 'tn', 
+            type: 'string'
+        }],
+        validations: [{
+            type: 'inclusion', 
+            field: 'state',   
+            list: ['A', 'I']
+        }],
+        proxy: {
+            type: 'rest',
+            url : ContentModelViewer.properties.url.object.datastreams,
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        }
+    });
+    /**
+     * Create Stores
+     */
+    Ext.create('Ext.data.Store', {
+        storeId:'datastreams',
+        model: ContentModelViewer.models.Datastream,
+        autoLoad: true,
+        //autoSync: true,
+        pageSize: 10,
+        listeners: {
+            write: function(store, operation) {
+                if(operation.success === true) {
+                    for (var i = 0; i < operation.records.length; i++) {
+                        var record = operation.records[i];
+                        if(record.dirty) {
+                            record.commit();
+                        }
+                    }
+                }
+            }
+        }
+    })
 });
