@@ -237,7 +237,8 @@ function content_model_viewer_datastream($pid, $dsid) {
         $json = fread($stdin, $_SERVER['CONTENT_LENGTH']);
         $data = json_decode($json);
         // @todo Update the datastreams properties...
-        echo json_encode(array('success' => TRUE, 'msg' => "Successfully modified $dsid's properties"));
+        $data->created = "NOW";
+        echo json_encode(array('success' => TRUE, 'msg' => "Successfully modified $dsid's properties", 'data' => $data));
         exit();
       }
       break;

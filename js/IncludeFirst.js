@@ -125,12 +125,11 @@ Ext.onReady(function(){
         pageSize: 10,
         listeners: {
             write: function(store, operation) {
-                if(operation.success === true) {
-                    for (var i = 0; i < operation.records.length; i++) {
-                        var record = operation.records[i];
-                        if(record.dirty) {
-                            record.commit();
-                        }
+                var records = operation.getRecords();
+                if(operation.wasSuccessful()) {
+                    for (var i = 0; i < records.length; i++) {
+                        var record = records[i];
+                        record.commit();
                     }
                 }
             }
