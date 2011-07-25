@@ -230,19 +230,27 @@ function content_model_viewer_datastreams($pid) {
  * @param string $dsid 
  */
 function content_model_viewer_datastream($pid, $dsid) {
-  switch ($_SERVER['REQUEST_METHOD']) {
-    case 'PUT':
-      if ($_SERVER['CONTENT_LENGTH'] > 0) {
-        $stdin = fopen("php://input", "r");
-        $json = fread($stdin, $_SERVER['CONTENT_LENGTH']);
-        $data = json_decode($json);
-        // @todo Update the datastreams properties...
-        $data->created = "NOW";
-        echo json_encode(array('success' => TRUE, 'msg' => "Successfully modified $dsid's properties", 'data' => $data));
-        exit();
-      }
-      break;
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  $item = new Fedora_Item($pid);
+  if (isset($item->datastreams[$dsid])) {
+    $datastream = $item->datastreams[$dsid];
+    switch ($_SERVER['REQUEST_METHOD']) {
+      case 'PUT':
+        if ($_SERVER['CONTENT_LENGTH'] > 0) {
+          $stdin = fopen("php://input", "r");
+          $json = fread($stdin, $_SERVER['CONTENT_LENGTH']);
+          $data = json_decode($json);
+          // @todo Update the datastreams properties ...
+
+          $data->created = "NOW";
+          echo json_encode(array('success' => TRUE, 'msg' => "Successfully modified $dsid's properties", 'data' => $data));
+          exit();
+        }
+        break;
+    }
   }
+  echo json_encode(array('success' => FALSE, 'msg' => "Datastream $dsid does not exist."));
+  exit();
 }
 
 /**

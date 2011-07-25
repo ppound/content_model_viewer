@@ -5,7 +5,7 @@ Ext.onReady(function(){
     Ext.QuickTips.init();
     var tabs = [];
     // Create Tabs for each of the Panels if they are defined 
-    if(ContentModelViewer.widgets.OverviewPanel !== undefined) {
+    /*if(ContentModelViewer.widgets.OverviewPanel !== undefined) {
         tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel'));
     }
     if(ContentModelViewer.widgets.CollectionPanel !== undefined) {
@@ -13,7 +13,7 @@ Ext.onReady(function(){
     }
     if(ContentModelViewer.widgets.ViewerPanel !== undefined) {
         tabs.push(Ext.create('ContentModelViewer.widgets.ViewerPanel'));
-    }
+    }*/
     if(ContentModelViewer.widgets.ManagePanel !== undefined) {
         tabs.push(Ext.create('ContentModelViewer.widgets.ManagePanel'));
     }

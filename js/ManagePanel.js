@@ -7,9 +7,89 @@ Ext.onReady(function(){
         },
         items: [{
             xtype: 'panel',
-            title: 'Object Properties',
-            height: 200,
-            region: 'north'
+            region: 'north',
+            height: 300,
+            layout: {
+                type: 'border'
+            },
+            items: [{
+                xtype: 'form',
+                title: 'Object Properties',
+                height: 245,
+                region: 'center',
+                bodyPadding: 10,
+                items: [{
+                    xtype: 'textfield',
+                    fieldLabel: 'Label',
+                    name: 'label'
+                }, {
+                    xtype: 'textfield',
+                    fieldLabel: 'Owner',
+                    name: 'owner'
+                }, {
+                    xtype: 'combobox',
+                    fieldLabel: 'State',
+                    name: 'state',
+                    queryMode: 'local',
+                    displayField: 'name',
+                    valueField: 'value',
+                    value: "I",
+                    store: Ext.create('Ext.data.Store', {
+                        fields: ['value', 'name'],
+                        data : [{
+                            "value":"A", 
+                            "name":"Active"
+                        }, {
+                            "value":"I", 
+                            "name":"Inactive"
+                        }, {
+                            "value":"D", 
+                            "name":"Deleted"
+                        }]
+                    })
+                }, {
+                    xtype: 'displayfield',
+                    fieldLabel: 'Date Created',
+                    name: 'created'
+                }, {
+                    xtype: 'displayfield',
+                    fieldLabel: 'Last Modified',
+                    name: 'modified'
+                }],
+                buttons: [{
+                    text: 'Save Changes',
+                    formBind: true, // Only enabled once the form is valid
+                    handler: function() {
+                        var form = this.up('form').getForm();
+                        if (form.isValid()) {
+                            form.submit({
+                                success: function(form, action) {
+                                    Ext.Msg.alert('Success', action.result.msg);
+                                },
+                                failure: function(form, action) {
+                                    Ext.Msg.alert('Failed', action.result.msg);
+                                }
+                            });
+                        }
+                    }
+                }],
+                dockedItems: [{
+                    xtype: 'toolbar',
+                    dock: 'top',
+                    items: [{
+                        xtype: 'button',
+                        text: 'Add',
+                        cls: 'x-btn-text-icon',
+                        iconCls: 'add-datastream-icon',
+                        id: 'add-datastream'
+                    }]
+                }]
+            }, {
+                xtype: 'panel',
+                title: 'Datastream Preview',
+                region: 'east',
+                width: 200
+            }]
         }, {
             xtype: 'panel',
             title: 'Datastreams',
@@ -107,11 +187,6 @@ Ext.onReady(function(){
                     displayInfo: true
                 }]
             })]
-        }, {
-            xtype: 'panel',
-            title: 'Detailed Information',
-            region: 'east',
-            width: 200
         }]
     })
 });
