@@ -117,6 +117,7 @@ Ext.onReady(function(){
         }, {
             xtype: 'gridpanel',
             title: 'Datastreams',
+            id: 'manage-panel-datastreams',
             region: 'center',
             height: '100%',
             selType: 'rowmodel',
@@ -161,6 +162,19 @@ Ext.onReady(function(){
                 header: 'Date Created', 
                 dataIndex: 'created'
             }],
+            listeners: {
+                selectionchange: function(view, selections, options) {
+                    var button, record = selections[0];
+                    button = Ext.getCmp('remove-datastream');
+                    button.enable();
+                    button = Ext.getCmp('edit-datastream');
+                    record.get('edit') ? button.enable() : button.disable();
+                    button = Ext.getCmp('view-datastream');
+                    record.get('view') ? button.enable() : button.disable();
+                    button = Ext.getCmp('download-datastream');
+                    record.get('download') ? button.enable() : button.disable();
+                }      
+            },
             store: Ext.data.StoreManager.lookup('datastreams'),
             dockedItems: [{
                 xtype: 'toolbar',
@@ -170,38 +184,159 @@ Ext.onReady(function(){
                     text: 'Add',
                     cls: 'x-btn-text-icon',
                     iconCls: 'add-datastream-icon',
-                    id: 'add-datastream'
+                    id: 'add-datastream',
+                    handler : function() {
+                        // Launch form then post a form to the given url.
+                        Ext.create('Ext.window.Window', {
+                            title: 'Add Datastream',
+                            height: 200,
+                            width: 400,
+                            layout: 'fit',
+                            items: {  // Let's put an empty grid in just to illustrate fit layout
+                                xtype: 'form',
+                                bodyPadding: 10,
+                                items: [{
+                                    xtype: 'textfield',
+                                    fieldLabel: 'Datastream ID'
+                                }, {
+                                    xtype: 'textfield',
+                                    fieldLabel: 'Label'
+                                }, {
+                                    xtype:'combobox',
+                                    fieldLabel: 'State',
+                                    store: Ext.create('Ext.data.Store', {
+                                        fields: ['value', 'name'],
+                                        data : [{
+                                            "value":"A", 
+                                            "name":"Active"
+                                        }, {
+                                            "value":"I", 
+                                            "name":"Inactive"
+                                        }]
+                                    }),
+                                    queryMode: 'local',
+                                    displayField: 'name',
+                                    valueField: 'value',
+                                    value: "I"
+                                }]
+                            },
+                            buttons: [{
+                                text: 'Add',
+                                formBind: true, // Only enabled once the form is valid
+                                handler: function(button) {
+                                    button.up('form').getForm().submit({
+                                        url: ContentModelViewer.properties.url.datastream.add,
+                                        waitMsg: 'Creating...',
+                                        success: function(form, action) {
+                                            var store = Ext.data.StoreManager.lookup('datastreams');
+                                            store.sync();
+                                        }
+                                    });
+                                }
+                            }]
+                        }).show();
+                    /*
+                        var url = ContentModelViewer.properties.url.datastream.add;
+                        Ext.Ajax.request({
+                            url: url,
+                            method: 'POST',
+                            success: function(response){
+                                    
+                            }
+                        });*/
+                    }
                 }, {
                     xtype: 'button',
                     text: 'Remove',
+                    disabled: true,
                     cls: 'x-btn-text-icon',
                     iconCls: 'remove-datastream-icon',
-                    id: 'remove-datastream'
+                    id: 'remove-datastream',
+                    handler : function() {
+                        var grid = this.up('gridpanel');
+                        var selectionModel = grid.getSelectionModel();
+                        if(selectionModel.hasSelection()) {
+                            var record = selectionModel.selected.first();
+                            var dsid = record.get('dsid');
+                            var url = ContentModelViewer.properties.url.datastream.purge(dsid);
+                            // @todo make sure the grid shows loading...
+                            Ext.Ajax.request({
+                                url: url,
+                                method: 'POST',
+                                success: function(response){
+                                    
+                                }
+                            });
+                        }
+                    }
                 }, {
                     xtype: 'button',
                     text: 'Edit',
+                    disabled: true,
                     cls: 'x-btn-text-icon',
                     iconCls: 'edit-datastream-icon',
-                    id: 'edit-datastream'
+                    id: 'edit-datastream',
+                    handler : function() {
+                        var grid = this.up('gridpanel');
+                        var selectionModel = grid.getSelectionModel();
+                        if(selectionModel.hasSelection()) {
+                            var record = selectionModel.selected.first();
+                            var dsid = record.get('dsid');
+                            var url = ContentModelViewer.properties.url.datastream.download(dsid);
+                            Ext.Ajax.request({
+                                url: url,
+                                method: 'POST',
+                                success: function(response){
+                                    
+                                }
+                            });
+                        }
+                    }
                 },  {
                     xtype: 'button',
                     text: 'Download',
+                    disabled: true,
                     cls: 'x-btn-text-icon',
                     iconCls: 'download-datastream-icon',
-                    id: 'download-datastream'
+                    id: 'download-datastream',
+                    handler : function(button) {
+                        var grid = this.up('gridpanel');
+                        var selectionModel = grid.getSelectionModel();
+                        if(selectionModel.hasSelection()) {
+                            var record = selectionModel.selected.first();
+                            var dsid = record.get('dsid');
+                            var url = ContentModelViewer.properties.url.datastream.download(dsid);
+                            Ext.Ajax.request({
+                                url: url,
+                                method: 'POST',
+                                success: function(response){
+                                    
+                                }
+                            });
+                        }
+                    }
                 }, {
                     xtype: 'button',
                     text: 'View',
+                    disabled: true,
                     cls: 'x-btn-text-icon',
                     iconCls: 'view-datastream-icon',
-                    id: 'view-datastream'
-                }, {
-                    xtype: 'button',
-                    text: 'Save',
-                    id: 'save-datastream', 
+                    id: 'view-datastream',
                     handler : function() {
-                        var store = Ext.data.StoreManager.lookup('datastreams');
-                        store.sync();
+                        var grid = this.up('gridpanel');
+                        var selectionModel = grid.getSelectionModel();
+                        if(selectionModel.hasSelection()) {
+                            var record = selectionModel.selected.first();
+                            var dsid = record.get('dsid');
+                            var url = ContentModelViewer.properties.url.datastream.download(dsid);
+                            Ext.Ajax.request({
+                                url: url,
+                                method: 'POST',
+                                success: function(response){
+                                    
+                                }
+                            });
+                        }
                     }
                 }]
             },{
