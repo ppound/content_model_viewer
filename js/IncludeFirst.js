@@ -5,6 +5,7 @@ Ext.ns('ContentModelViewer');
 Ext.ns('ContentModelViewer.properties');
 Ext.ns('ContentModelViewer.models');
 Ext.ns('ContentModelViewer.widgets');
+
 /**
  * Grab properties from properties stored in the HTML 
  */
@@ -21,7 +22,7 @@ Ext.onReady(function(){
             purge: $('#object_purge_url').text()
         },
         datastream: {
-            add: $('#datasƒtream_add_url').text(),
+            add: $('#datastream_add_url').text(),
             purge: function(dsid) {
                 var url = $('#datastream_purge_url').text();
                 return url.replace('/dsid/', '/'+dsid+'/');
@@ -68,7 +69,12 @@ Ext.onReady(function(){
         }],
         proxy: {
             type: 'rest',
-            url : ContentModelViewer.properties.url.object.properties
+            url : ContentModelViewer.properties.url.object.properties,
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
         }
     });
     Ext.define('ContentModelViewer.models.Datastream', {
@@ -121,7 +127,7 @@ Ext.onReady(function(){
         storeId:'datastreams',
         model: ContentModelViewer.models.Datastream,
         autoLoad: true,
-        //autoSync: true,
+        autoSync: true,
         pageSize: 10,
         listeners: {
             write: function(store, operation) {
@@ -134,5 +140,21 @@ Ext.onReady(function(){
                 }
             }
         }
-    })
+    });
+    Ext.create('Ext.data.Store', {
+        storeId:'objectProperties',
+        model: ContentModelViewer.models.FedoraObject,
+        autoLoad: true,
+        listeners: {
+            write: function(store, operation) {
+                var records = operation.getRecords();
+                if(operation.wasSuccessful()) {
+                    for (var i = 0; i < records.length; i++) {
+                        var record = records[i];
+                        record.commit();
+                    }
+                }
+            }
+        }
+    });
 });

@@ -112,9 +112,15 @@ class ObjectProperties {
     $xpath = new DOMXPath($doc);
     $result = $xpath->query("/*[local-name()='digitalObject']/*[local-name()='objectProperties']/*[local-name()='property'][@NAME='info:fedora/fedora-system:def/model#state']/@VALUE");
     if ($result && $result->length == 1) {
-      return $result->item(0)->value;
+      $convert = array(
+        'Active' => 'A',
+        'Inactive' => 'I',
+        'Deleted' => 'D',
+      );
+      $value = $result->item(0)->value;
+      return isset($convert[$value]) ? $convert[$value] : $value;
     }
-    return '';
+    return 'I'; // Default...
   }
 
   /**
@@ -143,7 +149,7 @@ class ObjectProperties {
    * @return boolean
    */
   private function validState($state) {
-    return $state == "Active" || $state == "Inactive" || $state == "Deleted";
+    return $state == "A" || $state == "I" || $state == "D";
   }
 
   /**
@@ -151,7 +157,7 @@ class ObjectProperties {
    * 
    * @param string $label
    * @param string $owner
-   * @param string $state (Expected to be "Active", "Inactive", "Deleted")
+   * @param string $state (Expected to be "A", "I", "D")
    */
   public function setProperties($label, $owner, $state) {
     if (!$this->validState($state)) {
