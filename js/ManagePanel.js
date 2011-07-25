@@ -8,7 +8,7 @@ Ext.onReady(function(){
         items: [{
             xtype: 'panel',
             region: 'north',
-            height: 300,
+            height: 255,
             layout: {
                 type: 'border'
             },
@@ -21,11 +21,13 @@ Ext.onReady(function(){
                 items: [{
                     xtype: 'textfield',
                     fieldLabel: 'Label',
-                    name: 'label'
+                    name: 'label',
+                    width: 400
                 }, {
                     xtype: 'textfield',
                     fieldLabel: 'Owner',
-                    name: 'owner'
+                    name: 'owner',
+                    width: 400
                 }, {
                     xtype: 'combobox',
                     fieldLabel: 'State',
@@ -78,17 +80,23 @@ Ext.onReady(function(){
                     dock: 'top',
                     items: [{
                         xtype: 'button',
-                        text: 'Add',
+                        text: 'Edit Permissions',
                         cls: 'x-btn-text-icon',
-                        iconCls: 'add-datastream-icon',
-                        id: 'add-datastream'
+                        iconCls: 'edit-datastream-icon',
+                        id: 'edit-xacml'
+                    }, {
+                        xtype: 'button',
+                        text: 'Purge Object',
+                        cls: 'x-btn-text-icon',
+                        iconCls: 'remove-datastream-icon',
+                        id: 'purge-object'
                     }]
                 }]
             }, {
                 xtype: 'panel',
                 title: 'Datastream Preview',
                 region: 'east',
-                width: 200
+                width: 350
             }]
         }, {
             xtype: 'panel',
