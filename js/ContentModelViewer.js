@@ -19,7 +19,7 @@ Ext.onReady(function(){
     }
     var viewer = Ext.create('Ext.tab.Panel', {
         width: 800,
-        height: 600,
+        height: 800,
         renderTo: 'content-model-viewer',
         items: tabs
     });

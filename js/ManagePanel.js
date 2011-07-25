@@ -119,9 +119,9 @@ Ext.onReady(function(){
                 title: 'Datastreams',
                 region: 'center',
                 items: [Ext.create('Ext.grid.Panel', {
-                        selType: 'cellmodel',
-                        plugins: [Ext.create('Ext.grid.plugin.CellEditing', {
-                                clicksToEdit: 1
+                        selType: 'rowmodel',
+                        plugins: [Ext.create('Ext.grid.plugin.RowEditing', {
+                                clicksToEdit: 2
                             })],
                         columns: [{
                                 header: 'ID',  
