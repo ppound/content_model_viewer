@@ -1,4 +1,11 @@
 Ext.onReady(function(){
+    Ext.define('ContentModelViewer.widgets.FileUpload', {
+        extend: 'Ext.form.field.File',
+        xtype: 'filefield',
+        name: 'file',
+        fieldLabel: 'File'
+    })
+    
     Ext.define('ContentModelViewer.widgets.ManagePanel', {
         extend: 'Ext.panel.Panel',
         title: 'Manage',
@@ -197,12 +204,15 @@ Ext.onReady(function(){
                                 bodyPadding: 10,
                                 items: [{
                                     xtype: 'textfield',
-                                    fieldLabel: 'Datastream ID'
+                                    name: 'dsid',
+                                    fieldLabel: 'Identifier'
                                 }, {
                                     xtype: 'textfield',
+                                    name: 'label',
                                     fieldLabel: 'Label'
                                 }, {
                                     xtype:'combobox',
+                                    name: 'state',
                                     fieldLabel: 'State',
                                     store: Ext.create('Ext.data.Store', {
                                         fields: ['value', 'name'],
@@ -218,7 +228,7 @@ Ext.onReady(function(){
                                     displayField: 'name',
                                     valueField: 'value',
                                     value: "I"
-                                }]
+                                }, Ext.create('ContentModelViewer.widgets.FileUpload')]
                             },
                             buttons: [{
                                 text: 'Add',
