@@ -128,7 +128,7 @@ Ext.onReady(function(){
         model: ContentModelViewer.models.Datastream,
         autoLoad: true,
         autoSync: true,
-        pageSize: 10,
+        pageSize: 15,
         listeners: {
             write: function(store, operation) {
                 var records = operation.getRecords();
