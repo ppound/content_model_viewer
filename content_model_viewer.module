@@ -294,7 +294,8 @@ function content_model_viewer_purge_object($pid) {
   $item = new Fedora_Item($pid);
   $success = $item->purge();
   $message = $success ? t('Successfuly deleted object') : t('Failed to delete object');
-  return json_encode(array('success' => $success, 'msg' => $message));
+  echo json_encode(array('success' => $success, 'msg' => $message));
+  exit();
 }
 
 /**
@@ -308,19 +309,21 @@ function content_model_viewer_add_datastream($pid) {
   $values = $_POST;
   $dsid = $_POST['dsid'];
   $label = $_POST['label'];
-  $control = $_POST['control_group'];
-  $mime = $_POST['mime_type'];
+  $control = $_POST['control']; // Manage
+  $mime = $_POST['mime_type']; // Set from file type
   $file = array_shift($_FILES);
   if ($file['type'] != $mime) {
     $message = t('Mime type of file does not match the mime type specified.');
-    return json_encode(array('success' => FALSE, 'msg' => $message));
+    echo json_encode(array('success' => FALSE, 'msg' => $message));
+    exit();
   }
   else {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     $item = new Fedora_Item($pid);
     $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, $mime, $control);
     $message = $success ? t('Successfully added datastream.') : t('Failed to add datastream.');
-    return json_encode(array('success' => $success, 'msg' => $message));
+    echo json_encode(array('success' => $success, 'msg' => $message));
+    exit();
   }
 }
 
@@ -337,7 +340,8 @@ function content_model_viewer_purge_datastream($pid, $dsid) {
   $item = new Fedora_Item($pid);
   $success = $item->purge_datastream($dsid);
   $message = $success ? t('Successfully purged datastream.') : t('Failed to purge datastream.');
-  return json_encode(array('success' => $success, 'msg' => $message));
+  echo json_encode(array('success' => $success, 'msg' => $message));
+  exit();
 }
 
 /**

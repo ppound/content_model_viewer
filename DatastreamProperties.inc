@@ -41,7 +41,7 @@ class DatastreamProperties {
    * The datastreams control group.
    * 
    * Potential values: 
-   *  Internal XML Content "I", 
+   *  Internal XML Content "X", 
    *  Managed Content "M",
    *  Externally Referenced Content "E",
    *  Redirect Referenced Content "R",

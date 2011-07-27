@@ -196,20 +196,22 @@ Ext.onReady(function(){
                         // Launch form then post a form to the given url.
                         Ext.create('Ext.window.Window', {
                             title: 'Add Datastream',
-                            height: 200,
-                            width: 400,
+                            height: 250,
+                            width: 375,
                             layout: 'fit',
-                            items: {  // Let's put an empty grid in just to illustrate fit layout
+                            items: [{  // Let's put an empty grid in just to illustrate fit layout
                                 xtype: 'form',
                                 bodyPadding: 10,
                                 items: [{
                                     xtype: 'textfield',
                                     name: 'dsid',
-                                    fieldLabel: 'Identifier'
+                                    fieldLabel: 'Identifier',
+                                    width: 300
                                 }, {
                                     xtype: 'textfield',
                                     name: 'label',
-                                    fieldLabel: 'Label'
+                                    fieldLabel: 'Label',
+                                    width: 300
                                 }, {
                                     xtype:'combobox',
                                     name: 'state',
@@ -228,32 +230,74 @@ Ext.onReady(function(){
                                     displayField: 'name',
                                     valueField: 'value',
                                     value: "I"
-                                }, Ext.create('ContentModelViewer.widgets.FileUpload')]
-                            },
-                            buttons: [{
-                                text: 'Add',
-                                formBind: true, // Only enabled once the form is valid
-                                handler: function(button) {
-                                    button.up('form').getForm().submit({
-                                        url: ContentModelViewer.properties.url.datastream.add,
-                                        waitMsg: 'Creating...',
-                                        success: function(form, action) {
-                                            var store = Ext.data.StoreManager.lookup('datastreams');
-                                            store.sync();
+                                }, {
+                                    xtype:'combobox',
+                                    name: 'control',
+                                    fieldLabel: 'Control Group',
+                                    store: Ext.create('Ext.data.Store', {
+                                        fields: ['value', 'name'],
+                                        data : [{
+                                            "value":"X", 
+                                            "name":"Internal XML"
+                                        }, {
+                                            "value":"M", 
+                                            "name":"Managed Content"
+                                        }, {
+                                            "value":"E", 
+                                            "name":"External Referenced Content"
+                                        }, {
+                                            "value":"R", 
+                                            "name":"Redirect Referenced Content"
+                                        }]
+                                    }),
+                                    queryMode: 'local',
+                                    displayField: 'name',
+                                    valueField: 'value',
+                                    value: "M",
+                                    width: 300,
+                                    listeners: {
+                                        change: function(combobox) {
+                                            var form = combobox.up('form');
+                                            var upload_panel = form.getComponent('upload-panel');
+                                            var external = combobox.value == 'E';
+                                            var redirect = combobox.value == 'R';
+                                            var item = (external || redirect) ? 'url' : 'file';
+                                            upload_panel.getLayout().setActiveItem(item);
                                         }
-                                    });
-                                }
+                                    }
+                                }, {
+                                    xtype: 'panel',
+                                    unstyled: true,
+                                    id: 'upload-panel',
+                                    layout: {
+                                        type: 'card'
+                                    },
+                                    items: [
+                                    Ext.create('ContentModelViewer.widgets.FileUpload', {
+                                        itemId: 'file'
+                                    }), {
+                                        xtype:'textfield',
+                                        itemId: 'url',
+                                        fieldLabel: 'Location',
+                                        name: 'url'
+                                    }],
+                                    buttons: [{
+                                        text: 'Add',
+                                        formBind: true, // Only enabled once the form is valid
+                                        handler: function(button) {
+                                            button.up('form').getForm().submit({
+                                                url: ContentModelViewer.properties.url.datastream.add,
+                                                waitMsg: 'Creating...',
+                                                success: function(form, action) {
+                                                    var store = Ext.data.StoreManager.lookup('datastreams');
+                                                    store.sync();
+                                                }
+                                            });
+                                        }
+                                    }]
+                                }]
                             }]
                         }).show();
-                    /*
-                        var url = ContentModelViewer.properties.url.datastream.add;
-                        Ext.Ajax.request({
-                            url: url,
-                            method: 'POST',
-                            success: function(response){
-                                    
-                            }
-                        });*/
                     }
                 }, {
                     xtype: 'button',
@@ -265,19 +309,31 @@ Ext.onReady(function(){
                     handler : function() {
                         var grid = this.up('gridpanel');
                         var selectionModel = grid.getSelectionModel();
-                        if(selectionModel.hasSelection()) {
-                            var record = selectionModel.selected.first();
-                            var dsid = record.get('dsid');
-                            var url = ContentModelViewer.properties.url.datastream.purge(dsid);
-                            // @todo make sure the grid shows loading...
-                            Ext.Ajax.request({
-                                url: url,
-                                method: 'POST',
-                                success: function(response){
-                                    
+                        Ext.Msg.show({
+                            title:'Remove Datastream?',
+                            msg: 'Are you sure you want to remove this datastream? This action cannot be undone.',
+                            buttons: Ext.Msg.YESNO,
+                            fn: function(choice) {
+                                if(choice == 'yes') {
+                                    var selectionModel = grid.getSelectionModel();
+                                    if(selectionModel.hasSelection()) {
+                                        var record = selectionModel.selected.first();
+                                        var dsid = record.get('dsid');
+                                        var url = ContentModelViewer.properties.url.datastream.purge(dsid);
+                                        Ext.Ajax.request({
+                                            url: url,
+                                            method: 'POST',
+                                            success: function(response){
+                                                Ext.Msg.alert('Status', 'Successfully removed datastream.');
+                                                var store = Ext.data.StoreManager.lookup('datastreams');
+                                                store.loadPage(store.currentPage);
+                                            }
+                                        });
+                                    }
                                 }
-                            });
-                        }
+                            },
+                            icon: Ext.window.MessageBox.QUESTION
+                        });
                     }
                 }, {
                     xtype: 'button',
