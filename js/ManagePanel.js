@@ -126,7 +126,6 @@ Ext.onReady(function(){
             title: 'Datastreams',
             id: 'manage-panel-datastreams',
             region: 'center',
-            height: '100%',
             selType: 'rowmodel',
             plugins: [Ext.create('Ext.grid.plugin.RowEditing', {
                 clicksToEdit: 2
@@ -172,14 +171,16 @@ Ext.onReady(function(){
             listeners: {
                 selectionchange: function(view, selections, options) {
                     var button, record = selections[0];
-                    button = Ext.getCmp('remove-datastream');
-                    button.enable();
-                    button = Ext.getCmp('edit-datastream');
-                    record.get('edit') ? button.enable() : button.disable();
-                    button = Ext.getCmp('view-datastream');
-                    record.get('view') ? button.enable() : button.disable();
-                    button = Ext.getCmp('download-datastream');
-                    record.get('download') ? button.enable() : button.disable();
+                    if(record) {
+                        button = Ext.getCmp('remove-datastream');
+                        button.enable();
+                        button = Ext.getCmp('edit-datastream');
+                        record.get('edit') ? button.enable() : button.disable();
+                        button = Ext.getCmp('view-datastream');
+                        record.get('view') ? button.enable() : button.disable();
+                        button = Ext.getCmp('download-datastream');
+                        record.get('download') ? button.enable() : button.disable();
+                    }
                 }      
             },
             store: Ext.data.StoreManager.lookup('datastreams'),
@@ -324,9 +325,9 @@ Ext.onReady(function(){
                                             url: url,
                                             method: 'POST',
                                             success: function(response){
+                                                var pager = Ext.getCmp('datastream-pager');
+                                                pager.doRefresh();
                                                 Ext.Msg.alert('Status', 'Successfully removed datastream.');
-                                                var store = Ext.data.StoreManager.lookup('datastreams');
-                                                store.loadPage(store.currentPage);
                                             }
                                         });
                                     }
@@ -348,14 +349,7 @@ Ext.onReady(function(){
                         if(selectionModel.hasSelection()) {
                             var record = selectionModel.selected.first();
                             var dsid = record.get('dsid');
-                            var url = ContentModelViewer.properties.url.datastream.download(dsid);
-                            Ext.Ajax.request({
-                                url: url,
-                                method: 'POST',
-                                success: function(response){
-                                    
-                                }
-                            });
+                            var url = ContentModelViewer.properties.url.datastream.edit(dsid);
                         }
                     }
                 },  {
@@ -372,13 +366,11 @@ Ext.onReady(function(){
                             var record = selectionModel.selected.first();
                             var dsid = record.get('dsid');
                             var url = ContentModelViewer.properties.url.datastream.download(dsid);
-                            Ext.Ajax.request({
-                                url: url,
-                                method: 'POST',
-                                success: function(response){
-                                    
-                                }
+                            var form = Ext.get("datastream-download-form");
+                            form.set({
+                                action: url
                             });
+                            document.forms["datastream-download-form"].submit();
                         }
                     }
                 }, {
@@ -394,18 +386,11 @@ Ext.onReady(function(){
                         if(selectionModel.hasSelection()) {
                             var record = selectionModel.selected.first();
                             var dsid = record.get('dsid');
-                            var url = ContentModelViewer.properties.url.datastream.download(dsid);
-                            Ext.Ajax.request({
-                                url: url,
-                                method: 'POST',
-                                success: function(response){
-                                    
-                                }
-                            });
                         }
                     }
                 }]
             },{
+                id: 'datastream-pager',
                 xtype: 'pagingtoolbar',
                 store: Ext.data.StoreManager.lookup('datastreams'),   // same store GridPanel is using
                 dock: 'bottom',
