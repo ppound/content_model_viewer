@@ -66,8 +66,8 @@ Ext.onReady(function(){
             type: 'inclusion', 
             field: 'state',   
             list: ['Active', 'Inactive', 'Deleted']
-        }],
-        proxy: {
+        }]
+        /*proxy: {
             type: 'rest',
             url : ContentModelViewer.properties.url.object.properties,
             reader: {
@@ -75,7 +75,7 @@ Ext.onReady(function(){
                 root: 'data',
                 totalProperty: 'total'
             }
-        }
+        }*/
     });
     Ext.define('ContentModelViewer.models.Datastream', {
         extend: 'Ext.data.Model',
@@ -141,7 +141,7 @@ Ext.onReady(function(){
             }
         }
     });
-    Ext.create('Ext.data.Store', {
+    /*Ext.create('Ext.data.Store', {
         storeId:'objectProperties',
         model: ContentModelViewer.models.FedoraObject,
         autoLoad: true,
@@ -156,5 +156,5 @@ Ext.onReady(function(){
                 }
             }
         }
-    });
+    });*/
 });

@@ -25,6 +25,13 @@ Ext.onReady(function(){
                 height: 245,
                 region: 'center',
                 bodyPadding: 10,
+                waitMsgTarget: true,
+                reader: Ext.create('Ext.data.reader.Json', {
+                    type: 'json',
+                    model: 'ContentModelViewer.models.FedoraObject',
+                    root: 'data',
+                    successProperty: 'success'
+                }),
                 items: [{
                     xtype: 'textfield',
                     fieldLabel: 'Label',
@@ -101,7 +108,13 @@ Ext.onReady(function(){
                     }]
                 }],
                 listeners: {
-                    added: function(form) {
+                    afterrender: function(form) {
+                        form.getForm().load({
+                            method: 'GET',
+                            url: ContentModelViewer.properties.url.object.properties,
+                            waitMsg: 'Loading...'
+                        });
+                    /*
                         var store = Ext.data.StoreManager.lookup('objectProperties');
                         var record = store.first();
                         if(record) {
@@ -112,7 +125,7 @@ Ext.onReady(function(){
                                 var record = store.first();
                                 form.getForm().loadRecord(record);
                             });
-                        }
+                        }*/
                     }
                 }
             }, {
@@ -290,8 +303,23 @@ Ext.onReady(function(){
                                                 url: ContentModelViewer.properties.url.datastream.add,
                                                 waitMsg: 'Creating...',
                                                 success: function(form, action) {
-                                                    var store = Ext.data.StoreManager.lookup('datastreams');
-                                                    store.sync();
+                                                    var pager = Ext.getCmp('datastream-pager');
+                                                    pager.doRefresh();
+                                                    Ext.Msg.alert('Status', 'Successfully Added datastream.');
+                                                    var window = button.up('window');
+                                                    window.close();
+                                                },
+                                                failure: function(form, action) {
+                                                    switch (action.failureType) {
+                                                        case Ext.form.action.Action.CLIENT_INVALID:
+                                                            Ext.Msg.alert('Failure', 'Form fields may not be submitted with invalid values');
+                                                            break;
+                                                        case Ext.form.action.Action.CONNECT_FAILURE:
+                                                            Ext.Msg.alert('Failure', 'Ajax communication failed');
+                                                            break;
+                                                        case Ext.form.action.Action.SERVER_INVALID:
+                                                            Ext.Msg.alert('Failure', action.result.msg);
+                                                    }
                                                 }
                                             });
                                         }

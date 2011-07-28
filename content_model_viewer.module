@@ -196,7 +196,7 @@ function content_model_viewer_overview($pid) {
  * @param string $pid 
  */
 function content_model_viewer_datastreams($pid) {
-  // @todo check to see if the object exists.
+// @todo check to see if the object exists.
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $item = new Fedora_Item($pid);
   $data = array();
@@ -240,7 +240,7 @@ function content_model_viewer_datastream($pid, $dsid) {
           $stdin = fopen("php://input", "r");
           $json = fread($stdin, $_SERVER['CONTENT_LENGTH']);
           $data = json_decode($json);
-          // @todo Update the datastreams properties ...
+// @todo Update the datastreams properties ...
           $data->created = "NOW";
           echo json_encode(array('success' => TRUE, 'msg' => "Successfully modified $dsid's properties", 'data' => $data));
           exit();
@@ -299,7 +299,7 @@ function content_model_viewer_purge_object($pid) {
 }
 
 /**
- * Adds a datastream to the object identified by $pid.
+ * Adds a datastream to the object identified by $pid.*
  *
  * @param string $pid 
  *
@@ -310,21 +310,20 @@ function content_model_viewer_add_datastream($pid) {
   $dsid = $_POST['dsid'];
   $label = $_POST['label'];
   $control = $_POST['control']; // Manage
-  $mime = $_POST['mime_type']; // Set from file type
   $file = array_shift($_FILES);
-  if ($file['type'] != $mime) {
-    $message = t('Mime type of file does not match the mime type specified.');
-    echo json_encode(array('success' => FALSE, 'msg' => $message));
-    exit();
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  $success = false;
+  if ($file['error'] == UPLOAD_ERR_OK) {
+    try {
+      $item = new Fedora_Item($pid);
+      $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, NULL, $control);
+    } catch (Exception $e) {
+      // log some error...
+    }
   }
-  else {
-    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-    $item = new Fedora_Item($pid);
-    $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, $mime, $control);
-    $message = $success ? t('Successfully added datastream.') : t('Failed to add datastream.');
-    echo json_encode(array('success' => $success, 'msg' => $message));
-    exit();
-  }
+  $message = $success ? t('Successfully added datastream.') : t('Failed to add datastream.');
+  echo json_encode(array('success' => $success, 'msg' => $message));
+  exit();
 }
 
 /**
@@ -366,7 +365,7 @@ function content_model_viewer_download_datastream($pid, $dsid) {
  * @return string
  */
 function content_model_viewer_view_datastream($pid, $dsid) {
-  // @todo implement
+// @todo implement
 }
 
 /**
@@ -380,7 +379,7 @@ function content_model_viewer_view_datastream($pid, $dsid) {
 function content_model_viewer_datastream_properties($pid, $dsid) {
   module_load_include('inc', 'content_model_viewer', 'DatastreamProperties');
   if (empty($_POST)) {
-    // @todo detect if the datastream doesn't exist and respond accordingly
+// @todo detect if the datastream doesn't exist and respond accordingly
     $datastream_properties = new DatastreamProperties($pid);
     list($properties, $total) = $datastream_properties->getProperties();
     return json_encode(array('success' => TRUE, 'data' => $properties, 'total' => $total));
