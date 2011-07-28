@@ -320,6 +320,8 @@ Ext.onReady(function(){
                                                         case Ext.form.action.Action.SERVER_INVALID:
                                                             Ext.Msg.alert('Failure', action.result.msg);
                                                     }
+                                                    var window = button.up('window');
+                                                    window.close();
                                                 }
                                             });
                                         }

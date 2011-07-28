@@ -196,7 +196,7 @@ function content_model_viewer_overview($pid) {
  * @param string $pid 
  */
 function content_model_viewer_datastreams($pid) {
-// @todo check to see if the object exists.
+  // @todo check to see if the object exists.
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $item = new Fedora_Item($pid);
   $data = array();
@@ -240,7 +240,7 @@ function content_model_viewer_datastream($pid, $dsid) {
           $stdin = fopen("php://input", "r");
           $json = fread($stdin, $_SERVER['CONTENT_LENGTH']);
           $data = json_decode($json);
-// @todo Update the datastreams properties ...
+          // @todo Update the datastreams properties ...
           $data->created = "NOW";
           echo json_encode(array('success' => TRUE, 'msg' => "Successfully modified $dsid's properties", 'data' => $data));
           exit();
@@ -316,7 +316,9 @@ function content_model_viewer_add_datastream($pid) {
   if ($file['error'] == UPLOAD_ERR_OK) {
     try {
       $item = new Fedora_Item($pid);
-      $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, NULL, $control);
+      if (empty($item->datastreams[$dsid])) {
+        $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, NULL, $control);
+      }
     } catch (Exception $e) {
       // log some error...
     }
