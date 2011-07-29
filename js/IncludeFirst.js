@@ -15,6 +15,7 @@ Ext.onReady(function(){
      */
     ContentModelViewer.properties.pid = $('#pid').text();
     ContentModelViewer.properties.dsid = $('#dsid').text();
+    ContentModelViewer.properties.viewFunction = $('#view_function').text();
     ContentModelViewer.properties.url = {
         object: {
             overview: $('#object_overview_url').text(),
@@ -43,6 +44,22 @@ Ext.onReady(function(){
         }
     };
     /**
+     * Define Functions
+     */
+    ContentModelViewer.functions = {
+        selectDatastream: function(dsid) {
+          // @todo implement  
+        },
+        viewSelectedDatastream: function() {
+            var pid = ContentModelViewer.properties.pid;
+            var dsid = ContentModelViewer.properties.dsid;
+            var view_function = ContentModelViewer.properties.viewFunction;
+            if(view_function) {
+                eval(view_function)(pid, dsid);
+            }
+        }
+    }
+    /**
      * Define Models.
      */
     Ext.define('ContentModelViewer.models.FedoraObject', {
@@ -68,15 +85,6 @@ Ext.onReady(function(){
             field: 'state',   
             list: ['Active', 'Inactive', 'Deleted']
         }]
-        /*proxy: {
-            type: 'rest',
-            url : ContentModelViewer.properties.url.object.properties,
-            reader: {
-                type: 'json',
-                root: 'data',
-                totalProperty: 'total'
-            }
-        }*/
     });
     Ext.define('ContentModelViewer.models.Datastream', {
         extend: 'Ext.data.Model',
@@ -142,20 +150,4 @@ Ext.onReady(function(){
             }
         }
     });
-    /*Ext.create('Ext.data.Store', {
-        storeId:'objectProperties',
-        model: ContentModelViewer.models.FedoraObject,
-        autoLoad: true,
-        listeners: {
-            write: function(store, operation) {
-                var records = operation.getRecords();
-                if(operation.wasSuccessful()) {
-                    for (var i = 0; i < records.length; i++) {
-                        var record = records[i];
-                        record.commit();
-                    }
-                }
-            }
-        }
-    });*/
 });

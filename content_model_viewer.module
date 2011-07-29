@@ -200,7 +200,8 @@ function template_preprocess_content_model_viewer(array &$variables) {
   global $base_url;
   $pid = $variables['pid'];
   $variables['base_url'] = $base_url;
-  $variables['dsid'] = 'PDF';
+  $variables['dsid'] = 'SWF';
+  $variables['view_function'] = 'loadFlexPlayer';
   $variables['paths'] = array(
     'object' => array(
       'overview' => "viewer/$pid/overview",

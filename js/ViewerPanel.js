@@ -6,20 +6,18 @@ Ext.onReady(function(){
             type: 'border'
         },
         items: [{
-            xtype: 'panel',
-            region: 'center',
-            html: '<div>Loading...</div>',
-            loader: {
-                url: ContentModelViewer.properties.url.datastream.view(ContentModelViewer.properties.dsid),
-                renderer: 'html',
-                loadMask: true,
-                autoLoad: true,
-                success: function() {
-                    var pid = ContentModelViewer.properties.pid;
-                    var dsid = ContentModelViewer.properties.dsid;
-                    loadFlexPlayer(pid, dsid);
+                xtype: 'panel',
+                region: 'center',
+                id: 'datastream-viewer',
+                loader: {
+                    url: ContentModelViewer.properties.url.datastream.view(ContentModelViewer.properties.dsid),
+                    renderer: 'html',
+                    loadMask: true,
+                    autoLoad: true,
+                    success: function() {
+                        ContentModelViewer.functions.viewSelectedDatastream();
+                    }
                 }
-            }
-        }, Ext.create('ContentModelViewer.widgets.FilesPanel')]
+            }, Ext.create('ContentModelViewer.widgets.FilesPanel')]
     });
 });
