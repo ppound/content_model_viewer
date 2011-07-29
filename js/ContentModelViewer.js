@@ -10,10 +10,10 @@ Ext.onReady(function(){
     }
     if(ContentModelViewer.widgets.CollectionPanel !== undefined) {
         tabs.push(Ext.create('ContentModelViewer.widgets.CollectionPanel'));
-    }
+    }*/
     if(ContentModelViewer.widgets.ViewerPanel !== undefined) {
         tabs.push(Ext.create('ContentModelViewer.widgets.ViewerPanel'));
-    }*/
+    }
     if(ContentModelViewer.widgets.ManagePanel !== undefined) {
         tabs.push(Ext.create('ContentModelViewer.widgets.ManagePanel'));
     }

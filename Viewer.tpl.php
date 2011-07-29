@@ -1,6 +1,8 @@
 <div id="content-model-viewer">
   <div style="display:none" id="properties">
     <div id="pid"><?php print $pid; ?></div>
+    <div id="dsid"><?php print $dsid; ?></div>
+    <div id="base_url"><?php print $base_url; ?></div>
     <div id="object_overview_url"><?php print check_url(url($paths['object']['overview'])); ?></div>
     <div id="object_properties_url"><?php print check_url(url($paths['object']['properties'])); ?></div>
     <div id="object_datastreams_url"><?php print check_url(url($paths['object']['datastreams'])); ?></div>

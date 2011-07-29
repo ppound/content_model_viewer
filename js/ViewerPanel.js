@@ -7,8 +7,19 @@ Ext.onReady(function(){
         },
         items: [{
             xtype: 'panel',
-            html: '<div>viewer</div>',
-            region: 'center'
+            region: 'center',
+            html: '<div>Loading...</div>',
+            loader: {
+                url: ContentModelViewer.properties.url.datastream.view(ContentModelViewer.properties.dsid),
+                renderer: 'html',
+                loadMask: true,
+                autoLoad: true,
+                success: function() {
+                    var pid = ContentModelViewer.properties.pid;
+                    var dsid = ContentModelViewer.properties.dsid;
+                    loadFlexPlayer(pid, dsid);
+                }
+            }
         }, Ext.create('ContentModelViewer.widgets.FilesPanel')]
     });
 });

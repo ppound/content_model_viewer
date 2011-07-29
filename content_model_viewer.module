@@ -126,12 +126,81 @@ function content_model_viewer_theme() {
 }
 
 /**
+ * Loads all the installed module classes.
+ */
+function content_model_viewer_include_content_models() {
+  $include_path = drupal_get_path('module', 'content_model_viewer') . "/models";
+  $dir = opendir($include_path);
+  if ($dir !== false) {
+    while (($file = readdir($dir)) !== false) {
+      if (preg_match('/\.inc$/', $file)) {
+        require_once "$include_path/$file";
+      }
+    }
+  }
+  closedir($dir);
+}
+
+/**
+ * Get the list of installed ContentModelViewer classes.
+ */
+function content_model_viewer_get_models() {
+  $models = array();
+  $classes = get_declared_classes();
+  foreach ($classes as $class) {
+    if ($class instanceof ContentModelViewer) {
+      $models[] = $class;
+    }
+  }
+  return $models;
+}
+
+/**
+ * Loads all the installed viewer classes.
+ */
+function content_model_viewer_include_viewers() {
+  $include_path = drupal_get_path('module', 'content_model_viewer') . "/viewers";
+  $dir = opendir($include_path);
+  if ($dir !== false) {
+    while (($file = readdir($dir)) !== false) {
+      if (preg_match('/\.inc$/', $file)) {
+        require_once "$include_path/$file";
+      }
+    }
+  }
+  closedir($dir);
+}
+
+/**
+ * Gets the Supported Viewers.
+ * 
+ * @staticvar array $cache
+ * @return array
+ */
+function content_model_viewer_get_supported_viewers() {
+  static $cache;
+  if (!isset($cache)) {
+    $cache = array();
+    foreach (module_implements('elements') as $module) {
+      $elements = module_invoke($module, 'elements');
+      if (isset($elements) && is_array($elements)) {
+        $cache = array_merge_recursive($cache, $elements);
+      }
+    }
+  }
+  return $cache;
+}
+
+/**
  * Sets up variables for the template.
  * 
  * @param array $variables
  */
 function template_preprocess_content_model_viewer(array &$variables) {
+  global $base_url;
   $pid = $variables['pid'];
+  $variables['base_url'] = $base_url;
+  $variables['dsid'] = 'PDF';
   $variables['paths'] = array(
     'object' => array(
       'overview' => "viewer/$pid/overview",
@@ -162,19 +231,19 @@ function content_model_viewer($pid) {
   drupal_add_js($ext_path . '/ext-all-dev.js');
   drupal_add_css($path . '/css/Clear.css');
   drupal_add_css($ext_path . '/resources/css/ext-all-gray.css', 'theme', 'all');
-  /* Load Viewer */
+  /* Load Panels/Widgets */
   $js_path = $path . '/js';
-  /* @todo Determine what widgits need to be defined. */
   drupal_add_js($js_path . '/IncludeFirst.js');
   drupal_add_js($js_path . '/FilesPanel.js'); /* Appears on the OverviewPanel and the Viewer Panel */
-  /* @todo Determine what panels to render */
   drupal_add_js($js_path . '/OverviewPanel.js');
   drupal_add_js($js_path . '/CollectionPanel.js');
   drupal_add_js($js_path . '/ViewerPanel.js');
   drupal_add_js($js_path . '/ManagePanel.js');
   drupal_add_js($js_path . '/ContentModelViewer.js');
   drupal_add_css($path . '/css/ContentModelViewer.css');
-  /* @todo: Load required javascript for each datastream viewer */
+  /* Load Viewers */
+  module_load_include('inc', 'content_model_viewer', 'viewers/AbstractViewer');
+  AbstractViewer::LoadRequiredResourcesForAllViewers();
   return theme('content_model_viewer', $pid);
 }
 
@@ -186,6 +255,11 @@ function content_model_viewer($pid) {
  * @return string
  */
 function content_model_viewer_overview($pid) {
+  content_model_viewer_include_content_models(); // Include Content Models.
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  module_load_include('inc', 'fedora_repository', 'ContentModel');
+  //$content_model = ContentModel::loadFromObject($pid);
+  //module_invoke_all('');
   echo '<div>Over View Panel</div>';
   exit();
 }
@@ -367,7 +441,15 @@ function content_model_viewer_download_datastream($pid, $dsid) {
  * @return string
  */
 function content_model_viewer_view_datastream($pid, $dsid) {
-// @todo implement
+  content_model_viewer_include_viewers();
+  // @todo get the viewer for the datastream
+  $viewer_exists = false;
+  if (!$viewer_exists) {
+    $viewer = new FlexPaperViewer();
+    echo $viewer->render($pid, $dsid);
+    exit();
+  }
+  exit();
 }
 
 /**

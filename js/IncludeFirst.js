@@ -14,6 +14,7 @@ Ext.onReady(function(){
      * Set Properties
      */
     ContentModelViewer.properties.pid = $('#pid').text();
+    ContentModelViewer.properties.dsid = $('#dsid').text();
     ContentModelViewer.properties.url = {
         object: {
             overview: $('#object_overview_url').text(),
