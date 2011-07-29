@@ -8,6 +8,7 @@ Ext.onReady(function(){
     
     Ext.define('ContentModelViewer.widgets.ManagePanel', {
         extend: 'Ext.panel.Panel',
+        itemId: 'manage',
         title: 'Manage',
         layout: {
             type: 'border'
@@ -114,18 +115,6 @@ Ext.onReady(function(){
                             url: ContentModelViewer.properties.url.object.properties,
                             waitMsg: 'Loading...'
                         });
-                    /*
-                        var store = Ext.data.StoreManager.lookup('objectProperties');
-                        var record = store.first();
-                        if(record) {
-                            form.getForm().loadRecord(record);
-                        }
-                        else {
-                            store.addListener('load', function (store) {
-                                var record = store.first();
-                                form.getForm().loadRecord(record);
-                            });
-                        }*/
                     }
                 }
             }, {
@@ -207,13 +196,12 @@ Ext.onReady(function(){
                     iconCls: 'add-datastream-icon',
                     id: 'add-datastream',
                     handler : function() {
-                        // Launch form then post a form to the given url.
                         Ext.create('Ext.window.Window', {
                             title: 'Add Datastream',
                             height: 250,
                             width: 375,
                             layout: 'fit',
-                            items: [{  // Let's put an empty grid in just to illustrate fit layout
+                            items: [{
                                 xtype: 'form',
                                 bodyPadding: 10,
                                 items: [{
@@ -415,7 +403,8 @@ Ext.onReady(function(){
                         var selectionModel = grid.getSelectionModel();
                         if(selectionModel.hasSelection()) {
                             var record = selectionModel.selected.first();
-                            var dsid = record.get('dsid');
+                            ContentModelViewer.functions.selectDatastreamRecord(record);
+                            ContentModelViewer.functions.viewSelectedDatastreamRecord();
                         }
                     }
                 }]

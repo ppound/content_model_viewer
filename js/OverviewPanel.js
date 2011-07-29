@@ -1,6 +1,7 @@
 Ext.onReady(function(){
     Ext.define('ContentModelViewer.widgets.OverviewPanel', {
         extend: 'Ext.panel.Panel',
+        itemId: 'overview',
         title: 'Overview',
         layout: {
             type: 'border'

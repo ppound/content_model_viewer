@@ -47,10 +47,21 @@ Ext.onReady(function(){
      * Define Functions
      */
     ContentModelViewer.functions = {
-        selectDatastream: function(dsid) {
-          // @todo implement  
+        selectDatastreamRecord: function(record) {
+            ContentModelViewer.properties.dsid = record.get('dsid');
+            ContentModelViewer.properties.viewFunction = record.get('view_function');
         },
-        viewSelectedDatastream: function() {
+        viewSelectedDatastreamRecord: function() {
+            var viewer = Ext.getCmp('datastream-viewer');
+            var loader = viewer.getLoader();
+            loader.load({
+                url: ContentModelViewer.properties.url.datastream.view(ContentModelViewer.properties.dsid)
+            });
+            var viewerPanel = viewer.up('panel');
+            var tabpanel = viewer.up('tabpanel');
+            tabpanel.setActiveTab(viewerPanel);
+        },
+        callDatastreamViewFunction: function() {
             var pid = ContentModelViewer.properties.pid;
             var dsid = ContentModelViewer.properties.dsid;
             var view_function = ContentModelViewer.properties.viewFunction;
@@ -113,6 +124,9 @@ Ext.onReady(function(){
         }, {
             name: 'tn', 
             type: 'string'
+        }, {
+            name: 'view_function', 
+            type: 'string'
         }],
         validations: [{
             type: 'inclusion', 
@@ -130,8 +144,8 @@ Ext.onReady(function(){
         }
     });
     /**
-     * Create Stores
-     */
+ * Create Stores
+ */
     Ext.create('Ext.data.Store', {
         storeId:'datastreams',
         model: ContentModelViewer.models.Datastream,

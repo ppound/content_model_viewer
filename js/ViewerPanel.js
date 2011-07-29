@@ -1,6 +1,7 @@
 Ext.onReady(function(){
     Ext.define('ContentModelViewer.widgets.ViewerPanel', {
         extend: 'Ext.panel.Panel',
+        itemId: 'viewer',
         title: 'Viewer',
         layout: {
             type: 'border'
@@ -15,7 +16,7 @@ Ext.onReady(function(){
                     loadMask: true,
                     autoLoad: true,
                     success: function() {
-                        ContentModelViewer.functions.viewSelectedDatastream();
+                        ContentModelViewer.functions.callDatastreamViewFunction();
                     }
                 }
             }, Ext.create('ContentModelViewer.widgets.FilesPanel')]

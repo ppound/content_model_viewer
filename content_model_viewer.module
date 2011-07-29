@@ -286,8 +286,9 @@ function content_model_viewer_datastreams($pid) {
       $stream['state'] = 'A';
       $stream['mime'] = $attr['MIMEType'];
       $stream['created'] = '';
-      $stream['view'] = true;
-      $stream['download'] = true;
+      $stream['view'] = true; // From Files Panel
+      $stream['view_function'] = 'loadFlexPlayer';
+      $stream['download'] = true; // From Files Panel
       $stream['tn'] = 'some url';
       $data[] = $stream;
     }
