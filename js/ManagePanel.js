@@ -37,12 +37,12 @@ Ext.onReady(function(){
                     xtype: 'textfield',
                     fieldLabel: 'Label',
                     name: 'label',
-                    width: 400
+                    width: 350
                 }, {
                     xtype: 'textfield',
                     fieldLabel: 'Owner',
                     name: 'owner',
-                    width: 400
+                    width: 350
                 }, {
                     xtype: 'combobox',
                     fieldLabel: 'State',
