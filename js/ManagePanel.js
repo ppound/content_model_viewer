@@ -29,7 +29,7 @@ Ext.onReady(function(){
                 waitMsgTarget: true,
                 reader: Ext.create('Ext.data.reader.Json', {
                     type: 'json',
-                    model: 'ContentModelViewer.models.FedoraObject',
+                    model: 'ContentModelViewer.models.ObjectProperties',
                     root: 'data',
                     successProperty: 'success'
                 }),

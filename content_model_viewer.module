@@ -30,6 +30,12 @@ function content_model_viewer_menu() {
     'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
     'type' => MENU_NORMAL_ITEM,
   );
+  $items['viewer/%/members'] = array(
+    'page callback' => 'content_model_viewer_members',
+    'page arguments' => array(1),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
+    'type' => MENU_CALLBACK,
+  );
   $items['viewer/%/properties'] = array(
     'page callback' => 'content_model_viewer_properties',
     'page arguments' => array(1),
@@ -39,12 +45,6 @@ function content_model_viewer_menu() {
   $items['viewer/%/datastreams'] = array(
     'page callback' => 'content_model_viewer_datastreams',
     'page arguments' => array(1),
-    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
-    'type' => MENU_CALLBACK,
-  );
-  $items['viewer/%/datastreams/%'] = array(
-    'page callback' => 'content_model_viewer_datastream',
-    'page arguments' => array(1, 3),
     'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
     'type' => MENU_CALLBACK,
   );
@@ -85,7 +85,7 @@ function content_model_viewer_menu() {
     'type' => MENU_CALLBACK,
   );
   $items['viewer/%/%/properties'] = array(
-    'page callback' => 'content_model_viewer_properties',
+    'page callback' => '',
     'page arguments' => array(1, 2),
     'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_MODIFY_DATASTEAM_PROPERTIES),
     'type' => MENU_CALLBACK,
@@ -207,12 +207,13 @@ function template_preprocess_content_model_viewer(array &$variables) {
       'overview' => "viewer/$pid/overview",
       'properties' => "viewer/$pid/properties",
       'datastreams' => "viewer/$pid/datastreams",
+      'members' => "viewer/$pid/members",
       'purge' => "viewer/$pid/purge"
     ),
     'datastream' => array(
       'add' => "viewer/$pid/add",
       'purge' => "viewer/$pid/dsid/purge",
-      'properties' => "viewer/dsid/properties",
+      'properties' => "viewer/$pid/dsid/properties",
       'download' => "viewer/$pid/dsid/download",
       'view' => "viewer/$pid/dsid/view"
     )
@@ -261,6 +262,48 @@ function content_model_viewer_overview($pid) {
   //$content_model = ContentModel::loadFromObject($pid);
   //module_invoke_all('');
   echo '<div>Over View Panel</div>';
+  exit();
+}
+
+/**
+ * Gets the members of this collection.
+ * 
+ * @param string $pid 
+ */
+function content_model_viewer_members($pid) {
+  global $base_url;
+  $module_path = drupal_get_path('module', 'content_model_viewer');
+  $data = array(
+    array(
+      'link' => $base_url . '/viewer/' . 'coccc:1675',
+      'label' => 'Some Colorado College Object',
+      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the \"yearbox.\"',
+      'owner' => 'fedoraAdmin',
+      'created' => '2011-06-17T15:15:57.214Z',
+      'modified' => '2011-07-15T19:08:16.008Z',
+      'tn' => '/' . $module_path. '/images/collection.png',
+    ),
+    array(
+      'link' => $base_url . '/viewer/' . 'coccc:1675',
+      'label' => 'Some Colorado College Object',
+      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the \"yearbox.\"',
+      'owner' => 'fedoraAdmin',
+      'created' => '2011-06-17T15:15:57.214Z',
+      'modified' => '2011-07-15T19:08:16.008Z',
+      'tn' => '/' . $module_path. '/images/collection.png',
+    ),
+    array(
+      'link' => $base_url . '/viewer/' . 'coccc:1675',
+      'label' => 'Some Colorado College Object',
+      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the \"yearbox.\"',
+      'owner' => 'fedoraAdmin',
+      'created' => '2011-06-17T15:15:57.214Z',
+      'modified' => '2011-07-15T19:08:16.008Z',
+      'tn' => '/' . $module_path. '/images/collection.png',
+    )
+  );
+  $total = 3;
+  echo json_encode(array('success' => TRUE, 'data' => $data, 'total' => $total));
   exit();
 }
 
@@ -464,7 +507,7 @@ function content_model_viewer_view_datastream($pid, $dsid) {
 function content_model_viewer_datastream_properties($pid, $dsid) {
   module_load_include('inc', 'content_model_viewer', 'DatastreamProperties');
   if (empty($_POST)) {
-// @todo detect if the datastream doesn't exist and respond accordingly
+    // @todo detect if the datastream doesn't exist and respond accordingly
     $datastream_properties = new DatastreamProperties($pid);
     list($properties, $total) = $datastream_properties->getProperties();
     return json_encode(array('success' => TRUE, 'data' => $properties, 'total' => $total));

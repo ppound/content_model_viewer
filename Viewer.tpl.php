@@ -7,6 +7,7 @@
     <div id="object_overview_url"><?php print check_url(url($paths['object']['overview'])); ?></div>
     <div id="object_properties_url"><?php print check_url(url($paths['object']['properties'])); ?></div>
     <div id="object_datastreams_url"><?php print check_url(url($paths['object']['datastreams'])); ?></div>
+    <div id="object_members_url"><?php print check_url(url($paths['object']['members'])); ?></div>
     <div id="object_purge_url"><?php print check_url(url($paths['object']['purge'])); ?></div>
     <div id="datastream_add_url"><?php print check_url(url($paths['datastream']['add'])); ?></div>
     <div id="datastream_purge_url"><?php print check_url(url($paths['datastream']['purge'])); ?></div>

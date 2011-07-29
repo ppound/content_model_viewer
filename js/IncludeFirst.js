@@ -21,6 +21,7 @@ Ext.onReady(function(){
             overview: $('#object_overview_url').text(),
             properties: $('#object_properties_url').text(),
             datastreams: $('#object_datastreams_url').text(),
+            members: $('#object_members_url').text(),
             purge: $('#object_purge_url').text()
         },
         datastream: {
@@ -76,6 +77,31 @@ Ext.onReady(function(){
     Ext.define('ContentModelViewer.models.FedoraObject', {
         extend: 'Ext.data.Model',
         fields: [{
+            name: 'link',  
+            type: 'string'
+        }, {
+            name: 'label',  
+            type: 'string'
+        }, {
+            name: 'description',   
+            type: 'string'
+        }, {
+            name: 'owner', 
+            type: 'string'
+        }, {
+            name: 'created', 
+            type: 'string'
+        }, {
+            name: 'modified', 
+            type: 'string'
+        }, {
+            name: 'tn',
+            type: 'string'
+        }]
+    });
+    Ext.define('ContentModelViewer.models.ObjectProperties', {
+        extend: 'Ext.data.Model',
+        fields: [{
             name: 'label',  
             type: 'string'
         }, {
@@ -93,7 +119,7 @@ Ext.onReady(function(){
         },],
         validations: [{
             type: 'inclusion', 
-            field: 'state',   
+            field: 'state',
             list: ['Active', 'Inactive', 'Deleted']
         }]
     });
@@ -147,6 +173,21 @@ Ext.onReady(function(){
      * Create Stores
      */
     Ext.create('Ext.data.Store', {
+        storeId:'members',
+        model: ContentModelViewer.models.FedoraObject,
+        autoLoad: true,
+        autoSync: true,
+        pageSize: 10,
+        proxy: {
+            type: 'ajax',
+            url : ContentModelViewer.properties.url.object.members,
+            reader: {
+                type: 'json',
+                root: 'data'
+            }
+        }
+    });
+    Ext.create('Ext.data.Store', {
         storeId:'datastreams',
         model: ContentModelViewer.models.Datastream,
         autoLoad: true,
@@ -164,9 +205,6 @@ Ext.onReady(function(){
             }
         }
     });
-    /**
-     * 
-     */
     Ext.create('Ext.data.Store', {
         storeId:'files',
         model: ContentModelViewer.models.Datastream,

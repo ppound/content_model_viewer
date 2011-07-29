@@ -64,6 +64,31 @@
     font-size: 1.3em;
 }
 
+.member-item {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.member-item-img {
+    margin-left: auto;
+    margin-right: auto;
+    float: left;
+    height: 64px;
+    width: 64px;
+}
+
+/*
+.member-item-label {
+    text-align: center;
+    
+}
+
+.member-item-description {
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+}*/
+
 .x-list-selected {
     background-color: #ffff00;
 }
