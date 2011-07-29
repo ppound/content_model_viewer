@@ -235,7 +235,6 @@ function content_model_viewer($pid) {
   /* Load Panels/Widgets */
   $js_path = $path . '/js';
   drupal_add_js($js_path . '/IncludeFirst.js');
-  drupal_add_js($js_path . '/FilesPanel.js'); /* Appears on the OverviewPanel and the Viewer Panel */
   drupal_add_js($js_path . '/OverviewPanel.js');
   drupal_add_js($js_path . '/CollectionPanel.js');
   drupal_add_js($js_path . '/ViewerPanel.js');

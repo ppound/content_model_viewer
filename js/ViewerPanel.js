@@ -35,8 +35,15 @@ Ext.onReady(function(){
                     cls: 'x-btn-text-icon',
                     iconCls: 'view-datastream-icon',
                     disabled: true,
+                    id: 'viewer-view-file',
                     handler : function() {
-                    
+                        var view = this.up('panel').down('dataview');
+                        var selectionModel = view.getSelectionModel();
+                        if(selectionModel.hasSelection()) {
+                            var record = selectionModel.selected.first();
+                            ContentModelViewer.functions.selectDatastreamRecord(record);
+                            ContentModelViewer.functions.viewSelectedDatastreamRecord();
+                        }
                     }
                 }, {
                     xtype: 'button',
@@ -44,8 +51,20 @@ Ext.onReady(function(){
                     cls: 'x-btn-text-icon',
                     iconCls: 'download-datastream-icon',
                     disabled: true,
+                    id: 'viewer-download-file',
                     handler : function() {
-                    
+                        var view = this.up('panel').down('dataview');
+                        var selectionModel = view.getSelectionModel();
+                        if(selectionModel.hasSelection()) {
+                            var record = selectionModel.selected.first();
+                            var dsid = record.get('dsid');
+                            var url = ContentModelViewer.properties.url.datastream.download(dsid);
+                            var form = Ext.get("datastream-download-form");
+                            form.set({
+                                action: url
+                            });
+                            document.forms["datastream-download-form"].submit();
+                        }
                     }
                 }]
             },{
@@ -77,12 +96,12 @@ Ext.onReady(function(){
                         }
                     }),
                 listeners: {
-                    selectionchanged: function(view, selections, options) {
+                    selectionchange: function(view, selections, options) {
                         var button, record = selections[0];
                         if(record) {
-                            button = Ext.getCmp('view-file');
+                            button = Ext.getCmp('viewer-view-file');
                             record.get('view') ? button.enable() : button.disable();
-                            button = Ext.getCmp('download-file');
+                            button = Ext.getCmp('viewer-download-file');
                             record.get('download') ? button.enable() : button.disable();
                         }
                     } 
