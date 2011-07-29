@@ -50,9 +50,14 @@ class FieldBookModelViewer {
   /**
    * Gets datastreams.
    * 
+   * @param boolean $filter
+   *   Filter datastreams for users.
+   * 
    * @return array
+   *   The first value is the array of datastream properties, the second value it the number of datastreams that
+   *   can be used.
    */
-  public function getDatastreams() {
+  public function getDatastreams($filter = false) {
     $count = 0;
     $data = array();
     $start = $_GET['start'];
@@ -62,30 +67,55 @@ class FieldBookModelViewer {
       $passed_start = $count >= $start;
       $within_limit = (empty($end) || $count < $end);
       $within_range = $passed_start && $within_limit;
-      if ($within_range) {
-        $stream['dsid'] = $dsid;
-        $stream['label'] = $attr['label'];
-        $stream['state'] = $attr['state'];
-        $stream['mime'] = $attr['MIMEType'];
-        $stream['created'] = '';
-        $stream['view'] = $this->getViewableDatastream($dsid); // From Files Panel
-        $stream['view_function'] = ($stream['view']) ?
-            $this->getViewerLoadFunction($stream['view']) :
-            null;
-        $stream['download'] = $this->getDownloadableDatastream($dsid); // From Files Panel
-        $stream['tn'] = $this->getThumbnail($dsid);
-        $data[] = $stream;
+      $allowed = $filter ? $this->isDatastreamVisibleToUser($dsid) : true;
+      if ($allowed) {
+        if ($within_range) {
+          $view = ($filter) ?
+              $this->getViewableDatastream($dsid) :
+              $this->isDatastreamViewable($dsid) ?
+                  $dsid :
+                  NULL;
+          $view_function = $view ?
+              $this->getViewerLoadFunction($stream['view']) :
+              NULL;
+          $download = ($filter) ?
+              $this->getDownloadableDatastream($dsid) :
+              $dsid;
+          $data[] = array(
+            'dsid' => $dsid,
+            'label' => $attr['label'],
+            'state' => $attr['state'],
+            'mime' => $attr['MIMEType'],
+            'created' => '',
+            'view' => $view,
+            'view_function' => $view_function,
+            'download' => $download,
+            'tn' => $this->getThumbnail($dsid)
+          );
+        }
+        $count++;
       }
-      $count++;
     }
-    return $data;
+    return array($data, $count);
   }
 
   /**
-   * Gets a datastream to view.
+   * Checks to see if this datastream should be visible to the user.
+   * 
+   * @param string $dsid 
+   * 
+   * @return boolean
+   */
+  private function isDatastreamVisibleToUser($dsid) {
+    return true;
+  }
+
+  /**
+   * Gets the dsid for the datastream to render into the viewer.
    * 
    * Some datastreams with mime-type like 'application/pdf' are not viewable, In these cases we need to 
-   * use a derived type to view the datastream. Most of the time we will return.
+   * use a derived type to view the datastream. In a case like that we would return the dsid of a 
+   * datastream that has a mime-type of 'application/shockwave-flash'.
    * 
    * @param string $dsid 
    * 
@@ -98,7 +128,12 @@ class FieldBookModelViewer {
   }
 
   /**
+   * Gets the dsid for the datastream 
    * 
+   * Some datastreams may be locked down, such as a original source image. In these cases we may allow the user 
+   * to download a reduced quality version of the original source image. In a case like that we would return the dsid
+   * for the reduced quality version of the original source image. In most cases this function will return the same 
+   * value as its parameter.
    * 
    * @param string $dsid 
    * 
@@ -109,7 +144,12 @@ class FieldBookModelViewer {
   }
 
   /**
-   *
+   * Returns a string that identifies a javascript function to be run after the viewer is rendered into 
+   * the viewer panel.
+   * 
+   * The javascript function is expected to do any final processing required to render the viewer for the given
+   * datastream
+   * 
    * @param string $dsid 
    * 
    * @return string
