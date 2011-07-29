@@ -38,20 +38,20 @@
     background-image:url(../images/icon/remove.png);
 }
 
-.adr-file {
+.file-item {
     padding-top: 5px;
     padding-bottom: 10px;
+    cursor: pointer;
+}
+.file-item.x-item-selected {
+    background-color: #D3E1F1 !important;
 }
 
-.adr-file-selectable {
-
-}
-
-.adr-file .adr-file-label {
+.file-item .file-item-label {
     text-align: center;
 }
 
-.adr-file .adr-file-img {
+.file-item .file-item-img {
     margin-left: auto;
     margin-right: auto;
     display: block;
@@ -59,52 +59,9 @@
     width: 96px;
 }
 
-.adr-file .adr-file-dsid {
+.file-item .file-item-dsid {
     text-align: center;
     font-size: 1.3em;
-}
-
-.adr-file .adr-file-controls {
-    vertical-align: middle;
-    text-align: center;
-}
-
-.adr-file-controls .adr-file-view{
-    padding: 3px;
-}
-
-.adr-file-controls .adr-file-download {
-    padding: 3px;
-}
-
-.adr-edit-file {
-    float: left;
-    width: 200px;
-    height: 180px;
-    padding: 10px;
-}
-
-.adr-edit-file .adr-edit-file-label {
-    text-align: center;
-    font-size: 1.3em;
-}
-
-.adr-edit-file .adr-edit-file-img {
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 100%;
-    width: 128px;
-    height: 128px;
-    clip: rect(0px 128px 128px 0px);
-    display: block;
-}
-
-.adr-edit-file .adr-edit-file-dsid {
-    text-align: center;
-}
-
-#adr-manage-object-properties th {
-    padding-right: 10px;
 }
 
 .x-list-selected {

@@ -144,8 +144,8 @@ Ext.onReady(function(){
         }
     });
     /**
- * Create Stores
- */
+     * Create Stores
+     */
     Ext.create('Ext.data.Store', {
         storeId:'datastreams',
         model: ContentModelViewer.models.Datastream,
@@ -163,5 +163,14 @@ Ext.onReady(function(){
                 }
             }
         }
+    });
+    /**
+     * 
+     */
+    Ext.create('Ext.data.Store', {
+        storeId:'files',
+        model: ContentModelViewer.models.Datastream,
+        autoLoad: true,
+        pageSize: 4
     });
 });
