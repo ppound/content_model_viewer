@@ -177,7 +177,7 @@ Ext.onReady(function(){
         model: ContentModelViewer.models.FedoraObject,
         autoLoad: true,
         autoSync: true,
-        pageSize: 10,
+        pageSize: 6,
         proxy: {
             type: 'ajax',
             url : ContentModelViewer.properties.url.object.members,

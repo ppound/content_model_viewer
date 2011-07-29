@@ -6,19 +6,7 @@ Ext.onReady(function(){
         dockedItems: [{
             xtype: 'toolbar',
             dock: 'top',
-            items: [{
-                xtype: 'button',
-                text: 'Edit Permissions',
-                cls: 'x-btn-text-icon',
-                iconCls: 'edit-datastream-icon',
-                id: 'edit-xacml'
-            }, {
-                xtype: 'button',
-                text: 'Purge Object',
-                cls: 'x-btn-text-icon',
-                iconCls: 'remove-datastream-icon',
-                id: 'purge-object'
-            }]
+            items: []
         }, {
             id: 'collection-pager',
             xtype: 'pagingtoolbar',

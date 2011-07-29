@@ -277,7 +277,7 @@ function content_model_viewer_members($pid) {
     array(
       'link' => $base_url . '/viewer/' . 'coccc:1675',
       'label' => 'Some Colorado College Object',
-      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the \"yearbox.\"',
+      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the',
       'owner' => 'fedoraAdmin',
       'created' => '2011-06-17T15:15:57.214Z',
       'modified' => '2011-07-15T19:08:16.008Z',
@@ -300,7 +300,43 @@ function content_model_viewer_members($pid) {
       'created' => '2011-06-17T15:15:57.214Z',
       'modified' => '2011-07-15T19:08:16.008Z',
       'tn' => '/' . $module_path. '/images/collection.png',
-    )
+    ),
+    array(
+      'link' => $base_url . '/viewer/' . 'coccc:1675',
+      'label' => 'Some Colorado College Object',
+      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the',
+      'owner' => 'fedoraAdmin',
+      'created' => '2011-06-17T15:15:57.214Z',
+      'modified' => '2011-07-15T19:08:16.008Z',
+      'tn' => '/' . $module_path. '/images/collection.png',
+    ),
+    array(
+      'link' => $base_url . '/viewer/' . 'coccc:1675',
+      'label' => 'Some Colorado College Object',
+      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the \"yearbox.\"',
+      'owner' => 'fedoraAdmin',
+      'created' => '2011-06-17T15:15:57.214Z',
+      'modified' => '2011-07-15T19:08:16.008Z',
+      'tn' => '/' . $module_path. '/images/collection.png',
+    ),
+    array(
+      'link' => $base_url . '/viewer/' . 'coccc:1675',
+      'label' => 'Some Colorado College Object',
+      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the',
+      'owner' => 'fedoraAdmin',
+      'created' => '2011-06-17T15:15:57.214Z',
+      'modified' => '2011-07-15T19:08:16.008Z',
+      'tn' => '/' . $module_path. '/images/collection.png',
+    ),
+    array(
+      'link' => $base_url . '/viewer/' . 'coccc:1675',
+      'label' => 'Some Colorado College Object',
+      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the',
+      'owner' => 'fedoraAdmin',
+      'created' => '2011-06-17T15:15:57.214Z',
+      'modified' => '2011-07-15T19:08:16.008Z',
+      'tn' => '/' . $module_path. '/images/collection.png',
+    ),
   );
   $total = 3;
   echo json_encode(array('success' => TRUE, 'data' => $data, 'total' => $total));
