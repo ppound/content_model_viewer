@@ -12,11 +12,11 @@ Ext.onReady(function(){
     }
     var tabs = [];
     // Create Tabs for each of the Panels if they are defined 
-    if(ContentModelViewer.widgets.OverviewPanel !== undefined) {
-        tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel'));
-    }
     if(ContentModelViewer.widgets.CollectionPanel !== undefined) {
         tabs.push(Ext.create('ContentModelViewer.widgets.CollectionPanel'));
+    }
+    if(ContentModelViewer.widgets.OverviewPanel !== undefined) {
+        tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel'));
     }
     if(ContentModelViewer.widgets.ViewerPanel !== undefined) {
         tabs.push(Ext.create('ContentModelViewer.widgets.ViewerPanel'));
