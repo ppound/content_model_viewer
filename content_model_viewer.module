@@ -126,6 +126,11 @@ function content_model_viewer_theme() {
       'arguments' => array('pid' => NULL),
       'template' => 'models/Default',
       'file' => 'models/Default'
+    ),
+    'field_book_content_model_viewer' => array(
+      'arguments' => array('pid' => NULL),
+      'template' => 'models/Default',
+      'file' => 'models/Default'
     )
   );
 }
@@ -223,7 +228,9 @@ function content_model_viewer_get_registered_content_model_viewer($pid) {
  * @return string
  */
 function content_model_viewer_get_content_model_pid($pid) {
-  // @todo implement
+  module_load_include('inc', 'fedora_repository', 'ContentModel');
+  $content_model = ContentModel::loadFromObject($pid);
+  return $content_model->pid;
 }
 
 /**
@@ -292,9 +299,11 @@ function content_model_viewer($pid) {
   $js_path = $path . '/js';
   drupal_add_js($js_path . '/IncludeFirst.js');
   drupal_add_js($js_path . '/OverviewPanel.js');
-  drupal_add_js($js_path . '/CollectionPanel.js');
   drupal_add_js($js_path . '/ViewerPanel.js');
   drupal_add_js($js_path . '/ManagePanel.js');
+  if (content_model_viewer_object_has_members($pid)) {
+    drupal_add_js($js_path . '/CollectionPanel.js');
+  }
   drupal_add_js($js_path . '/ContentModelViewer.js');
   drupal_add_css($path . '/css/ContentModelViewer.css');
   /* Load Viewers */
@@ -529,4 +538,28 @@ function content_model_viewer_datastream_properties($pid, $dsid) {
     $properties = $datastream_properties->getProperties();
     return json_encode(array('success' => TRUE, 'msg' => $message, 'data' => $properties));
   }
+}
+
+/**
+ * Checks if an object has members.
+ * 
+ * @param string $pid 
+ * 
+ * @return boolean
+ */
+function content_model_viewer_object_has_members($pid) {
+  module_load_include('inc', 'fedora_repository', 'CollectionClass');
+  $collection = new CollectionClass();
+  $results = $collection->getRelatedItems($pid);
+  $results = trim($results);
+  if ($results != '') {
+    $document = new DOMDocument();
+    $document->loadXML($results);
+    $path = new DOMXPath($document);
+    $path->registerNamespace('sparql', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
+    $results = $path->query('//sparql:result');
+    $count = $results->length;
+    return $count > 0;
+  }
+  return FALSE;
 }
