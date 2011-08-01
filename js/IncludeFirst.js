@@ -209,6 +209,18 @@ Ext.onReady(function(){
         storeId:'files',
         model: ContentModelViewer.models.Datastream,
         autoLoad: true,
-        pageSize: 4
+        pageSize: 4,
+        proxy: {
+            type: 'rest',
+            url : ContentModelViewer.properties.url.object.datastreams,
+            extraParams: {
+                filter: true
+            },
+            reader: {
+                type: 'json',
+                root: 'data',
+                totalProperty: 'total'
+            }
+        }
     });
 });

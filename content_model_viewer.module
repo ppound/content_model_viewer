@@ -172,6 +172,56 @@ function content_model_viewer_include_viewers() {
 }
 
 /**
+ * Hook for foobar
+ * 
+ * @return array
+ */
+function content_model_viewer_foobar() {
+  $models = array();
+  $models['si:fieldbooks'] = array(
+    'type' => 'inc',
+    'module' => 'content_model_viewer',
+    'file' => 'FieldBooks',
+    'class' => 'FieldBookModelViewer'
+  );
+  return $models;
+}
+
+/**
+ * Gets an instance of a content model viewer.
+ * 
+ * @param string $pid
+ * 
+ * @return object
+ *   An instance of the Content Model Viewer if found. Otherwise it returns
+ *   the default content model viewer.
+ */
+function content_model_viewer_get_registered_content_model_viewer($pid) {
+  $model_pid = content_model_viewer_get_content_model_pid($pid);
+  $models = module_invoke_all('foobar');
+  foreach ($models as $key => $model) {
+    if ($key == $model_pid) {
+      module_load_include($model['type'], $model['module'], $model['file']);
+      $class = $model['class'];
+      return new $class($pid);
+    }
+  }
+  module_load_include('inc', 'content_model_viewer', 'models/default');
+  return new DefaultModelViewer($pid);
+}
+
+/**
+ * Get the pid of this objects content model.
+ * 
+ * @param string $pid
+ * 
+ * @return string
+ */
+function content_model_viewer_get_content_model_pid($pid) {
+  // @todo implement
+}
+
+/**
  * Gets the Supported Viewers.
  * 
  * @staticvar array $cache
@@ -256,12 +306,8 @@ function content_model_viewer($pid) {
  * @return string
  */
 function content_model_viewer_overview($pid) {
-  content_model_viewer_include_content_models(); // Include Content Models.
-  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  module_load_include('inc', 'fedora_repository', 'ContentModel');
-  //$content_model = ContentModel::loadFromObject($pid);
-  //module_invoke_all('');
-  echo '<div>Over View Panel</div>';
+  $viewer = content_model_viewer_get_registered_content_model_viewer($pid);
+  echo $viewer->getOverview();
   exit();
 }
 
@@ -276,76 +322,15 @@ function content_model_viewer_members($pid) {
   list($data, $total) = $collection->getMembers();
   echo json_encode(array('success' => TRUE, 'data' => $data, 'total' => $total));
   exit();
-  /*
-  $module_path = drupal_get_path('module', 'content_model_viewer');
-  $data = array(
-    array(
-      'link' => $base_url . '/viewer/' . 'coccc:1675',
-      'label' => 'Some Colorado College Object',
-      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the',
-      'owner' => 'fedoraAdmin',
-      'created' => '2011-06-17T15:15:57.214Z',
-      'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path . '/images/collection.png',
-    ),
-    array(
-      'link' => $base_url . '/viewer/' . 'coccc:1675',
-      'label' => 'Some Colorado College Object',
-      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the \"yearbox.\"',
-      'owner' => 'fedoraAdmin',
-      'created' => '2011-06-17T15:15:57.214Z',
-      'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path . '/images/collection.png',
-    ),
-    array(
-      'link' => $base_url . '/viewer/' . 'coccc:1675',
-      'label' => 'Some Colorado College Object',
-      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the \"yearbox.\"',
-      'owner' => 'fedoraAdmin',
-      'created' => '2011-06-17T15:15:57.214Z',
-      'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path . '/images/collection.png',
-    ),
-    array(
-      'link' => $base_url . '/viewer/' . 'coccc:1675',
-      'label' => 'Some Colorado College Object',
-      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the',
-      'owner' => 'fedoraAdmin',
-      'created' => '2011-06-17T15:15:57.214Z',
-      'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path . '/images/collection.png',
-    ),
-    array(
-      'link' => $base_url . '/viewer/' . 'coccc:1675',
-      'label' => 'Some Colorado College Object',
-      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the \"yearbox.\"',
-      'owner' => 'fedoraAdmin',
-      'created' => '2011-06-17T15:15:57.214Z',
-      'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path . '/images/collection.png',
-    ),
-    array(
-      'link' => $base_url . '/viewer/' . 'coccc:1675',
-      'label' => 'Some Colorado College Object',
-      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the',
-      'owner' => 'fedoraAdmin',
-      'created' => '2011-06-17T15:15:57.214Z',
-      'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path . '/images/collection.png',
-    ),
-    array(
-      'link' => $base_url . '/viewer/' . 'coccc:1675',
-      'label' => 'Some Colorado College Object',
-      'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the',
-      'owner' => 'fedoraAdmin',
-      'created' => '2011-06-17T15:15:57.214Z',
-      'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path . '/images/collection.png',
-    ),
-  );
-  $total = 3;
-  echo json_encode(array('success' => TRUE, 'data' => $data, 'total' => $total));
-  exit();*/
+  /**
+   * 'link' => $base_url . '/viewer/' . 'coccc:1675',
+   * 'label' => 'Some Colorado College Object',
+   * 'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the',
+   * 'owner' => 'fedoraAdmin',
+   * 'created' => '2011-06-17T15:15:57.214Z',
+   * 'modified' => '2011-07-15T19:08:16.008Z',
+   * 'tn' => '/' . $module_path . '/images/collection.png',
+   */
 }
 
 /**
@@ -354,30 +339,9 @@ function content_model_viewer_members($pid) {
  * @param string $pid 
  */
 function content_model_viewer_datastreams($pid) {
-  // @todo check to see if the object exists.
-  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  $item = new Fedora_Item($pid);
-  $data = array();
-  $count = 0;
-  $start = $_GET['start'];
-  $limit = $_GET['limit'];
-  $end = (isset($limit)) ? $start + $limit : NULL;
-  foreach ($item->datastreams as $dsid => $attr) {
-    if ($count >= $start && (empty($end) || $count < $end)) {
-      $stream['dsid'] = $dsid;
-      $stream['label'] = $attr['label'];
-      $stream['state'] = 'A';
-      $stream['mime'] = $attr['MIMEType'];
-      $stream['created'] = '';
-      $stream['view'] = true; // From Files Panel
-      $stream['view_function'] = 'loadFlexPlayer';
-      $stream['download'] = true; // From Files Panel
-      $stream['tn'] = 'some url';
-      $data[] = $stream;
-    }
-    $count++;
-  }
-  $total = count($item->datastreams);
+  $filter = isset($_GET['filter']) ? $_GET['filter'] : false;
+  $viewer = content_model_viewer_get_registered_content_model_viewer($pid);
+  list($data, $total) = $viewer->getDatastreams($filter);
   echo json_encode(array('success' => TRUE, 'data' => $data, 'total' => $total));
   exit();
 }
