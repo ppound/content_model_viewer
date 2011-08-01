@@ -324,7 +324,11 @@ function content_model_viewer($pid) {
  */
 function content_model_viewer_overview($pid) {
   $viewer = content_model_viewer_get_registered_content_model_viewer($pid);
-  echo $viewer->getOverview();
+  try {
+    echo $viewer->getOverview();
+  } catch (Exception $e) {
+    drupal_set_message($e->getMessage());
+  }
   exit();
 }
 

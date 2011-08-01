@@ -4,10 +4,12 @@
 Ext.onReady(function(){
     Ext.QuickTips.init();
     var parent = $('#tabs-tabset').parent();
-    var content_model_viewer = $('#content-model-viewer');
-    var content = content_model_viewer.remove();
-    parent.empty();
-    parent.append(content);
+    if(parent.length) {
+        var content_model_viewer = $('#content-model-viewer');
+        var content = content_model_viewer.remove();
+        parent.empty();
+        parent.append(content);    
+    }
     var tabs = [];
     // Create Tabs for each of the Panels if they are defined 
     if(ContentModelViewer.widgets.OverviewPanel !== undefined) {

@@ -109,6 +109,16 @@ class FieldBookModelViewer {
   private function isDatastreamVisibleToUser($dsid) {
     return true;
   }
+  
+  /**
+   *
+   * @param string $dsid 
+   * 
+   * @return boolean
+   */
+  private function isDatastreamViewable($dsid) {
+    return true;
+  }
 
   /**
    * Gets the dsid for the datastream to render into the viewer.
