@@ -110,7 +110,7 @@ class DefaultModelViewer {
       case 'application/pdf':
         return TRUE;
       default:
-        return TRUE;
+        return FALSE;
     }
   }
 
@@ -124,9 +124,8 @@ class DefaultModelViewer {
   private function isDatastreamViewable($dsid) {
     $mime = $this->item->datastreams[$dsid]['MIMEType'];
     switch ($mime) {
-      case 'text/xml':
-        return FALSE  ;
       case 'application/x-shockwave-flash':
+      case 'application/shockwave-flash':
         return TRUE;
       default:
         return FALSE;
@@ -185,7 +184,7 @@ class DefaultModelViewer {
    */
   private function getViewerLoadFunction($dsid) {
     $mime = $this->item->datastreams[$dsid]['MIMEType'];
-    if ($mime == 'application/x-shockwave-flash') { // application/x-shockwave-flash
+    if ($mime == 'application/x-shockwave-flash' || $mime == 'application/shockwave-flash') { // application/x-shockwave-flash
       return 'loadFlexPlayer';
     }
     return NULL;
