@@ -49,7 +49,7 @@ Ext.onReady(function(){
      */
     ContentModelViewer.functions = {
         selectDatastreamRecord: function(record) {
-            ContentModelViewer.properties.dsid = record.get('dsid');
+            ContentModelViewer.properties.dsid = record.get('view');
             ContentModelViewer.properties.viewFunction = record.get('view_function');
         },
         viewSelectedDatastreamRecord: function() {
@@ -143,10 +143,10 @@ Ext.onReady(function(){
             type: 'string'
         }, {
             name: 'view', 
-            type: 'boolean'
+            type: 'string'
         }, {
             name: 'download', 
-            type: 'boolean'
+            type: 'string'
         }, {
             name: 'tn', 
             type: 'string'

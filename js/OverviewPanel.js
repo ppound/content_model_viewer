@@ -103,6 +103,6 @@ Ext.onReady(function(){
                     } 
                 }    
             }]
-        }],
+        }]
     });
 });

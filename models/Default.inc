@@ -70,11 +70,11 @@ class DefaultModelViewer {
         if ($within_range) {
           $view = ($filter) ?
               $this->getViewableDatastream($dsid) :
-              $this->isDatastreamViewable($dsid) ?
+              ($this->isDatastreamViewable($dsid) ?
                   $dsid :
-                  NULL;
+                  NULL);
           $view_function = $view ?
-              $this->getViewerLoadFunction($stream['view']) :
+              $this->getViewerLoadFunction($view) :
               NULL;
           $download = ($filter) ?
               $this->getDownloadableDatastream($dsid) :
@@ -105,17 +105,32 @@ class DefaultModelViewer {
    * @return boolean
    */
   private function isDatastreamVisibleToUser($dsid) {
-    return true;
+    $mime = $this->item->datastreams[$dsid]['MIMEType'];
+    switch ($mime) {
+      case 'application/pdf':
+        return TRUE;
+      default:
+        return TRUE;
+    }
   }
 
   /**
-   *
+   * Checks to see if a viewer exists for the given datastream.
+   * 
    * @param string $dsid 
    * 
    * @return boolean
    */
   private function isDatastreamViewable($dsid) {
-    return false;
+    $mime = $this->item->datastreams[$dsid]['MIMEType'];
+    switch ($mime) {
+      case 'text/xml':
+        return FALSE  ;
+      case 'application/x-shockwave-flash':
+        return TRUE;
+      default:
+        return FALSE;
+    }
   }
 
   /**
@@ -132,7 +147,13 @@ class DefaultModelViewer {
    *   NULL if this datastream can't be viewed
    */
   private function getViewableDatastream($dsid) {
-    return $dsid;
+    $mime = $this->item->datastreams[$dsid]['MIMEType'];
+    switch ($mime) {
+      case 'application/pdf':
+        return 'PDF.swf'; // @todo remove hack.
+      default:
+        return NULL;
+    }
   }
 
   /**
@@ -163,6 +184,10 @@ class DefaultModelViewer {
    * @return string
    */
   private function getViewerLoadFunction($dsid) {
+    $mime = $this->item->datastreams[$dsid]['MIMEType'];
+    if ($mime == 'application/x-shockwave-flash') { // application/x-shockwave-flash
+      return 'loadFlexPlayer';
+    }
     return NULL;
   }
 
