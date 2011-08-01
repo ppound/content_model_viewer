@@ -271,7 +271,12 @@ function content_model_viewer_overview($pid) {
  * @param string $pid 
  */
 function content_model_viewer_members($pid) {
-  global $base_url;
+  module_load_include('inc', 'content_model_viewer', 'Collection');
+  $collection = new Collection($pid);
+  list($data, $total) = $collection->getMembers();
+  echo json_encode(array('success' => TRUE, 'data' => $data, 'total' => $total));
+  exit();
+  /*
   $module_path = drupal_get_path('module', 'content_model_viewer');
   $data = array(
     array(
@@ -281,7 +286,7 @@ function content_model_viewer_members($pid) {
       'owner' => 'fedoraAdmin',
       'created' => '2011-06-17T15:15:57.214Z',
       'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path. '/images/collection.png',
+      'tn' => '/' . $module_path . '/images/collection.png',
     ),
     array(
       'link' => $base_url . '/viewer/' . 'coccc:1675',
@@ -290,7 +295,7 @@ function content_model_viewer_members($pid) {
       'owner' => 'fedoraAdmin',
       'created' => '2011-06-17T15:15:57.214Z',
       'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path. '/images/collection.png',
+      'tn' => '/' . $module_path . '/images/collection.png',
     ),
     array(
       'link' => $base_url . '/viewer/' . 'coccc:1675',
@@ -299,7 +304,7 @@ function content_model_viewer_members($pid) {
       'owner' => 'fedoraAdmin',
       'created' => '2011-06-17T15:15:57.214Z',
       'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path. '/images/collection.png',
+      'tn' => '/' . $module_path . '/images/collection.png',
     ),
     array(
       'link' => $base_url . '/viewer/' . 'coccc:1675',
@@ -308,7 +313,7 @@ function content_model_viewer_members($pid) {
       'owner' => 'fedoraAdmin',
       'created' => '2011-06-17T15:15:57.214Z',
       'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path. '/images/collection.png',
+      'tn' => '/' . $module_path . '/images/collection.png',
     ),
     array(
       'link' => $base_url . '/viewer/' . 'coccc:1675',
@@ -317,7 +322,7 @@ function content_model_viewer_members($pid) {
       'owner' => 'fedoraAdmin',
       'created' => '2011-06-17T15:15:57.214Z',
       'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path. '/images/collection.png',
+      'tn' => '/' . $module_path . '/images/collection.png',
     ),
     array(
       'link' => $base_url . '/viewer/' . 'coccc:1675',
@@ -326,7 +331,7 @@ function content_model_viewer_members($pid) {
       'owner' => 'fedoraAdmin',
       'created' => '2011-06-17T15:15:57.214Z',
       'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path. '/images/collection.png',
+      'tn' => '/' . $module_path . '/images/collection.png',
     ),
     array(
       'link' => $base_url . '/viewer/' . 'coccc:1675',
@@ -335,12 +340,12 @@ function content_model_viewer_members($pid) {
       'owner' => 'fedoraAdmin',
       'created' => '2011-06-17T15:15:57.214Z',
       'modified' => '2011-07-15T19:08:16.008Z',
-      'tn' => '/' . $module_path. '/images/collection.png',
+      'tn' => '/' . $module_path . '/images/collection.png',
     ),
   );
   $total = 3;
   echo json_encode(array('success' => TRUE, 'data' => $data, 'total' => $total));
-  exit();
+  exit();*/
 }
 
 /**

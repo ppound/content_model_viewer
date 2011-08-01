@@ -155,7 +155,7 @@ class FieldBookModelViewer {
    * @return string
    */
   private function getViewerLoadFunction($dsid) {
-    
+    return NULL;
   }
 
   /**
@@ -166,7 +166,7 @@ class FieldBookModelViewer {
    * @return string
    */
   private function getThumbnail($dsid) {
-    $module_path = drupal_get_path('module', 'content_model_viewer');
+    $module_path = '/' . drupal_get_path('module', 'content_model_viewer');
     $image_path = $module_path . './images/mime/';
     $default_image = $image_path . 'Default.png';
     return $default_image;

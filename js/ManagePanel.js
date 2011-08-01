@@ -99,13 +99,19 @@ Ext.onReady(function(){
                         text: 'Edit Permissions',
                         cls: 'x-btn-text-icon',
                         iconCls: 'edit-datastream-icon',
-                        id: 'edit-xacml'
+                        id: 'edit-xacml',
+                        handler: function() {
+                            Ext.Msg.alert('Action Restricted', 'This action is currently restricted');
+                        }
                     }, {
                         xtype: 'button',
                         text: 'Purge Object',
                         cls: 'x-btn-text-icon',
                         iconCls: 'remove-datastream-icon',
-                        id: 'purge-object'
+                        id: 'purge-object',
+                        handler: function() {
+                            Ext.Msg.alert('Action Restricted', 'This action is currently restricted');
+                        }
                     }]
                 }],
                 listeners: {
