@@ -122,6 +122,11 @@ function content_model_viewer_theme() {
       'arguments' => array('pid' => NULL),
       'template' => 'Viewer',
     ),
+    'default_content_model_viewer' => array(
+      'arguments' => array('pid' => NULL),
+      'template' => 'models/Default',
+      'file' => 'models/Default'
+    )
   );
 }
 

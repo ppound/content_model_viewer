@@ -42,9 +42,7 @@ class DefaultModelViewer {
    * @return string
    */
   public function getOverview() {
-    // Get some data render a template with the info!
-    // @todo get some metdata info, and run some itql queries.
-    return '<div>Default</div>';
+    return theme('default_content_model_viewer', $this->pid);
   }
 
   /**
@@ -182,4 +180,27 @@ class DefaultModelViewer {
     return $default_image;
   }
 
+}
+
+/**
+ *
+ * @global string $base_url
+ * @param array $variables 
+ */
+function template_preprocess_default_content_model_viewer(array &$variables) {
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  $pid = $variables['pid'];
+  $item = new Fedora_Item($pid);
+  $xml = $item->get_datastream_dissemination('DC');
+  $document = new DOMDocument();
+  $document->loadXML($xml);
+  $xpath = new DOMXPath($document);
+  $result = $xpath->query('//*[local-name()="title"]');
+  $title = $result->item(0);
+  $result = $xpath->query('//*[local-name()="identifier"]');
+  $identifier = $result->item(0);
+  $variables['table'] = theme_table(array('Field', 'Value'), array(
+    array('Title', $title->textContent),
+    array('Identifier', $identifier->textContent))
+  );
 }
