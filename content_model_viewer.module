@@ -125,12 +125,10 @@ function content_model_viewer_theme() {
     'default_content_model_viewer' => array(
       'arguments' => array('pid' => NULL),
       'template' => 'models/Default',
-      'file' => 'models/Default'
     ),
     'field_book_content_model_viewer' => array(
       'arguments' => array('pid' => NULL),
       'template' => 'models/Default',
-      'file' => 'models/Default'
     )
   );
 }
