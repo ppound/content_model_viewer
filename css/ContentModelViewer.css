@@ -97,3 +97,17 @@
 .x-list-over {
     background-color: #eeeebb;
 }
+
+.x-btn .direction-asc {
+    background-image: url("../lib/ext/resources/themes/images/default/grid/sort_asc.gif");
+    background-position: 4px 6px !important;
+}
+
+.x-btn .direction-desc {
+    background-image: url("../lib/ext/resources/themes/images/default/grid/sort_desc.gif");
+    background-position: 4px 6px !important;
+}
+
+.x-btn-inner {
+  
+}

@@ -339,6 +339,7 @@ function content_model_viewer($pid) {
   /* Load Panels/Widgets */
   $js_path = $path . '/js';
   drupal_add_js($js_path . '/IncludeFirst.js');
+  drupal_add_js($js_path . '/SortButton.js');
   drupal_add_js($js_path . '/OverviewPanel.js');
   drupal_add_js($js_path . '/ViewerPanel.js');
   drupal_add_js($js_path . '/ManagePanel.js');

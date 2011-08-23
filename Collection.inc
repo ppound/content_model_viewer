@@ -20,12 +20,31 @@ class Collection {
   protected $pid;
 
   /**
+   * Named default properties.
+   * 
+   * @var array
+   */
+  protected $default;
+
+  /**
    * Create a Collection class.
    * 
    * @param string $pid 
    */
   public function __construct($pid) {
     $this->pid = $pid;
+    $sort = array(new stdClass(), new stdClass());
+    $sort[0]->property = 'label';
+    $sort[0]->direction = 'ASC';
+    $sort[1]->property = 'created';
+    $sort[1]->direction = 'ASC';
+    $filter = array(new stdClass());
+    $filter[0]->property = 'label';
+    $filter[0]->value = NULL;
+    $this->default = array(
+      'sort' => $sort,
+      'filter' => $filter
+    );
   }
 
   /**
@@ -33,13 +52,13 @@ class Collection {
    * @return array
    */
   public function getMembers() {
+
     $offset = isset($_REQUEST['start']) ? $_REQUEST['start'] : 0;
     $limit = isset($_REQUEST['limit']) ? $_REQUEST['limit'] : 7;
-    $type = isset($_REQUEST['filter']) ? $_REQUEST['filter'] : 'all';
-    $sort = isset($_REQUEST['sort']) ? $_REQUEST['sort'] : 'alpha-asc';
-    $search = isset($_REQUEST['search_text']) ? $_REQUEST['search_text'] : '';
-    $results = $this->findMembers($type);
-    $results = $this->filter($results, $search);
+    $filter = isset($_REQUEST['filter']) ? json_decode($_REQUEST['filter']) : $this->default['filter'];
+    $sort = isset($_REQUEST['sort']) ? json_decode($_REQUEST['sort']) : $this->default['sort'];
+    $results = $this->findMembers('all');
+    $results = $this->filter($results, $filter);
     $results = $this->sort($results, $sort);
     list($results, $count) = $this->limit($results, $offset, $limit);
     $results = $this->populate($results);
@@ -167,13 +186,12 @@ class Collection {
    * 
    * @return array
    */
-  private function filter(array $results, $search) {
-    $search = trim($search_text);
-    $filter = isset($search_text) && $search != '';
-    if ($filter) {
+  private function filter(array $results, $filter) {
+    $search = isset($filter[0]->value) ? trim($filter[0]->value) : NULL;
+    if (isset($search) && $search != '') {
       $ret = array();
       foreach ($results as $result) {
-        $matches = preg_match("/^.*{$search}.*/i", $result['title']);
+        $matches = preg_match("/^.*{$search}.*/i", $result['label']);
         if ($matches > 0) {
           $ret[] = $result;
         }
