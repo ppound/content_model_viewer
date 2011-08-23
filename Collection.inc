@@ -36,8 +36,6 @@ class Collection {
     $sort = array(new stdClass(), new stdClass());
     $sort[0]->property = 'label';
     $sort[0]->direction = 'ASC';
-    $sort[1]->property = 'created';
-    $sort[1]->direction = 'ASC';
     $filter = array(new stdClass());
     $filter[0]->property = 'label';
     $filter[0]->value = NULL;
@@ -210,19 +208,24 @@ class Collection {
    * @return array
    */
   private function sort(array $results, $sort) {
-    $label_sort = $sort[0];
-    if ($label_sort->direction == 'ASC') {
-      usort($results, array($this, 'alpha_asc_sort'));
-    }
-    else {
-      usort($results, array($this, 'alpha_desc_sort'));
-    }
-    $created_sort = $sort[1];
-    if ($created_sort->direction == 'ASC') {
-      usort($results, array($this, 'date_newest_sort'));
-    }
-    else {
-      usort($results, array($this, 'date_oldest_sort'));
+    switch ($sort[0]->property) {
+      case 'created':
+        if ($sort[0]->direction == 'ASC') {
+          usort($results, array($this, 'date_newest_sort'));
+        }
+        else {
+          usort($results, array($this, 'date_oldest_sort'));
+        }
+        break;
+      case 'label':
+      default:
+        if ($sort[0]->direction == 'ASC') {
+          usort($results, array($this, 'alpha_asc_sort'));
+        }
+        else {
+          usort($results, array($this, 'alpha_desc_sort'));
+        }
+        break;
     }
     return $results;
   }

@@ -1,4 +1,38 @@
 Ext.onReady(function(){
+  var sorter = (function() {
+    var type = 0;
+    var types = ['label', 'created'];
+    var direction = 0;
+    var directions = ['ASC', 'DESC'];
+    var labels = ['Label', 'Date Created'];
+    return {
+      toggleType: function() {
+        type = type ? 0 : 1;
+      },
+      toggleDirection: function() {
+        direction = direction ? 0: 1;
+      },
+      type: function() {
+        return types[type];
+      },
+      label: function() {
+        return labels[type];
+      },
+      direction: function() {
+        return directions[direction];
+      },
+      refresh: function() {
+        var store = Ext.data.StoreManager.lookup('members');
+        store.sorters.clear();
+        store.sorters.add(new Ext.util.Sorter({
+          property: this.type(),
+          direction: this.direction()
+        }));
+        store.load();
+      }
+    };
+  })();
+  
   Ext.define('ContentModelViewer.widgets.CollectionPanel', {
     extend: 'Ext.panel.Panel',
     itemId: 'collection',
@@ -9,28 +43,21 @@ Ext.onReady(function(){
       items: [ {
         xtype: 'tbtext', 
         text: 'Sort By: '
-      }, {
-        xtype: 'sortbutton',
-        text : 'Label',
-        listeners: {
-          changedirection: function(direction) {
-            var store = Ext.data.StoreManager.lookup('members');
-            var sorters = store.sorters;
-            var title = sorters.get('label');
-            title.setDirection(direction);
-            store.load();
-          }
+      }, Ext.create('Ext.Action', {
+        text : sorter.label(),
+        handler: function(action, event) {
+          sorter.toggleType();
+          action.setText(sorter.label());
+          sorter.refresh();
         }
-      }, {
+      }), {
         xtype: 'sortbutton',
-        text : 'Created',
+        text : sorter.direction(),
         listeners: {
           changedirection: function(direction) {
-            var store = Ext.data.StoreManager.lookup('members');
-            var sorters = store.sorters;
-            var date = sorters.get('created');
-            date.setDirection(direction);
-            store.load();
+            sorter.toggleDirection();
+            this.setText(sorter.direction());
+            sorter.refresh();
           }
         }
       }, {

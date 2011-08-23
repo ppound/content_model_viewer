@@ -183,9 +183,6 @@ Ext.onReady(function(){
     sorters: [{
       property : 'label',
       direction: 'ASC'
-    }, {
-      property : 'created',
-      direction: 'ASC'
     }],
     filters: [{
       property: 'label',
