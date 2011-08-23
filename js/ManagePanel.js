@@ -167,7 +167,7 @@ Ext.onReady(function(){
                     queryMode: 'local',
                     displayField: 'name',
                     valueField: 'value',
-                    value: "I"
+                    value: "Inactive"
                 }
             }, {
                 header: 'Mime Type', 

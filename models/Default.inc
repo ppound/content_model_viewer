@@ -19,6 +19,7 @@ class DefaultModelViewer {
    * @var string
    */
   protected $pid;
+
   /**
    * The Object.
    * 
@@ -68,17 +69,9 @@ class DefaultModelViewer {
       $allowed = $filter ? $this->isDatastreamVisibleToUser($dsid) : true;
       if ($allowed) {
         if ($within_range) {
-          $view = ($filter) ?
-              $this->getViewableDatastream($dsid) :
-              ($this->isDatastreamViewable($dsid) ?
-                  $dsid :
-                  NULL);
-          $view_function = $view ?
-              $this->getViewerLoadFunction($view) :
-              NULL;
-          $download = ($filter) ?
-              $this->getDownloadableDatastream($dsid) :
-              $dsid;
+          $view = $this->getViewableDatastream($dsid, $filter);
+          $view_function = $this->getViewerLoadFunction($view);
+          $download = $this->getDownloadableDatastream($dsid, $filter);
           $data[] = array(
             'dsid' => $dsid,
             'label' => $attr['label'],
@@ -140,12 +133,16 @@ class DefaultModelViewer {
    * datastream that has a mime-type of 'application/shockwave-flash'.
    * 
    * @param string $dsid 
+   * @param boolean $filter
    * 
    * @return string
    *   The dsid of the datastream to use in conjunction with the datastream viewer. 
    *   NULL if this datastream can't be viewed
    */
-  private function getViewableDatastream($dsid) {
+  private function getViewableDatastream($dsid, $filter = FALSE) {
+    if ($filter === FALSE) {
+      return $this->isDatastreamViewable($dsid) ? $dsid : NULL;
+    }
     $mime = $this->item->datastreams[$dsid]['MIMEType'];
     switch ($mime) {
       case 'application/pdf':
@@ -167,7 +164,10 @@ class DefaultModelViewer {
    * 
    * @return string
    */
-  private function getDownloadableDatastream($dsid) {
+  private function getDownloadableDatastream($dsid, $filter) {
+    if ($filter) {
+      return $dsid;
+    }
     return $dsid;
   }
 
@@ -182,7 +182,10 @@ class DefaultModelViewer {
    * 
    * @return string
    */
-  private function getViewerLoadFunction($dsid) {
+  private function getViewerLoadFunction($dsid = NULL) {
+    if (empty($dsid)) {
+      return NULL;
+    }
     $mime = $this->item->datastreams[$dsid]['MIMEType'];
     if ($mime == 'application/x-shockwave-flash' || $mime == 'application/shockwave-flash') { // application/x-shockwave-flash
       return 'loadFlexPlayer';

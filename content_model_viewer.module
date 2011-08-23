@@ -90,6 +90,46 @@ function content_model_viewer_menu() {
     'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_MODIFY_DATASTEAM_PROPERTIES),
     'type' => MENU_CALLBACK,
   );
+  $items['admin/settings/content_model_viewer'] = array(
+    'title' => t('Content Model Viewer Settings'),
+    'description' => t('Settings for the Contet Model Viewer.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('content_model_viewer_admin'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/settings/content_model_viewer/%'] = array(
+    'title' => t('Content Model Viewer Settings'),
+    'description' => t('Settings for the Contet Model Viewer.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('content_model_viewer_admin'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/settings/content_model_viewer/%/add'] = array(
+    'title' => t('Content Model Viewer Settings'),
+    'description' => t('Settings for the Contet Model Viewer.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('content_model_viewer_admin'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/settings/content_model_viewer/%/remove'] = array(
+    'title' => t('Content Model Viewer Settings'),
+    'description' => t('Settings for the Contet Model Viewer.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('content_model_viewer_admin'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/settings/content_model_viewer/%/edit'] = array(
+    'title' => t('Content Model Viewer Settings'),
+    'description' => t('Settings for the Contet Model Viewer.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('content_model_viewer_admin'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
   return $items;
 }
 
@@ -567,4 +607,17 @@ function content_model_viewer_object_has_members($pid) {
     return $count > 0;
   }
   return FALSE;
+}
+
+/**
+ * The admin settings form page for the content model viewer.
+ * 
+ * @param array $form_state
+ *   The Drupal Form State.
+ * 
+ * @return array
+ *   The generated form.
+ */
+function content_model_viewer_admin(array &$form_state) {
+  return array();
 }

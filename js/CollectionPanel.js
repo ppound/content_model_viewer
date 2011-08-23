@@ -18,7 +18,7 @@ Ext.onReady(function(){
             xtype: 'dataview',
             store: Ext.data.StoreManager.lookup('members'),
             itemSelector: 'div.file-item',
-            emptyText: 'No Files Availible',
+            emptyText: 'No Files Available',
             deferEmptyText: false,
             itemTpl: new Ext.XTemplate(
                 '<tpl for=".">',
