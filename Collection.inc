@@ -210,20 +210,19 @@ class Collection {
    * @return array
    */
   private function sort(array $results, $sort) {
-    switch ($sort) {
-      case 'alpha-desc':
-        usort($results, array($this, 'alpha_desc_sort'));
-        break;
-      case 'date-newest':
-        usort($results, array($this, 'date_newest_sort'));
-        break;
-      case 'date-oldest':
-        usort($results, array($this, 'date_oldest_sort'));
-        break;
-      case 'alpha-asc':
-      default:
-        usort($results, array($this, 'alpha_asc_sort'));
-        break;
+    $label_sort = $sort[0];
+    if ($label_sort->direction == 'ASC') {
+      usort($results, array($this, 'alpha_asc_sort'));
+    }
+    else {
+      usort($results, array($this, 'alpha_desc_sort'));
+    }
+    $created_sort = $sort[1];
+    if ($created_sort->direction == 'ASC') {
+      usort($results, array($this, 'date_newest_sort'));
+    }
+    else {
+      usort($results, array($this, 'date_oldest_sort'));
     }
     return $results;
   }
@@ -237,7 +236,7 @@ class Collection {
    * @return boolean
    */
   private function alpha_asc_sort($a, $b) {
-    return strcmp($a['title'], $b['title']);
+    return strcmp($a['label'], $b['label']);
   }
 
   /**
@@ -249,7 +248,7 @@ class Collection {
    * @return boolean
    */
   private function alpha_desc_sort($a, $b) {
-    return strcmp($b['title'], $a['title']);
+    return strcmp($b['label'], $a['label']);
   }
 
   /**

@@ -18,6 +18,7 @@ Ext.onReady(function(){
             var sorters = store.sorters;
             var title = sorters.get('label');
             title.setDirection(direction);
+            store.load();
           }
         }
       }, {
@@ -29,6 +30,7 @@ Ext.onReady(function(){
             var sorters = store.sorters;
             var date = sorters.get('created');
             date.setDirection(direction);
+            store.load();
           }
         }
       }, {
@@ -40,11 +42,15 @@ Ext.onReady(function(){
       }, {
         xtype: 'button',
         text: 'Go',
-        handler: function() {
+        handler: function(button, event) {
           var store = Ext.data.StoreManager.lookup('members');
           var filters = store.filters;
           var label = filters.get(0);
-          label.value = 'tset';
+          var toolbar = button.up('toolbar');
+          var search = toolbar.down('textfield');
+          var value = Ext.String.trim(search.getValue());
+          label.value = value != '' ? value : null;
+          store.load();
         }
       }]
     },  {
