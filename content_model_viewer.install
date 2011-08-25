@@ -1,0 +1,115 @@
+<?php
+
+// $Id$
+
+/**
+ * @file
+ *
+ * Installs the required database schema for storing display and control properties for the viewer.
+ */
+
+/**
+ * Implementation of hook_install.
+ */
+function content_model_viewer_install() {
+  drupal_install_schema('content_model_viewer');
+  // Add Constraint to rules.
+  $constraint_query = <<<EOT
+  ALTER TABLE `content_model_viewer_datastream_rules` ADD CONSTRAINT `model_id`
+  FOREIGN KEY (`model_id`)
+  REFERENCES `content_model_viewer_models` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE NO ACTION
+EOT;
+  db_query($constraint_query);
+  // Add default model.
+  $object = new stdClass();
+  $object->id = 1;
+  $object->pid = 'default';
+  drupal_write_record('content_model_viewer_models', $object);
+  // Add default rule, uses the default values for rule fields.
+  $object = new stdClass();
+  $object->id = 1;
+  $object->model_id = 1;
+  drupal_write_record('content_model_viewer_datastream_rules', $object);
+}
+
+/**
+ * Implementation of hook_uninstall.
+ */
+function content_model_viewer_uninstall() {
+  drupal_uninstall_schema('content_model_viewer');
+}
+
+/**
+ * Implementation of hook_schema.
+ * 
+ * @return array
+ */
+function content_model_viewer_schema() {
+  $schema['content_model_viewer_datastream_rules'] = array(
+    'description' => t('This table is used to store rules for displaying/viewing/downloading datastreams for non-admin users.'),
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'model_id' => array(
+        'type' => 'int',
+        'not null' => TRUE
+      ),
+      'dsid' => array(
+        'description' => t('A Regular expression that constrains this rule to any dsid that matches.'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+        'default' => '.*'
+      ),
+      'mime' => array(
+        'description' => t('A Regular expression that constrains this rule to any mime type that matches.'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+        'default' => '.*'
+      ),
+      'view' => array(
+        'description' => t('TRUE if the user is allowed to view datastreams that match this rule FALSE otherwise.'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'download' => array(
+        'description' => t('TRUE if the user is allowed to download datastreams that match this rule FALSE otherwise.'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+    ),
+    'primary key' => array('id'),
+    'indexes' => array(
+      'model_id' => array('model_id'),
+    ),
+  );
+  $schema['content_model_viewer_models'] = array(
+    'description' => t('This table is used to store associations between XML Form API style form definitions, and the Content models that use them.'),
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'pid' => array(
+        'description' => t('The content model pid.'),
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE
+      ),
+    ),
+    'primary key' => array('id'),
+    'unique keys' => array(
+      'pid' => array('pid')
+    ),
+  );
+  return $schema;
+}

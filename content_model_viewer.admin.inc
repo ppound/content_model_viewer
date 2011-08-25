@@ -87,15 +87,14 @@ function content_model_viewer_default_settings_form(array &$form_state) {
     'fieldset' => array(
       '#type' => 'fieldset',
       '#title' => 'Configure default settings.',
-      'restrict' => array(
+      '#description' => 'These setting will be applied to all content models that don\'t define their own custom settings.',
+      'datastreams' => array(
         '#type' => 'fieldset',
-        '#title' => 'Restricted Datastreams (View/Download)',
-        '#description' => 'Datastream restrictions only apply to datastreams show in the Overview/Viewer tab panels.'
-      ),
-      'allow' => array(
-        '#type' => 'fieldset',
-        '#title' => 'Allowed Datastreams (View/Download)',
-        '#description' => 'These only apply to datastreams show in the Overview/Viewer tab panels.'
+        '#title' => 'Data stream Display Rules (View/Download)',
+        '#description' => 'Datastream rules only apply to datastreams shown in the Overview/Viewer tab panels.',
+        'table' => array(
+          '#theme' => 'content_model_viewer_datastream_rules_table'
+        )
       ),
       'submit' => array(
         '#type' => 'submit',
