@@ -147,6 +147,50 @@ function content_model_viewer_default_settings_form_submit(array $form, array &$
 }
 
 /**
+ * Gets the form for a given Content Model.
+ * 
+ * @param array $form_state 
+ *   The Drupal Form State.
+ * 
+ * @return array
+ *   The Drupal Form.
+ */
+function content_model_viewer_model_settings_form(array &$form_state) {
+  
+}
+
+/**
+ * Validates the model settings form.
+ * 
+ * @param array $form_state 
+ *   The Drupal Form State.
+ */
+function content_model_viewer_model_settings_form_validate(array &$form_state) {
+  
+}
+
+/**
+ * Submit the model settings form.
+ * 
+ * @param array $form_state
+ *   The Drupal Form State.
+ */
+function content_model_viewer_model_settings_form_submit(array &$form_state) {
+  
+}
+
+/**
+ * Delete the model settings form.
+ * 
+ * @param string $content_model 
+ */
+function content_model_viewer_delete_model_settings($content_model) {
+  db_query('DELETE FROM content_model_viewer_models WHERE pid = "%s"', $content_model);
+  drupal_set_message(t('Successfully removed settings for ') . $content_model . '.');
+  drupal_goto('admin/settings/content_model_viewer');
+}
+
+/**
  * Autocomplete the content model name..
  * 
  * @param string $string

@@ -102,16 +102,18 @@ function content_model_viewer_menu() {
   $items['admin/settings/content_model_viewer/%/edit'] = array(
     'title' => t('Content Model Viewer Settings'),
     'description' => t('Settings for the Contet Model Viewer.'),
+    'file' => 'content_model_viewer.admin.inc',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('content_model_viewer_admin'),
+    'page arguments' => array('content_model_viewer_model_settings_form', 3),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
   );
   $items['admin/settings/content_model_viewer/%/delete'] = array(
     'title' => t('Content Model Viewer Settings'),
     'description' => t('Settings for the Contet Model Viewer.'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('content_model_viewer_admin'),
+    'page callback' => 'content_model_viewer_delete_model_settings',
+    'file' => 'content_model_viewer.admin.inc',
+    'page arguments' => array(3),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
   );
