@@ -13,8 +13,13 @@
  * @param array $variables 
  */
 function template_preprocess_content_model_viewer_settings(array &$variables) {
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $variables['content_models'] = array();
-  $variables['content_models'][] = array('label' => 'Test IR Object', 'pid' => 'ir:1');
+  $result = db_query('SELECT * FROM {content_model_viewer_models} WHERE id > 1');
+  while ($data = db_fetch_object($result)) {
+    $item = new Fedora_Item($data->pid);
+    $variables['content_models'][] = array('label' => $item->objectProfile->objLabel, 'pid' => $data->pid);
+  }
 }
 
 /**
@@ -57,7 +62,15 @@ function content_model_viewer_add_custom_settings_form(array &$form_state) {
  *   The Drupal Form State.
  */
 function content_model_viewer_add_custom_settings_form_validate(array $form, array &$form_state) {
-  
+  $pid = $form_state['values']['content_model'];
+  $item = new Fedora_Item($pid);
+  if (!$item->exists()) {
+    form_set_error('content_model', "The fedora object {$pid} does not exists.");
+  }
+  $query = db_query('SELECT count(pid) FROM content_model_viewer_models WHERE id > 1 AND pid = "%s"', $pid);
+  if (db_result($query) > 0) {
+    form_set_error('content_model', "The content model {$pid} already has custom settings. Click on the edit link above to change them.");
+  }
 }
 
 /**
@@ -69,7 +82,11 @@ function content_model_viewer_add_custom_settings_form_validate(array $form, arr
  *   The Drupal Form State.
  */
 function content_model_viewer_add_custom_settings_form_submit(array $form, array &$form_state) {
-  
+  $pid = $form_state['values']['content_model'];
+  $object = new stdClass();
+  $object->pid = $pid;
+  drupal_write_record('content_model_viewer_models', $object);
+  $form_state['redirect'] = "admin/settings/content_model_viewer/$pid/edit";
 }
 
 /**
