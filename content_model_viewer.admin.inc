@@ -8,6 +8,22 @@
  * Defines a collection of functions and forms that appear in the admin section of the site. They allow the user 
  * to provided settings for this module.
  */
+function template_preprocess_content_model_viewer_custom_settings(array &$variables) {
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  $pid = $variables['pid'];
+  $item = new Fedora_Item($pid);
+  if (!$item->exists()) {
+    drupal_set_message(t('The Fedora Object %pid does not exist.', array('%pid' => $pid)), 'error');
+    drupal_not_found();
+    exit();
+  }
+  if (!content_model_viewer_model_has_settings($pid)) {
+    drupal_set_message(t('The Fedora Object %pid doesn\'t have any custom settings.', array('%pid' => $pid)), 'error');
+    drupal_not_found();
+    exit();
+  }
+  $variables['model_id'] = content_model_viewer_get_model_id($pid);
+}
 
 /**
  * Provides a form that allows the user to add/remove Custom Settings for this module, on a per Content Model basis.
@@ -173,7 +189,7 @@ function content_model_viewer_datastream_rules_form(array &$form_state, $model_i
     '#header' => array('Datastream ID', 'MIME Type', 'View', 'Download'),
     '#theme' => 'content_model_viewer_form_table'
   );
-  foreach (content_model_viewer_get_settings() as $row) {
+  foreach (content_model_viewer_get_settings($model_id) as $row) {
     $settings[] = array(
       'dsid' => array('#value' => $row['dsid']),
       'mime' => array('#value' => $row['mime']),
@@ -213,7 +229,7 @@ function content_model_viewer_datastream_rules_form(array &$form_state, $model_i
     'add' => array(
       '#type' => 'submit',
       '#value' => 'Add',
-      '#model_id' => 1, // Default.
+      '#model_id' => $model_id, // Default.
       '#submit' => array('content_model_viewer_add_datastream_rule'),
       '#validate' => array('content_model_viewer_add_datastream_rule_validate'),
     )
@@ -236,7 +252,7 @@ function content_model_viewer_datastream_rules_form(array &$form_state, $model_i
       'add' => array(
         '#type' => 'submit',
         '#value' => 'Add',
-        '#model_id' => 1, // Default.
+        '#model_id' => $model_id, // Default.
         '#submit' => array('content_model_viewer_add_datastream_rule'),
         '#validate' => array('content_model_viewer_add_datastream_rule_validate'),
         '#attributes' => array('style' => 'position: absolute; left: -9999px; width: 1px; height: 1px;'),

@@ -103,8 +103,8 @@ function content_model_viewer_menu() {
     'title' => t('Content Model Viewer Settings'),
     'description' => t('Settings for the Contet Model Viewer.'),
     'file' => 'content_model_viewer.admin.inc',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('content_model_viewer_model_settings_form', 3),
+    'page callback' => 'theme',
+    'page arguments' => array('content_model_viewer_custom_settings', 3),
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
   );
@@ -147,7 +147,11 @@ function content_model_viewer_theme() {
       'template' => 'Viewer',
     ),
     'content_model_viewer_settings' => array(
-      'template' => 'AdminSettings',
+      'template' => 'templates/Settings',
+    ),
+    'content_model_viewer_custom_settings' => array(
+      'arguments' => array('pid' => NULL),
+      'template' => 'templates/CustomSettings',
     ),
     'default_content_model_viewer' => array(
       'arguments' => array('pid' => NULL),
@@ -630,15 +634,14 @@ function content_model_viewer_get_model_id($pid) {
  * 
  * If $pid is NULL get the default settings.
  * 
- * @param string $pid
- *   A fedora object pid.
+ * @param string $model_id
+ *   The model the settings are associated with.
  * 
  * @return array
  *   The rules associated with this fedora object.
  */
-function content_model_viewer_get_settings($pid = NULL) {
+function content_model_viewer_get_settings($model_id = NULL) {
   $settings = array();
-  $model_id = isset($pid) ? content_model_viewer_get_model_id($pid) : 1;
   $query = db_query('SELECT * FROM content_model_viewer_datastream_rules WHERE model_id = "%d"', $model_id);
   while ($data = db_fetch_object($query)) {
     $item = array();
