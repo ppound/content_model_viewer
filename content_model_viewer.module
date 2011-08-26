@@ -108,15 +108,6 @@ function content_model_viewer_menu() {
     'access arguments' => array('administer site configuration'),
     'type' => MENU_CALLBACK,
   );
-  $items['admin/settings/content_model_viewer/%/delete'] = array(
-    'title' => t('Content Model Viewer Settings'),
-    'description' => t('Settings for the Contet Model Viewer.'),
-    'page callback' => 'content_model_viewer_delete_model_settings',
-    'file' => 'content_model_viewer.admin.inc',
-    'page arguments' => array(3),
-    'access arguments' => array('administer site configuration'),
-    'type' => MENU_CALLBACK,
-  );
   $items['admin/settings/content_model_viewer/form/autocomplete/models'] = array(
     'page callback' => 'content_model_viewer_autocomplete_models',
     'access arguments' => array('administer site configuration'),
@@ -607,6 +598,18 @@ function content_model_viewer_object_has_members($pid) {
     return $count > 0;
   }
   return FALSE;
+}
+
+/**
+ *
+ * @param string $pid 
+ *   A Fedora Object PID.
+ * @return boolean
+ *   TRUE if there are settings defined for the given Content Model, FALSE otherwise.
+ */
+function content_model_viewer_model_has_settings($pid) {
+  $query = db_query('SELECT count(pid) FROM content_model_viewer_models WHERE id > 1 AND pid = "%s"', $pid);
+  return (db_result($query) > 0) ? TRUE : FALSE;
 }
 
 /**
