@@ -70,7 +70,7 @@ function content_model_viewer_schema() {
         'type' => 'varchar',
         'length' => 256,
         'not null' => TRUE,
-        'default' => '.*'
+        'default' => '*'
       ),
       'view' => array(
         'description' => t('TRUE if the user is allowed to view datastreams that match this rule FALSE otherwise.'),

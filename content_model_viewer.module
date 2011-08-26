@@ -165,6 +165,9 @@ function content_model_viewer_theme() {
     'field_book_content_model_viewer' => array(
       'arguments' => array('pid' => NULL),
       'template' => 'models/Default',
+    ),
+    'content_model_viewer_form_table' => array(
+      'arguments' => array('element' => NULL)
     )
   );
 }
@@ -604,4 +607,42 @@ function content_model_viewer_object_has_members($pid) {
     return $count > 0;
   }
   return FALSE;
+}
+
+/**
+ * Gets the model id that is used to identitfy the custom settings for the given content model, identified by $pid.
+ * 
+ * @param string $pid 
+ *   A fedora object pid.
+ * 
+ * @return int
+ *   Returns the model_id  
+ */
+function content_model_viewer_get_model_id($pid) {
+  return db_result(db_query('SELECT id FROM content_model_viewer_models WHERE id > 1 AND pid = "%s"', $pid));
+}
+
+/**
+ * Gets the custom settings for the given $pid.
+ * 
+ * If $pid is NULL get the default settings.
+ * 
+ * @param string $pid
+ *   A fedora object pid.
+ * 
+ * @return array
+ *   The rules associated with this fedora object.
+ */
+function content_model_viewer_get_settings($pid = NULL) {
+  $settings = array();
+  $model_id = isset($pid) ? content_model_viewer_get_model_id($pid) : 1;
+  $query = db_query('SELECT * FROM content_model_viewer_datastream_rules WHERE model_id = "%d"', $model_id);
+  while ($data = db_fetch_object($query)) {
+    $item = array();
+    foreach ($data as $key => $value) {
+      $item[$key] = $value;
+    }
+    $settings[] = $item;
+  }
+  return $settings;
 }
