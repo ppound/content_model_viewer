@@ -17,6 +17,10 @@ define("PERM_CONTENT_MODEL_VIEWER_ADD_DATASTREAMS", 'Add Datastreams');
 define("PERM_CONTENT_MODEL_VIEWER_PURGE_DATASTREAMS", 'Purge Datastreams');
 define("PERM_CONTENT_MODEL_VIEWER_DOWNLOAD_DATASTREAMS", 'Download Datastreams');
 define("PERM_CONTENT_MODEL_VIEWER_MODIFY_DATASTEAM_PROPERTIES", 'Modify Datastream Properties');
+define("CONTENT_MODEL_VIEWER_SETTINGS_TABLE", 'content_model_viewer_models');
+define("CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE", 'content_model_viewer_datastream_dsid_rules');
+define("CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE", 'content_model_viewer_datastream_mimetype_rules');
+define("CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID", 1);
 
 /**
  * Implements Menu Hook. Registers Menus.
@@ -692,7 +696,7 @@ function content_model_viewer_is_viewing_permitted($pid, $dsid) {
   $permitted = TRUE; // Default TRUE.
 
   foreach ($settings as $setting) {
-    if(($setting['mime'])) {
+    if (($setting['mime'])) {
       
     }
   }
