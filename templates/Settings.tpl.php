@@ -1,4 +1,7 @@
 <br/>
+<?php
+  drupal_add_tabledrag('datastream-rules', 'order', 'sibling', 'my-elements-weight');
+?>
 <div id="admin-settings-main">
   <h3><?php print t('Custom Settings') ?></h3>
   <div id="admin-settings-custom-form">
