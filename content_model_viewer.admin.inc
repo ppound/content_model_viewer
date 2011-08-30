@@ -62,7 +62,6 @@ function content_model_viewer_custom_settings_form(array &$form_state) {
     'content_model' => array(
       '#type' => 'textfield',
       '#title' => 'Content Model',
-      //'#required' => true,
       '#autocomplete_path' => 'admin/settings/content_model_viewer/form/autocomplete/models',
       '#description' => 'Choose a Content Model to customize. If the content model is already listed please follow the <b>Edit</b> link.',
       '#default_value' => isset($form_state['values']['content_model']) ? $form_state['values']['content_model'] : NULL,
@@ -153,9 +152,7 @@ function content_model_viewer_add_setting(array $form, array &$form_state) {
   drupal_write_record('content_model_viewer_models', $object);
   $model_id = content_model_viewer_get_model_id($pid);
   $row = new stdClass();
-  $row->model_id = $model_id;
-  $row->view = 0; // Prohibit
-  $row->download = 0; // Prohibit
+  $row->model_id = $model_id; // @todo incorporate this into its own function, so external modules can install defaults...
   $hidden = array('POLICY', 'DC', 'RELS-EXT', 'RELS-INT', 'ISLANDORACM');
   foreach ($hidden as $hide) {
     $row->dsid = $hide;
@@ -412,160 +409,6 @@ function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id 
       'rows' => $rows
     )
   );
-}
-
-/**
- * Gets the Datastream rules form.
- * 
- * Lists all the existing rules, and provides several fields for adding additional rules.
- * 
- * @param array $form_state
- *   The Drupal Form State.
- * @param int $model_id
- *   The Model associated with the datastream rule.
- *
- * @return array 
- *   A Drupal Form.
- */
-function content_model_viewer_datastream_rules_form(array &$form_state, $model_id = 1) {
-  foreach (content_model_viewer_get_settings($model_id) as $row) {
-    $settings[] = array(
-      'dsid' => array('#value' => $row['dsid']),
-      'mime' => array('#value' => $row['mime']),
-      'view' => array('#value' => $row['view'] ? t('Permit') : t('Prohibit')),
-      'download' => array('#value' => $row['download'] ? t('Permit') : t('Prohibit')),
-      'remove' => array(
-        '#type' => 'submit',
-        '#value' => 'Delete',
-        '#rule_id' => $row['id'],
-        '#submit' => array('content_model_viewer_delete_datastream_rule')
-      ),
-      '#attributes' => array(
-        'class' => 'draggable'
-      )
-    );
-  }
-
-  $form = array(
-    'datastreams' => array(
-      '#type' => 'fieldset',
-      '#title' => t('Datastream Display Rules (View/Download)'),
-      '#description' => '<p>Datastream rules only apply to datastreams shown in the Overview/Viewer tab panels.
-        The <b>Datastream ID</b> and <b>MIME Type</b> fields select one or more datastreams, and the 
-        <b>View</b> and <b>Download</b> specifiy what actions will be be avalible to the end user.
-        If both <b>View</b> and <b>Download</b> 
-        are <b>Prohibited</b> then the selected datastreams won\'t appear in the files section of the Viewer.
-        The rules governing MIME type are run </p>',
-    )
-  );
-  foreach (content_model_viewer_get_settings($model_id) as $row) {
-    $settings[] = array(
-      'dsid' => array('#value' => $row['dsid']),
-      'mime' => array('#value' => $row['mime']),
-      'view' => array('#value' => $row['view'] ? t('Permit') : t('Prohibit')),
-      'download' => array('#value' => $row['download'] ? t('Permit') : t('Prohibit')),
-      'remove' => array(
-        '#type' => 'submit',
-        '#value' => 'Delete',
-        '#rule_id' => $row['id'],
-        '#submit' => array('content_model_viewer_delete_datastream_rule')
-      ),
-      '#attributes' => array(
-        'class' => 'draggable'
-      )
-    );
-  }
-  $form['datastreams']['mime'] = array(
-    '#header' => array('MIME Type', 'View', 'Download'),
-    '#theme' => 'content_model_viewer_form_table'
-  );
-  $form['datastreams']['dsid'] = array(
-    '#header' => array('Datastream ID', 'View', 'Download'),
-    '#theme' => 'content_model_viewer_form_table'
-  );
-  return $form;
-
-  $settings = array(
-    '#header' => array('Datastream ID', 'MIME Type', 'View', 'Download'),
-    '#theme' => 'content_model_viewer_form_table'
-  );
-
-  foreach (content_model_viewer_get_settings($model_id) as $row) {
-    $settings[] = array(
-      'mime' => array('#value' => $row['mime']),
-      'view' => array('#value' => $row['view'] ? t('Permit') : t('Prohibit')),
-      'download' => array('#value' => $row['download'] ? t('Permit') : t('Prohibit')),
-      'remove' => array(
-        '#type' => 'submit',
-        '#value' => 'Delete',
-        '#rule_id' => $row['id'],
-        '#submit' => array('content_model_viewer_delete_datastream_rule')
-      ),
-      '#attributes' => array(
-        'class' => 'draggable'
-      )
-    );
-  }
-
-  $settings['add'] = array(
-    'dsid' => array(
-      '#type' => 'textfield',
-      '#title' => t(''),
-      '#description' => t('A PCRE (Perl-Compatible Regular Expression)'),
-      '#default_value' => '.*',
-      '#size' => 30,
-    ),
-    'mime' => array(
-      '#type' => 'textfield',
-      '#title' => t(''),
-      '#default_value' => '*',
-      '#description' => t('A valid MIME Type or * to indicate any MIME Type.'),
-      '#size' => 30,
-    ),
-    'view' => array(
-      '#type' => 'select',
-      '#options' => array(0 => 'Prohibit', 1 => 'Permit')
-    ),
-    'download' => array(
-      '#type' => 'select',
-      '#options' => array(0 => 'Prohibit', 1 => 'Permit')
-    ),
-    'add' => array(
-      '#type' => 'submit',
-      '#value' => 'Add',
-      '#model_id' => $model_id, // Default.
-      '#submit' => array('content_model_viewer_add_datastream_rule'),
-      '#validate' => array('content_model_viewer_add_datastream_rule_validate'),
-    )
-  );
-
-  $form = array(
-    'datastreams' => array(
-      '#type' => 'fieldset',
-      '#title' => t('Datastream Display Rules (View/Download)'),
-      '#description' => '<p>Datastream rules only apply to datastreams shown in the Overview/Viewer tab panels.
-        The <b>Datastream ID</b> and <b>MIME Type</b> fields select one or more datastreams, and the 
-        <b>View</b> and <b>Download</b> specifiy what actions will be be avalible to the end user.
-        If both <b>View</b> and <b>Download</b> 
-        are <b>Prohibited</b> then the selected datastreams won\'t appear in the files section of the Viewer.
-        The rules governing MIME type are run </p>',
-      /**
-       * A bit of a hack, I want the default action here to be add not delete, 
-       * so I've mirrored the add button and placed it at the begining of the form. 
-       * Making it hidden, so it will be the default action.
-       */
-      'add' => array(
-        '#type' => 'submit',
-        '#value' => 'Add',
-        '#model_id' => $model_id, // Default.
-        '#submit' => array('content_model_viewer_add_datastream_rule'),
-        '#validate' => array('content_model_viewer_add_datastream_rule_validate'),
-        '#attributes' => array('style' => 'position: absolute; left: -9999px; width: 1px; height: 1px;'),
-      ),
-      'settings' => $settings,
-    )
-  );
-  return $form;
 }
 
 /**
