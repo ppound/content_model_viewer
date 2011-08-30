@@ -671,7 +671,7 @@ function content_model_viewer_order_settings(array $settings) {
  *   Returns the model_id  
  */
 function content_model_viewer_get_model_id($pid) {
-  return db_result(db_query('SELECT id FROM content_model_viewer_models WHERE id > 1 AND pid = "%s"', $pid));
+  return db_result(db_query('SELECT id FROM %s WHERE id > 1 AND pid = "%s"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $pid));
 }
 
 /**

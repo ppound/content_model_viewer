@@ -151,6 +151,16 @@ function content_model_viewer_add_setting(array $form, array &$form_state) {
   $object = new stdClass();
   $object->pid = $pid;
   drupal_write_record('content_model_viewer_models', $object);
+  $model_id = content_model_viewer_get_model_id($pid);
+  $row = new stdClass();
+  $row->model_id = $model_id;
+  $row->view = 0; // Prohibit
+  $row->download = 0; // Prohibit
+  $hidden = array('POLICY', 'DC', 'RELS-EXT', 'RELS-INT', 'ISLANDORACM');
+  foreach ($hidden as $hide) {
+    $row->dsid = $hide;
+    drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $row);
+  }
   $form_state['redirect'] = "admin/settings/content_model_viewer/$pid/edit";
 }
 
@@ -183,6 +193,8 @@ function content_model_viewer_delete_setting(array $form, array &$form_state) {
  *   The Drupal Form.
  */
 function content_model_viewer_datastream_default_rules_form(array &$form_state, $model_id = 1) {
+  $view = db_result(db_query('SELECT view FROM %s WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $model_id));
+  $download = db_result(db_query('SELECT download FROM %s WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $model_id));
   return array(
     'datastreams' => array(
       '#type' => 'fieldset',
@@ -196,17 +208,18 @@ function content_model_viewer_datastream_default_rules_form(array &$form_state, 
         '#title' => t('Default Datastream View Behavior'),
         '#description' => t('If no MIME type or Datastream ID rules match below then this defines if the end user is able to view the Datastream or not.'),
         '#options' => array(0 => 'Prohibit', 1 => 'Permit'),
-        '#default_value' => variable_get('content_model_viewer_datastream_viewable_default', 1),
+        '#default_value' => $view,
       ),
       'download' => array(
         '#type' => 'select',
         '#title' => t('Default Datastream Download Behavior'),
         '#description' => t('If no MIME type or Datastream ID rules match below then this defines if the end user is able to download the Datastream or not.'),
         '#options' => array(0 => 'Prohibit', 1 => 'Permit'),
-        '#default_value' => variable_get('content_model_viewer_datastream_downloadable_default', 1),
+        '#default_value' => $download,
       ),
       'submit' => array(
         '#type' => 'submit',
+        '#model_id' => $model_id,
         '#value' => 'Set Defaults'
       )
     )
@@ -222,8 +235,15 @@ function content_model_viewer_datastream_default_rules_form(array &$form_state, 
  *   The Drupal Form State.
  */
 function content_model_viewer_datastream_default_rules_form_submit(array $form, array &$form_state) {
-  variable_set('content_model_viewer_datastream_viewable_default', $form_state['values']['view']);
-  variable_set('content_model_viewer_datastream_downloadable_default', $form_state['values']['download']);
+  if (isset($form_state['clicked_button']['#model_id'])) {
+    $update = array(
+      'view' => $form_state['values']['view'],
+      'download' => $form_state['values']['download'],
+    );
+    foreach ($update as $column => $value) {
+      db_query('UPDATE %s SET %s = "%d" where id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $column, $value, $form_state['clicked_button']['#model_id']);
+    }
+  }
 }
 
 /**
@@ -290,7 +310,7 @@ function content_model_viewer_datastream_mimetype_rules_form($form_state, $model
   return array(
     'fieldset' => array(
       '#type' => 'fieldset',
-      '#title' => t('Default Datastream Display Rules (View/Download)'),
+      '#title' => t('Datastream Display Rules (MIME Type)'),
       '#description' => t('<p>If a given datastream has the same MIME type as defined by one of these rules the <b>View</b> and <b>Download</b> properties defined here will take precedent over the default properties.</p>'),
       /**
        * A bit of a hack, I want the default action here to be add not delete, 
@@ -374,7 +394,7 @@ function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id 
   return array(
     'fieldset' => array(
       '#type' => 'fieldset',
-      '#title' => t('Datastream ID Display Rules (View/Download)'),
+      '#title' => t('Datastream Display Rules (Datastream ID)'),
       '#description' => t('<p>If a given datastream\'s ID matches one of the rules below the <b>View</b> and <b>Download</b> properties defined here will take precedent over all other rules.</p>'),
       /**
        * A bit of a hack, I want the default action here to be add not delete, 
@@ -429,7 +449,7 @@ function content_model_viewer_datastream_rules_form(array &$form_state, $model_i
   $form = array(
     'datastreams' => array(
       '#type' => 'fieldset',
-      '#title' => t('Default Datastream Display Rules (View/Download)'),
+      '#title' => t('Datastream Display Rules (View/Download)'),
       '#description' => '<p>Datastream rules only apply to datastreams shown in the Overview/Viewer tab panels.
         The <b>Datastream ID</b> and <b>MIME Type</b> fields select one or more datastreams, and the 
         <b>View</b> and <b>Download</b> specifiy what actions will be be avalible to the end user.
