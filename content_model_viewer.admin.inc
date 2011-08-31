@@ -42,11 +42,12 @@ function content_model_viewer_custom_settings_form(array &$form_state) {
   $result = db_query('SELECT * FROM {content_model_viewer_models} WHERE id > 1');
   $models = array(
     '#header' => array('Content Model', 'PID', 'Edit Settings', 'Delete Settings'),
-    '#theme' => 'content_model_viewer_form_table'
+    '#theme' => 'content_model_viewer_form_table',
   );
   while ($row = db_fetch_object($result)) {
     $item = new Fedora_Item($row->pid);
     $models[] = array(
+      '#tree' => TRUE,
       'label' => array('#value' => $item->objectProfile->objLabel),
       'pid' => array('#value' => $row->pid),
       'edit' => array('#value' => l('Edit', "admin/settings/content_model_viewer/{$row->pid}/edit")),
@@ -54,6 +55,7 @@ function content_model_viewer_custom_settings_form(array &$form_state) {
         '#type' => 'submit',
         '#value' => 'Delete',
         '#pid' => $row->pid, // Default.
+        '#name' => 'delete-dsid-rule' . $row->pid,
         '#submit' => array('content_model_viewer_delete_setting'),
       )
     );
@@ -153,9 +155,10 @@ function content_model_viewer_add_setting(array $form, array &$form_state) {
   $model_id = content_model_viewer_get_model_id($pid);
   $row = new stdClass();
   $row->model_id = $model_id; // @todo incorporate this into its own function, so external modules can install defaults...
-  $hidden = array('POLICY', 'DC', 'RELS-EXT', 'RELS-INT', 'ISLANDORACM');
+  $hidden = array('^POLICY$', '^DC$', '^RELS-EXT$', '^RELS-INT$', '^ISLANDORACM$');
   foreach ($hidden as $hide) {
     $row->dsid = $hide;
+    $row->view = $row->download = 0;
     drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $row);
   }
   $form_state['redirect'] = "admin/settings/content_model_viewer/$pid/edit";
@@ -262,17 +265,19 @@ function content_model_viewer_datastream_mimetype_rules_form($form_state, $model
    */
   $rows = array(
     '#header' => array(t('MIME Type'), t('View'), t('Download'), ''),
-    '#theme' => 'content_model_viewer_form_table'
+    '#theme' => 'content_model_viewer_form_table',
   );
   $query = db_query("SELECT * FROM %s WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE, $model_id);
   while ($row = db_fetch_array($query)) {
     $rows[] = array(
+      '#tree' => TRUE,
       'mime' => array('#value' => $row['mime']),
       'view' => array('#value' => $row['view'] ? t('Permit') : t('Prohibit')),
       'download' => array('#value' => $row['download'] ? t('Permit') : t('Prohibit')),
       'remove' => array(
         '#type' => 'submit',
         '#value' => 'Delete',
+        '#name' => 'delete-mime-rule' . $row['id'],
         '#rule_id' => $row['id'],
         '#submit' => array('content_model_viewer_delete_datastream_mimetype_rule')
       )
@@ -346,11 +351,12 @@ function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id 
    */
   $rows = array(
     '#header' => array(t('Datastream ID'), t('View'), t('Download'), ''),
-    '#theme' => 'content_model_viewer_form_table'
+    '#theme' => 'content_model_viewer_form_table',
   );
   $query = db_query("SELECT * FROM %s WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $model_id);
   while ($row = db_fetch_array($query)) {
     $rows[] = array(
+      '#tree' => TRUE,
       'dsid' => array('#value' => $row['dsid']),
       'view' => array('#value' => $row['view'] ? t('Permit') : t('Prohibit')),
       'download' => array('#value' => $row['download'] ? t('Permit') : t('Prohibit')),
@@ -358,6 +364,7 @@ function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id 
         '#type' => 'submit',
         '#value' => t('Delete'),
         '#rule_id' => $row['id'],
+        '#name' => 'delete-dsid-rule' . $row['id'],
         '#submit' => array('content_model_viewer_delete_datastream_dsid_rule')
       )
     );

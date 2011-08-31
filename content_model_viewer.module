@@ -7,6 +7,8 @@
  *
  * Implements hooks and callbacks for this module.
  */
+module_load_include('inc', 'content_model_viewer', 'content_model_viewer.db'); // Helper functions/constants for database.
+
 /**
  * Constants
  */
@@ -17,10 +19,6 @@ define("PERM_CONTENT_MODEL_VIEWER_ADD_DATASTREAMS", 'Add Datastreams');
 define("PERM_CONTENT_MODEL_VIEWER_PURGE_DATASTREAMS", 'Purge Datastreams');
 define("PERM_CONTENT_MODEL_VIEWER_DOWNLOAD_DATASTREAMS", 'Download Datastreams');
 define("PERM_CONTENT_MODEL_VIEWER_MODIFY_DATASTEAM_PROPERTIES", 'Modify Datastream Properties');
-define("CONTENT_MODEL_VIEWER_SETTINGS_TABLE", 'content_model_viewer_models');
-define("CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE", 'content_model_viewer_datastream_dsid_rules');
-define("CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE", 'content_model_viewer_datastream_mimetype_rules');
-define("CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID", 1);
 
 /**
  * Implements Menu Hook. Registers Menus.
@@ -49,6 +47,12 @@ function content_model_viewer_menu() {
   $items['viewer/%/datastreams'] = array(
     'page callback' => 'content_model_viewer_datastreams',
     'page arguments' => array(1),
+    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
+    'type' => MENU_CALLBACK,
+  );
+  $items['viewer/%/datastreams/%'] = array(
+    'page callback' => 'content_model_viewer_datastreams',
+    'page arguments' => array(1, 3),
     'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
     'type' => MENU_CALLBACK,
   );
@@ -86,12 +90,6 @@ function content_model_viewer_menu() {
     'page callback' => 'content_model_viewer_view_datastream',
     'page arguments' => array(1, 2),
     'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
-    'type' => MENU_CALLBACK,
-  );
-  $items['viewer/%/%/properties'] = array(
-    'page callback' => '',
-    'page arguments' => array(1, 2),
-    'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_MODIFY_DATASTEAM_PROPERTIES),
     'type' => MENU_CALLBACK,
   );
   $items['admin/settings/content_model_viewer'] = array(
@@ -392,46 +390,32 @@ function content_model_viewer_members($pid) {
 }
 
 /**
- * 
+ * Get/Set data stream properties for the given Fedora Object.
  * 
  * @param string $pid 
+ *   The PID of the Fedora Object, whose data streams this function will get/set.s
  */
-function content_model_viewer_datastreams($pid) {
-  $filter = isset($_GET['filter']) ? $_GET['filter'] : false;
-  //$viewer = content_model_viewer_get_registered_content_model_viewer($pid);
-  //list($data, $total) = $viewer->getDatastreams($filter);
-
-  echo json_encode(array('success' => TRUE, 'data' => $data, 'total' => $total));
-  exit();
-}
-
-/**
- * Get/Set a datastreams properties.
- * 
- * @param string $pid
- * @param string $dsid 
- */
-function content_model_viewer_datastream($pid, $dsid) {
-  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  $item = new Fedora_Item($pid);
-  if (isset($item->datastreams[$dsid])) {
-    $datastream = $item->datastreams[$dsid];
-    switch ($_SERVER['REQUEST_METHOD']) {
-      case 'PUT':
-        if ($_SERVER['CONTENT_LENGTH'] > 0) {
-          $stdin = fopen("php://input", "r");
-          $json = fread($stdin, $_SERVER['CONTENT_LENGTH']);
-          $data = json_decode($json);
-          // @todo Update the datastreams properties ...
-          $data->created = "NOW";
-          echo json_encode(array('success' => TRUE, 'msg' => "Successfully modified $dsid's properties", 'data' => $data));
-          exit();
-        }
-        break;
-    }
+function content_model_viewer_datastreams($pid, $dsid = NULL) {
+  module_load_include('inc', 'content_model_viewer', 'Datastreams');
+  switch ($_SERVER['REQUEST_METHOD']) {
+    case 'GET':
+      $filter = isset($_GET['filter']) ? $_GET['filter'] : FALSE;
+      $datastreams = new Datastreams($pid);
+      list($data, $total) = $datastreams->get($_GET['start'], $_GET['limit'], $filter);
+      echo json_encode(array('success' => TRUE, 'data' => $data, 'total' => $total));
+      exit();
+    case 'PUT':
+      if ($_SERVER['CONTENT_LENGTH'] > 0) {
+        $stdin = fopen("php://input", "r");
+        $json = fread($stdin, $_SERVER['CONTENT_LENGTH']);
+        $data = json_decode($json);
+        $datastreams = new Datastreams($pid);
+        $data = $datastreams->setProperties($dsid, $data);
+        echo json_encode(array('success' => TRUE, 'msg' => "Successfully modified $dsid's properties", 'data' => $data));
+        exit();
+      }
+      break;
   }
-  echo json_encode(array('success' => FALSE, 'msg' => "Datastream $dsid does not exist."));
-  exit();
 }
 
 /**
@@ -502,7 +486,7 @@ function content_model_viewer_add_datastream($pid) {
         $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, NULL, $control);
       }
     } catch (Exception $e) {
-      // log some error...
+// log some error...
     }
   }
   $message = $success ? t('Successfully added datastream.') : t('Failed to add datastream.');
@@ -549,8 +533,10 @@ function content_model_viewer_download_datastream($pid, $dsid) {
  * @return string
  */
 function content_model_viewer_view_datastream($pid, $dsid) {
+  // @todo make viewers plugin-play...
+
   content_model_viewer_include_viewers();
-  // @todo get the viewer for the datastream
+// @todo get the viewer for the datastream
   $viewer_exists = false;
   if (!$viewer_exists) {
     $viewer = new FlexPaperViewer();
@@ -558,31 +544,6 @@ function content_model_viewer_view_datastream($pid, $dsid) {
     exit();
   }
   exit();
-}
-
-/**
- * Gets/set the properties of the given datastream ($dsid) from the object identified by $pid.
- *
- * @param string $pid 
- * @param string $dsid
- *
- * @return string
- */
-function content_model_viewer_datastream_properties($pid, $dsid) {
-  module_load_include('inc', 'content_model_viewer', 'DatastreamProperties');
-  if (empty($_POST)) {
-    // @todo detect if the datastream doesn't exist and respond accordingly
-    $datastream_properties = new DatastreamProperties($pid);
-    list($properties, $total) = $datastream_properties->getProperties();
-    return json_encode(array('success' => TRUE, 'data' => $properties, 'total' => $total));
-  }
-  else {
-    $datastream_properties = new DatastreamProperties($pid);
-    $success = $datastream_properties->setProperties(/* Determine the fields we want to pass here */);
-    $message = $success ? t('Successfuly modified datastream properties') : t('Failed to modify datastream properties');
-    $properties = $datastream_properties->getProperties();
-    return json_encode(array('success' => TRUE, 'msg' => $message, 'data' => $properties));
-  }
 }
 
 /**
@@ -608,98 +569,3 @@ function content_model_viewer_object_has_members($pid) {
   }
   return FALSE;
 }
-
-/**
- *
- * @param string $pid 
- *   A Fedora Object PID.
- * @return boolean
- *   TRUE if there are settings defined for the given Content Model, FALSE otherwise.
- */
-function content_model_viewer_model_has_settings($pid) {
-  $query = db_query('SELECT count(pid) FROM content_model_viewer_models WHERE id > 1 AND pid = "%s"', $pid);
-  return (db_result($query) > 0) ? TRUE : FALSE;
-}
-
-/**
- * Gets the custom settings for the given $pid.
- * 
- * If $model is not provided get the default settings.
- * 
- * @param string $model_id
- *   The model the settings are associated with.
- * 
- * @return array
- *   The rules associated with this fedora object.
- */
-function content_model_viewer_get_settings($model_id = 1) {
-  $settings = array();
-  $query = db_query('SELECT * FROM content_model_viewer_datastream_rules WHERE model_id = "%d"', $model_id);
-  while ($data = db_fetch_object($query)) {
-    $item = array();
-    foreach ($data as $key => $value) {
-      $item[$key] = $value;
-    }
-    $settings[] = $item;
-  }
-  return $settings;
-}
-
-/**
- * Orders the settings for the given datastream, based on the MIME Type and DSID of the datastream. Also filter out 
- * settings that don't apply to this datastream.
- * 
- * If MIME type restricts, and DSID passes.
- * 
- * @param array $settings 
- * @param string $mime
- * @param string $dsid
- * 
- * @return array
- */
-function content_model_viewer_order_settings(array $settings) {
-  
-}
-
-/**
- * Gets the model id that is used to identitfy the custom settings for the given content model, identified by $pid.
- * 
- * @param string $pid 
- *   A fedora object pid.
- * 
- * @return int
- *   Returns the model_id  
- */
-function content_model_viewer_get_model_id($pid) {
-  return db_result(db_query('SELECT id FROM %s WHERE id > 1 AND pid = "%s"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $pid));
-}
-
-/**
- * Checks to see if the user can view the given datastream of the given Fedora Object.
- * 
- * @param string $pid
- *   The Fedora Objects pid.
- * @param string $dsid 
- *   The Datastream ID.
- * 
- * @return boolean
- *   TRUE if the end user is permitted to view the datastream, FALSE otherwise.
- */
-function content_model_viewer_is_viewing_permitted($pid, $dsid) {
-  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  module_load_include('inc', 'fedora_repository', 'ContentModel');
-  $item = new Fedora_Item($pid);
-  $content_model = ContentModel::loadFromObject($pid);
-  $pid = $content_model->pid;
-  $model_id = content_model_viewer_model_has_settings($pid) ? content_model_viewer_get_model_id($pid) : 1;
-  $settings = content_model_viewer_get_settings($model_id);
-  $permitted = TRUE; // Default TRUE.
-
-  foreach ($settings as $setting) {
-    if (($setting['mime'])) {
-      
-    }
-  }
-  return $permitted;
-}
-

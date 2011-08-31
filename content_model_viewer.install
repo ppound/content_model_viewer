@@ -67,7 +67,7 @@ function content_model_viewer_set_default_rules() {
   $row->model_id = CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID;
   $row->view = 0; // Prohibit
   $row->download = 0; // Prohibit
-  $hidden = array('POLICY', 'DC', 'RELS-EXT', 'RELS-INT', 'ISLANDORACM');
+  $hidden = array('^POLICY$', '^DC$', '^RELS-EXT$', '^RELS-INT$', '^ISLANDORACM$', '^COLLECTION_POLICY$');
   foreach ($hidden as $hide) {
     $row->dsid = $hide;
     drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $row);
