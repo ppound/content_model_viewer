@@ -170,6 +170,35 @@ function content_model_viewer_theme() {
 }
 
 /**
+ * 'content_model_datastream_viewers' Hook implementation. 
+ * 
+ * Lists all the datastream viewers
+ */
+function content_model_viewer_content_model_datastream_viewers() {
+  /**
+   * @todo make is so that no Classes need to be created and all the information is included
+   * in this array...
+   */
+  $flexpaper = array(
+    'type' => 'inc',
+    'module' => 'content_model_viewer',
+    'file' => 'viewers/Flexpaper',
+    'class' => 'FlexPaperViewer',
+  );
+  $xml = array(
+    'type' => 'inc',
+    'module' => 'content_model_viewer',
+    'file' => 'viewers/XML',
+    'class' => 'XMLDatastreamViewer',
+  );
+  return array(
+    'application/x-shockwave-flash' => $flexpaper,
+    'text/xml' => $xml,
+    'application/rdf+xml' => $xml
+  );
+}
+
+/**
  * Loads all the installed module classes.
  */
 function content_model_viewer_include_content_models() {
@@ -277,14 +306,34 @@ function content_model_viewer_get_supported_viewers() {
   static $cache;
   if (!isset($cache)) {
     $cache = array();
-    foreach (module_implements('elements') as $module) {
-      $elements = module_invoke($module, 'elements');
-      if (isset($elements) && is_array($elements)) {
-        $cache = array_merge_recursive($cache, $elements);
+    foreach (module_implements('content_model_datastream_viewers') as $module) {
+      $viewers = module_invoke($module, 'content_model_datastream_viewers');
+      if (isset($viewers) && is_array($viewers)) {
+        $cache = array_merge_recursive($cache, $viewers);
       }
     }
   }
   return $cache;
+}
+
+/**
+ * Looks for a supported viewer that can view the given MIME type, and gets the viewer properties.
+ * 
+ * @param string $mime 
+ *   A valid MIME Type.
+ *
+ * @return array
+ *   The properties of the viewer if found, NULL otherwise. The format of the properties is defined by the 
+ *   content_model_datastream_viewers hook.
+ */
+function content_model_viewer_get_viewer_properties($mime) {
+  $viewers = content_model_viewer_get_supported_viewers();
+  foreach ($viewers as $supported_mime_type => $properties) {
+    if ($supported_mime_type == $mime) { // @todo make both lower case.
+      return $properties;
+    }
+  }
+  return NULL;
 }
 
 /**
@@ -486,7 +535,7 @@ function content_model_viewer_add_datastream($pid) {
         $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, NULL, $control);
       }
     } catch (Exception $e) {
-// log some error...
+      // log some error...
     }
   }
   $message = $success ? t('Successfully added datastream.') : t('Failed to add datastream.');
@@ -533,15 +582,18 @@ function content_model_viewer_download_datastream($pid, $dsid) {
  * @return string
  */
 function content_model_viewer_view_datastream($pid, $dsid) {
-  // @todo make viewers plugin-play...
-
-  content_model_viewer_include_viewers();
-// @todo get the viewer for the datastream
-  $viewer_exists = false;
-  if (!$viewer_exists) {
-    $viewer = new FlexPaperViewer();
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  $item = new Fedora_Item($pid);
+  $mime = $item->datastreams[$dsid]['MIMEType'];
+  $properties = content_model_viewer_get_viewer_properties($mime);
+  if ($properties) {
+    module_load_include($properties['type'], $properties['module'], $properties['file']);
+    $class = $properties['class'];
+    $viewer = new $class();
     echo $viewer->render($pid, $dsid);
-    exit();
+  }
+  else {
+    echo '<div>' . t('No Viewer Avaliable') . '</div>';
   }
   exit();
 }

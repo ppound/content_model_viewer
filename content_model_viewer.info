@@ -2,5 +2,7 @@
 name = Content Model Viewer
 description = Displays Fedora Objects using the EXTJS javascript library.
 package = Fedora Repository
+dependencies[] = fedora_repository
+dependencies[] = php_lib
 version = 6.1dev
 core = 6.x

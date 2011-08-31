@@ -56,11 +56,16 @@ class Datastreams {
       $view = $this->hasViewer($mime) ? $dsid : NULL; // Check if there exists a viewer for the MIME Type
       $view_function = $view ? $this->getViewFunction($dsid, $mime) : NULL;
       $download = $dsid; // Can always download by default.
+      /* TODO move this filter exclusion to the filter function... */
       if ($filter) { // Overides the defaults
         list($viewable, $downloadable) = $this->getViewDownloadPermissions($dsid, $mime);
         $view = $viewable ? $this->getViewableDatastream($dsid, $mime) : NULL; // Might not be the current datastream.
         $view_function = $view ? $this->getViewFunction($view, $datastreams[$view]['MIMEType']) : NULL;
         $download = $downloadable ? $this->getDownloadableDatastream($dsid, $mime) : NULL;
+        if (empty($view) && empty($download)) { // TEMP HACK.
+          $total--;
+          continue;
+        }
       }
       $data[] = array(
         'dsid' => $dsid,
@@ -155,7 +160,7 @@ class Datastreams {
    *   TRUE if a viewer exists that can handle the given MIME type, FALSE otherwise.
    */
   private function hasViewer($mime) {
-    return TRUE; // @todo implement this functionality
+    return content_model_viewer_get_viewer_properties($mime) != NULL;
   }
 
   /**
@@ -195,11 +200,14 @@ class Datastreams {
    *   The function to call to initialize the viewer, NULL if none is required.
    */
   private function getViewFunction($dsid, $mime) {
-    // Check to see if their is a viewer associated with the given MIME type.
-    // If so return that datastream.
-    // If not look for a derived type in the RELS-INT
-    // If not derived type is found return NULL.
-    return $dsid;
+    $properties = content_model_viewer_get_viewer_properties($mime);
+    if ($properties) {
+      module_load_include($properties['type'], $properties['module'], $properties['file']);
+      $class = $properties['class'];
+      $viewer = new $class();
+      return $viewer->getInitializationFunction();
+    }
+    return NULL;
   }
 
   /**
