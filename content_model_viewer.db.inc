@@ -14,6 +14,8 @@ define("CONTENT_MODEL_VIEWER_SETTINGS_TABLE", 'content_model_viewer_models');
 define("CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE", 'content_model_viewer_datastream_dsid_rules');
 define("CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE", 'content_model_viewer_datastream_mimetype_rules');
 define("CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID", 1);
+define("CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT", 0);
+define("CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX", 1);
 
 /**
  *
@@ -60,7 +62,7 @@ function content_model_viewer_model_has_datastream_dsid_rules($model_id) {
  */
 function content_model_viewer_model_get_datastream_dsid_rules($model_id) {
   $rules = array();
-  $query = db_query('SELECT dsid, view, download FROM %s WHERE model_id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $model_id);
+  $query = db_query('SELECT * FROM %s WHERE model_id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $model_id);
   while ($row = db_fetch_array($query)) {
     $rules[] = $row;
   }

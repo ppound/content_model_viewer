@@ -15,6 +15,8 @@ class XMLDatastreamViewer extends AbstractViewer {
    * Adds all of the required javascript/css/etc that this viewer needs to run.
    */
   public function addRequiredResources() {
+    $path = drupal_get_path('module', 'content_model_viewer') . '/js';
+    drupal_add_js($path . '/XML.js');
     dom_document_pretty_print_include_files();
   }
 
@@ -27,7 +29,7 @@ class XMLDatastreamViewer extends AbstractViewer {
    *   The javascript initialization function if one exists, NULL otherwise.
    */
   public function getInitializationFunction() {
-    return 'prettyPrint';
+    return 'loadXMLViewer';
   }
 
   /**

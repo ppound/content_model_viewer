@@ -350,7 +350,7 @@ function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id 
    * Display the existing Datastream ID rules.
    */
   $rows = array(
-    '#header' => array(t('Datastream ID'), t('View'), t('Download'), ''),
+    '#header' => array(t('Datastream ID'), t('Match Type'), t('View'), t('Download'), ''),
     '#theme' => 'content_model_viewer_form_table',
   );
   $query = db_query("SELECT * FROM %s WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $model_id);
@@ -358,6 +358,7 @@ function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id 
     $rows[] = array(
       '#tree' => TRUE,
       'dsid' => array('#value' => $row['dsid']),
+      'type' => array('#value' => $row['type'] ? t('Regex') : t('Exact')),
       'view' => array('#value' => $row['view'] ? t('Permit') : t('Prohibit')),
       'download' => array('#value' => $row['download'] ? t('Permit') : t('Prohibit')),
       'remove' => array(
@@ -376,8 +377,13 @@ function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id 
     'dsid' => array(
       '#type' => 'textfield',
       '#title' => t(''),
-      '#description' => t('A Datastream ID or a PCRE (Perl-Compatible Regular Expression)'),
+      '#description' => t('The input for either Exact Match or a PCRE (Perl-Compatible Regular Expression)'),
       '#size' => 60,
+    ),
+    'type' => array(
+      '#type' => 'select',
+      '#title' => t(''),
+      '#options' => array(0 => t('Exact'), 1 => t('Regex'))
     ),
     'view' => array(
       '#type' => 'select',
@@ -545,6 +551,7 @@ function content_model_viewer_add_datastream_dsid_rule(array $form, array &$form
   $row = new stdClass();
   $row->model_id = $form_state['clicked_button']['#model_id'];
   $row->dsid = $form_state['values']['dsid'];
+  $row->type = $form_state['values']['type'];
   $row->view = $form_state['values']['view'];
   $row->download = $form_state['values']['download'];
   drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $row);
@@ -578,7 +585,7 @@ function content_model_viewer_add_datastream_dsid_rule_validate(array $form, arr
   if (empty($add['dsid']['#value'])) {
     form_error($add['dsid'], t('field is required.'));
   }
-  else {
+  else if ($add['type']['#value'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX) {
     content_model_viewer_regex_validate($add['dsid'], $form_state);
   }
 }

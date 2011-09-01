@@ -67,9 +67,10 @@ function content_model_viewer_set_default_rules() {
   $row->model_id = CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID;
   $row->view = 0; // Prohibit
   $row->download = 0; // Prohibit
-  $hidden = array('^POLICY$', '^DC$', '^RELS-EXT$', '^RELS-INT$', '^ISLANDORACM$', '^COLLECTION_POLICY$');
+  $hidden = array('POLICY', 'DC', 'RELS-EXT', 'RELS-INT', 'ISLANDORACM', 'COLLECTION_POLICY');
   foreach ($hidden as $hide) {
     $row->dsid = $hide;
+    $row->type = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT;
     drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $row);
   }
 }
@@ -140,6 +141,13 @@ function content_model_viewer_schema() {
         'type' => 'varchar',
         'length' => 256,
         'not null' => TRUE,
+      ),
+      'type' => array(
+        'description' => t('The type of value within dsid.'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT // Expected to 0 or 1, where 0 is exact and 1 in regex.
       ),
       'view' => array(
         'description' => t('TRUE if the user is allowed to view datastreams that match this rule FALSE otherwise.'),

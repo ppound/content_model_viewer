@@ -141,7 +141,10 @@ class Datastreams {
       $results = content_model_viewer_model_get_datastream_dsid_rules($id);
       foreach ($results as $row) {
         $pattern = $row['dsid'];
-        if (preg_match('/' . $pattern . '/', $dsid)) {
+        $matches = ($row['type'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX) ?
+            preg_match('/' . $pattern . '/', $dsid) :
+            trim($pattern) == trim($dsid);
+        if ($matches) {
           $view = $row['view'];
           $download = $row['download'];
           break;
@@ -181,7 +184,11 @@ class Datastreams {
     if ($this->hasViewer($mime)) {
       return $dsid;
     }
-    // If not look for a derived type in the RELS-INT
+    // Look for a rule for loading this mime type's derived type.
+    // If found try to execute this rule.
+    // A match on dsid or rdf, this way it can be used with existing data like coalliance or the library.
+    //if ($this->searchRDF($dsid)) {
+    //}
     // If not derived type is found return NULL.
     return NULL;
   }
