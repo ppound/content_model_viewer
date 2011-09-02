@@ -7,6 +7,7 @@
  *
  * Installs the required database schema for storing display and control properties for the viewer.
  */
+module_load_include('inc', 'content_model_viewer', 'content_model_viewer.db');
 
 /**
  * Implementation of hook_install.
