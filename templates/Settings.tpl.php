@@ -9,5 +9,7 @@
     <?php print drupal_get_form('content_model_viewer_datastream_default_rules_form'); ?>
     <?php print drupal_get_form('content_model_viewer_datastream_mimetype_rules_form'); ?>
     <?php print drupal_get_form('content_model_viewer_datastream_dsid_rules_form'); ?>
+    <?php print drupal_get_form('content_model_viewer_datastream_rels_view_derived_form'); ?>
+    <?php print drupal_get_form('content_model_viewer_datastream_dsid_view_derived_form'); ?>
   </div>
 </div>

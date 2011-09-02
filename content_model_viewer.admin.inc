@@ -425,6 +425,113 @@ function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id 
 }
 
 /**
+ * 
+ *
+ * 
+ * @param array $form_state
+ *   The Drupal Form State.
+ * @param int $model_id
+ *   The Model associated with the datastream rule.
+ *
+ * @return array 
+ *   A Drupal Form.
+ */
+function content_model_viewer_datastream_rels_view_derived_form($form_state, $model_id = 1) {
+  /**
+   * Display the existing Datastream ID rules.
+   */
+  $rows = array(
+    '#header' => array(t('MIME type'), t('Select'), t('Match'), t('Match Type'), ''),
+    '#theme' => 'content_model_viewer_form_table',
+  );
+  $query = db_query("SELECT * FROM %s WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $model_id);
+  while ($row = db_fetch_array($query)) {
+    $rows[] = array(
+      '#tree' => TRUE,
+      'mime' => array('#value' => $row['dsid']),
+      'xpath' => array('#value' => $row['dsid']),
+      'match' => array('#value' => $row['dsid']),
+      'type' => array('#value' => $row['type'] ? t('Regex') : t('Exact')),
+      'remove' => array(
+        '#type' => 'submit',
+        '#value' => t('Delete'),
+        '#rule_id' => $row['id'],
+        '#name' => 'delete-dsid-rule' . $row['id'],
+        '#submit' => array('content_model_viewer_delete_datastream_rels_view_derived_rule')
+      )
+    );
+  }
+  /**
+   * Add a row that has input for adding additional rules.
+   */
+  $rows['add'] = array(
+    'mime' => array(
+      '#type' => 'textfield',
+      '#title' => t(''),
+      '#description' => t('A valid MIME Type.'),
+      '#size' => 32,
+    ),
+    'xpath' => array(
+      '#type' => 'textfield',
+      '#title' => t(''),
+      '#description' => t('A valid xpath for RELS-INT.'),
+      '#size' => 32,
+    ),
+    'match' => array(
+      '#type' => 'textfield',
+      '#title' => t(''),
+      '#description' => t('The input for either Exact Match<br/> or a PCRE (Perl-Compatible Regular Expression)'),
+      '#size' => 32,
+    ),
+    'type' => array(
+      '#type' => 'select',
+      '#title' => t(''),
+      '#options' => array(0 => t('Exact'), 1 => t('Regex'))
+    ),
+    'add' => array(
+      '#type' => 'submit',
+      '#value' => t('Add'),
+      '#model_id' => $model_id, // Default.
+      '#submit' => array('content_model_viewer_add_datastream_dsid_rule'),
+      '#validate' => array('content_model_viewer_add_datastream_dsid_rule_validate'),
+    )
+  );
+  return array(
+    'fieldset' => array(
+      '#type' => 'fieldset',
+      '#title' => t('Derived Datastream Display Rules (RELS-INT)'),
+      '#description' => t('<p>Provides a way to match non-viewable types like PDF\'s with their viewable derived types such as SWF\'s. This set of rules queries the <b>RELS-INT</b> datastream for this relationship information. <b>%dsid%</b> and <b>%pid%</b> can be used in the <b>Search</b> and <b>Match</b> fields below to insert the Datastream ID and Object PID into the value.</p>'),
+      /**
+       * A bit of a hack, I want the default action here to be add not delete, 
+       * so I've mirrored the add button and placed it at the begining of the form. 
+       * Making it hidden, so it will be the default action.
+       */
+      'add' => array(
+        '#type' => 'submit',
+        '#value' => t('Add'),
+        '#model_id' => $model_id, // Default.
+        '#submit' => array('content_model_viewer_add_datastream_dsid_rule'),
+        '#validate' => array('content_model_viewer_add_datastream_dsid_rule_validate'),
+        '#attributes' => array('style' => 'position: absolute; left: -9999px; width: 1px; height: 1px;')
+      ),
+      'rows' => $rows
+    )
+  );
+}
+
+function content_model_viewer_delete_datastream_rels_view_derived_rule(array $form, array &$form_state) {
+  
+}
+
+function content_model_viewer_add_datastream_rels_view_derived_rule(array $form, array &$form_state) {
+  
+}
+
+function content_model_viewer_datastream_dsid_view_derived_form($form_state, $model_id = 1) {
+  
+}
+
+/**
  * Get Content Models for the Autocomplete Field.
  * 
  * @return array

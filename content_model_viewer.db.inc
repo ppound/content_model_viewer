@@ -13,6 +13,8 @@
 define("CONTENT_MODEL_VIEWER_SETTINGS_TABLE", 'content_model_viewer_models');
 define("CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE", 'content_model_viewer_datastream_dsid_rules');
 define("CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE", 'content_model_viewer_datastream_mimetype_rules');
+define("CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE", 'content_model_viewer_datastream_rels_view_derived_rules');
+define("CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE", 'content_model_viewer_datastream_dsid_view_derived_rules');
 define("CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID", 1);
 define("CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT", 0);
 define("CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX", 1);

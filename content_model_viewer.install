@@ -34,7 +34,9 @@ function content_model_viewer_add_foreign_key_constraints() {
 EOT;
   $tables = array(
     CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE,
-    CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE
+    CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE,
+    CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE,
+    CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE
   );
   foreach ($tables as $table) {
     $query = str_replace('%table%', $table, $constraint_query);
@@ -88,6 +90,84 @@ function content_model_viewer_uninstall() {
  * @return array
  */
 function content_model_viewer_schema() {
+  $schema[CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE] = array(
+    'description' => t(''),
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'model_id' => array(
+        'type' => 'int',
+        'not null' => TRUE
+      ),
+      'mime' => array(
+        'description' => t('A MIME type.'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+      ),
+      'xpath' => array(
+        'description' => t('An XPath type.'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+      ),
+      'match' => array(
+        'description' => t('A Regex or string to match the value returned from XPath.'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+      ),
+      'type' => array(
+        'description' => t('The type of value within dsid.'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT // Expected to 0 or 1, where 0 is exact and 1 in regex.
+      ),
+    ),
+    'primary key' => array('id'),
+    'indexes' => array(
+      'model_id' => array('model_id'),
+    ),
+  );
+  $schema[CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE] = array(
+    'description' => t(''),
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'model_id' => array(
+        'type' => 'int',
+        'not null' => TRUE
+      ),
+      'dsid' => array(
+        'description' => t('A MIME type.'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+      ),
+      'match' => array(
+        'description' => t('A Regex or string to match the value returned from XPath.'),
+        'type' => 'varchar',
+        'length' => 256,
+        'not null' => TRUE,
+      ),
+      'type' => array(
+        'description' => t('The type of value within dsid.'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT // Expected to 0 or 1, where 0 is exact and 1 in regex.
+      ),
+    ),
+    'primary key' => array('id'),
+    'indexes' => array(
+      'model_id' => array('model_id'),
+    ),
+  );
   $schema[CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE] = array(
     'description' => t('This table is used to store rules for displaying/viewing/downloading datastreams for non-admin users.'),
     'fields' => array(
