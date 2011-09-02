@@ -114,7 +114,7 @@ function content_model_viewer_schema() {
         'length' => 256,
         'not null' => TRUE,
       ),
-      'match' => array(
+      'matching' => array(
         'description' => t('A Regex or string to match the value returned from XPath.'),
         'type' => 'varchar',
         'length' => 256,
@@ -144,19 +144,26 @@ function content_model_viewer_schema() {
         'type' => 'int',
         'not null' => TRUE
       ),
-      'dsid' => array(
+      'src_dsid' => array(
         'description' => t('A MIME type.'),
         'type' => 'varchar',
         'length' => 256,
         'not null' => TRUE,
       ),
-      'match' => array(
+      'src_type' => array(
+        'description' => t('The type of value within dsid.'),
+        'type' => 'int',
+        'size' => 'tiny',
+        'not null' => TRUE,
+        'default' => CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT // Expected to 0 or 1, where 0 is exact and 1 in regex.
+      ),
+      'dest_dsid' => array(
         'description' => t('A Regex or string to match the value returned from XPath.'),
         'type' => 'varchar',
         'length' => 256,
         'not null' => TRUE,
       ),
-      'type' => array(
+      'dest_type' => array(
         'description' => t('The type of value within dsid.'),
         'type' => 'int',
         'size' => 'tiny',

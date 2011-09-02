@@ -94,7 +94,7 @@ function content_model_viewer_menu() {
   );
   $items['admin/settings/content_model_viewer'] = array(
     'title' => t('Content Model Viewer Settings'),
-    'description' => t('Settings for the Contet Model Viewer.'),
+    'description' => t('Settings for the Content Model Viewer.'),
     'page callback' => 'theme',
     'page arguments' => array('content_model_viewer_settings'),
     'access arguments' => array('administer site configuration'),

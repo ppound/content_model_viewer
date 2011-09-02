@@ -448,9 +448,9 @@ function content_model_viewer_datastream_rels_view_derived_form($form_state, $mo
   while ($row = db_fetch_array($query)) {
     $rows[] = array(
       '#tree' => TRUE,
-      'mime' => array('#value' => $row['dsid']),
-      'xpath' => array('#value' => $row['dsid']),
-      'match' => array('#value' => $row['dsid']),
+      'mime' => array('#value' => $row['mime']),
+      'xpath' => array('#value' => $row['xpath']),
+      'matching' => array('#value' => $row['matching']),
       'type' => array('#value' => $row['type'] ? t('Regex') : t('Exact')),
       'remove' => array(
         '#type' => 'submit',
@@ -469,19 +469,19 @@ function content_model_viewer_datastream_rels_view_derived_form($form_state, $mo
       '#type' => 'textfield',
       '#title' => t(''),
       '#description' => t('A valid MIME Type.'),
-      '#size' => 32,
+      '#size' => 20,
     ),
     'xpath' => array(
       '#type' => 'textfield',
       '#title' => t(''),
       '#description' => t('A valid xpath for RELS-INT.'),
-      '#size' => 32,
+      '#size' => 20,
     ),
-    'match' => array(
+    'matching' => array(
       '#type' => 'textfield',
       '#title' => t(''),
-      '#description' => t('The input for either Exact Match<br/> or a PCRE (Perl-Compatible Regular Expression)'),
-      '#size' => 32,
+      '#description' => t('The input for either Exact Match or a PCRE'),
+      '#size' => 30,
     ),
     'type' => array(
       '#type' => 'select',
@@ -492,15 +492,15 @@ function content_model_viewer_datastream_rels_view_derived_form($form_state, $mo
       '#type' => 'submit',
       '#value' => t('Add'),
       '#model_id' => $model_id, // Default.
-      '#submit' => array('content_model_viewer_add_datastream_dsid_rule'),
-      '#validate' => array('content_model_viewer_add_datastream_dsid_rule_validate'),
+      '#submit' => array('content_model_viewer_add_datastream_rels_view_derived_rule'),
+      '#validate' => array('content_model_viewer_add_datastream_rels_view_derived_rule_validate'),
     )
   );
   return array(
     'fieldset' => array(
       '#type' => 'fieldset',
       '#title' => t('Derived Datastream Display Rules (RELS-INT)'),
-      '#description' => t('<p>Provides a way to match non-viewable types like PDF\'s with their viewable derived types such as SWF\'s. This set of rules queries the <b>RELS-INT</b> datastream for this relationship information. <b>%dsid%</b> and <b>%pid%</b> can be used in the <b>Search</b> and <b>Match</b> fields below to insert the Datastream ID and Object PID into the value.</p>'),
+      '#description' => t('<p>Provides a way to match non-viewable types like PDF\'s with their viewable derived types such as SWF\'s. This set of rules queries the <b>RELS-INT</b> datastream for this relationship information. <b>%dsid%</b> and <b>%pid%</b> can be used in the <b>Select</b> and <b>Match</b> fields below to insert the Datastream ID and Object PID into the value.</p>'),
       /**
        * A bit of a hack, I want the default action here to be add not delete, 
        * so I've mirrored the add button and placed it at the begining of the form. 
@@ -510,8 +510,8 @@ function content_model_viewer_datastream_rels_view_derived_form($form_state, $mo
         '#type' => 'submit',
         '#value' => t('Add'),
         '#model_id' => $model_id, // Default.
-        '#submit' => array('content_model_viewer_add_datastream_dsid_rule'),
-        '#validate' => array('content_model_viewer_add_datastream_dsid_rule_validate'),
+        '#submit' => array('content_model_viewer_add_datastream_rels_view_derived_rule'),
+        '#validate' => array('content_model_viewer_add_datastream_rels_view_derived_rule_validate'),
         '#attributes' => array('style' => 'position: absolute; left: -9999px; width: 1px; height: 1px;')
       ),
       'rows' => $rows
@@ -519,16 +519,86 @@ function content_model_viewer_datastream_rels_view_derived_form($form_state, $mo
   );
 }
 
-function content_model_viewer_delete_datastream_rels_view_derived_rule(array $form, array &$form_state) {
-  
-}
-
-function content_model_viewer_add_datastream_rels_view_derived_rule(array $form, array &$form_state) {
-  
-}
-
 function content_model_viewer_datastream_dsid_view_derived_form($form_state, $model_id = 1) {
-  
+  /**
+   * Display the existing Datastream ID rules.
+   */
+  $rows = array(
+    '#header' => array(t('Source Datastream ID'), t('Match Type'), t('Derived Datastream ID'), t('Match Type'), ''),
+    '#theme' => 'content_model_viewer_form_table',
+  );
+  $query = db_query("SELECT * FROM %s WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE, $model_id);
+  while ($row = db_fetch_array($query)) {
+    $rows[] = array(
+      '#tree' => TRUE,
+      'src_dsid' => array('#value' => $row['src_dsid']),
+      'src_type' => array('#value' => $row['src_type'] ? t('Regex') : t('Exact')),
+      'dest_dsid' => array('#value' => $row['dest_dsid']),
+      'dest_type' => array('#value' => $row['dest_type'] ? t('Regex') : t('Exact')),
+      'remove' => array(
+        '#type' => 'submit',
+        '#value' => t('Delete'),
+        '#rule_id' => $row['id'],
+        '#name' => 'delete-dsid-rule' . $row['id'],
+        '#submit' => array('content_model_viewer_delete_datastream_dsid_view_derived_rule')
+      )
+    );
+  }
+  /**
+   * Add a row that has input for adding additional rules.
+   */
+  $rows['add'] = array(
+    'src_dsid' => array(
+      '#type' => 'textfield',
+      '#title' => t(''),
+      '#description' => t('The input for either Exact Match or a PCRE'),
+      '#size' => 30,
+    ),
+    'src_type' => array(
+      '#type' => 'select',
+      '#title' => t(''),
+      '#options' => array(0 => t('Exact'), 1 => t('Regex'))
+    ),
+    'dest_dsid' => array(
+      '#type' => 'textfield',
+      '#title' => t(''),
+      '#description' => t('The input for either Exact Match or a PCRE'),
+      '#size' => 30,
+    ),
+    'dest_type' => array(
+      '#type' => 'select',
+      '#title' => t(''),
+      '#options' => array(0 => t('Exact'), 1 => t('Regex'))
+    ),
+    'add' => array(
+      '#type' => 'submit',
+      '#value' => t('Add'),
+      '#model_id' => $model_id, // Default.
+      '#submit' => array('content_model_viewer_add_datastream_dsid_view_derived_rule'),
+      '#validate' => array('content_model_viewer_add_datastream_dsid_view_derived_rule_validate'),
+    )
+  );
+  return array(
+    'fieldset' => array(
+      '#type' => 'fieldset',
+      '#title' => t('Derived Datastream Display Rules (DSID)'),
+      '#description' => t('<p>Provides a way to match non-viewable types like PDF\'s with their viewable derived types such as SWF\'s. This set of rules compares the <b>Datastream ID\'s</b>. <b>%dsid%</b> and <b>%pid%</b> can be used in the <b>Source</b> and <b>Derived</b> fields below to insert the Datastream ID and Object PID into the value.</p>'),
+      /**
+       * A bit of a hack, I want the default action here to be add not delete, 
+       * so I've mirrored the add button and placed it at the begining of the form. 
+       * Making it hidden, so it will be the default action.
+       */
+      'add' => array(
+        '#type' => 'submit',
+        '#value' => t('Add'),
+        '#model_id' => $model_id, // Default.
+        '#submit' => array('content_model_viewer_add_datastream_dsid_view_derived_rule'),
+        '#validate' => array('content_model_viewer_add_datastream_dsid_view_derived_rule_validate'),
+        '#attributes' => array('style' => 'position: absolute; left: -9999px; width: 1px; height: 1px;')
+      ),
+      'rows' => $rows
+    )
+  );
 }
 
 /**
@@ -629,6 +699,38 @@ function content_model_viewer_delete_datastream_dsid_rule(array $form, array &$f
 }
 
 /**
+ * Removes the given RELS rule, identified by the #rule_id property of the clicked button.
+ * 
+ * @param array $form
+ *   The Drupal Form.
+ * @param array $form_state 
+ *   The Drupal Form State.
+ */
+function content_model_viewer_delete_datastream_rels_view_derived_rule(array $form, array &$form_state) {
+  if (isset($form_state['clicked_button']['#rule_id'])) {
+    $id = $form_state['clicked_button']['#rule_id'];
+    db_query('DELETE FROM %s WHERE id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $id);
+    drupal_set_message('Successfully Deleted Datastream Setting');
+  }
+}
+
+/**
+ * Removes the given DSID rule, identified by the #rule_id property of the clicked button.
+ *
+ * @param array $form
+ *   The Drupal Form.
+ * @param array $form_state 
+ *   The Drupal Form State.
+ */
+function content_model_viewer_delete_datastream_dsid_view_derived_rule(array $form, array &$form_state) {
+  if (isset($form_state['clicked_button']['#rule_id'])) {
+    $id = $form_state['clicked_button']['#rule_id'];
+    db_query('DELETE FROM %s WHERE id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE, $id);
+    drupal_set_message('Successfully Deleted Datastream Setting');
+  }
+}
+
+/**
  * Adds a MIME type datastream rule to a Model setting, identified by the #model_id property of the clicked button.
  * 
  * @param array $form
@@ -638,12 +740,13 @@ function content_model_viewer_delete_datastream_dsid_rule(array $form, array &$f
  */
 function content_model_viewer_add_datastream_mimetype_rule(array $form, array &$form_state) {
   $row = new stdClass();
-  $row->model_id = $form_state['clicked_button']['#model_id'];
-  $row->mime = $form_state['values']['mime'];
-  $row->view = $form_state['values']['view'];
-  $row->download = $form_state['values']['download'];
-  drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE, $row);
-  drupal_set_message(t('Successfully Added Datastream Setting'));
+  $row->model_id = (int) $form_state['clicked_button']['#model_id'];
+  $row->mime = (string) $form_state['values']['mime'];
+  $row->view = (int) $form_state['values']['view'];
+  $row->download = (int) $form_state['values']['download'];
+  if (drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE, $row)) {
+    drupal_set_message(t('Successfully Added Datastream Setting'));
+  }
 }
 
 /**
@@ -657,12 +760,54 @@ function content_model_viewer_add_datastream_mimetype_rule(array $form, array &$
 function content_model_viewer_add_datastream_dsid_rule(array $form, array &$form_state) {
   $row = new stdClass();
   $row->model_id = $form_state['clicked_button']['#model_id'];
-  $row->dsid = $form_state['values']['dsid'];
-  $row->type = $form_state['values']['type'];
-  $row->view = $form_state['values']['view'];
-  $row->download = $form_state['values']['download'];
-  drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $row);
-  drupal_set_message(t('Successfully Added Datastream Setting'));
+  $row->dsid = (string) $form_state['values']['dsid'];
+  $row->type = (int) $form_state['values']['type'];
+  $row->view = (int) $form_state['values']['view'];
+  $row->download = (int) $form_state['values']['download'];
+  if (drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $row)) {
+    drupal_set_message(t('Successfully Added Datastream Setting'));
+  }
+}
+
+/**
+ * Adds a rule to a Model setting, identified by the #model_id property of the clicked button.
+ * 
+ * @param array $form
+ *   The Drupal Form.
+ * @param array $form_state 
+ *   The Drupal Form State.
+ */
+function content_model_viewer_add_datastream_rels_view_derived_rule(array $form, array &$form_state) {
+  drupal_set_message(print_r($form_state['values'], true));
+  $row = new stdClass();
+  $row->model_id = (int) $form_state['clicked_button']['#model_id'];
+  $row->mime = (string) $form_state['values']['mime'];
+  $row->xpath = (string) $form_state['values']['xpath'];
+  $row->matching = (string) $form_state['values']['matching'];
+  $row->type = (int) $form_state['values']['type'];
+  if (drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $row)) {
+    drupal_set_message(t('Successfully Added Datastream Setting'));
+  }
+}
+
+/**
+ * Adds a rule to a Model setting, identified by the #model_id property of the clicked button.
+ * 
+ * @param array $form
+ *   The Drupal Form.
+ * @param array $form_state 
+ *   The Drupal Form State.
+ */
+function content_model_viewer_add_datastream_dsid_view_derived_rule(array $form, array &$form_state) {
+  $row = new stdClass();
+  $row->model_id = $form_state['clicked_button']['#model_id'];
+  $row->src_dsid = (string) $form_state['values']['src_dsid'];
+  $row->src_type = (int) $form_state['values']['src_type'];
+  $row->dest_dsid = (string) $form_state['values']['dest_dsid'];
+  $row->dest_type = (int) $form_state['values']['dest_type'];
+  if (drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE, $row)) {
+    drupal_set_message(t('Successfully Added Datastream Setting'));
+  }
 }
 
 /**
