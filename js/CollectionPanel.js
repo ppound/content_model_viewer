@@ -79,6 +79,20 @@ Ext.onReady(function(){
           label.value = value != '' ? value : null;
           store.load();
         }
+      }, '->', {
+        xtype: 'button',
+        text: 'Add to this Collection',
+        handler: function(button, event) {
+          var form = Ext.get("datastream-edit-form");
+          form.set({
+            action: window.location // Same Spot.
+          });
+          var action = form.down('input[name="action"]');
+          action.set({
+            value: 'ingest'
+          });
+          document.forms["datastream-edit-form"].submit();
+        }
       }]
     },  {
       id: 'collection-pager-top',

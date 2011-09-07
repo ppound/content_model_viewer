@@ -388,7 +388,7 @@ function content_model_viewer($pid) {
     $path = drupal_get_path('module', 'content_model_viewer');
     /* Load ExtJS */
     $ext_path = $path . '/lib/ext';
-    drupal_add_js($ext_path . '/ext-all-dev.js');
+    drupal_add_js($ext_path . '/ext-all.js');
     drupal_add_css($path . '/css/Clear.css');
     drupal_add_css($ext_path . '/resources/css/ext-all-gray.css', 'theme', 'all');
     /* Load Panels/Widgets */
