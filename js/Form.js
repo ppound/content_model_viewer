@@ -6,6 +6,7 @@ $(document).ready(function() {
     parent.empty();
     parent.append(content);
   }
+  $('.ahah-processed').removeClass('ahah-processed');
   Drupal.attachBehaviors();
 });
 
