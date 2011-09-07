@@ -243,13 +243,15 @@ class DatastreamProperties {
     $total = count($datastreams);
     $datastreams = array_slice($datastreams, $start, $length);
     foreach ($datastreams as $dsid => $properties) {
-      list($label, $state, $mime, $created) = array(
-        $properties['label'], $properties['state'], $properties['MIMEType'], NULL // @todo MIME type
-      );
+      $detailed_info = $this->item->get_datastream_info($dsid);
+      $label = $detailed_info->datastream->label;
+      $mime = $detailed_info->datastream->MIMEType;
+      $state = $detailed_info->datastream->state;
+      $created = $detailed_info->datastream->createDate;
       $view = $this->hasViewer($mime) ? $dsid : NULL; // Check if there exists a viewer for the MIME Type
       $view_function = $view ? $this->getViewFunction($dsid, $mime) : NULL;
       $download = $dsid; // Can always download by default.
-      /* TODO move this filter exclusion to the filter function... */
+      /* @todo move this filter exclusion to the filter function... */
       if ($filter) { // Overides the defaults
         list($viewable, $downloadable) = $this->getViewDownloadPermissions($dsid, $mime);
         $view = $viewable ? $this->getViewableDatastream($dsid, $mime) : NULL; // Might not be the current datastream.
@@ -260,12 +262,13 @@ class DatastreamProperties {
           continue;
         }
       }
+      /* End @todo */
       $data[] = array(
         'dsid' => $dsid,
         'label' => $label,
         'state' => $state,
         'mime' => $mime,
-        'created' => $create,
+        'created' => $created,
         'edit' => $this->canEditDatastream($dsid),
         'view' => $view,
         'view_function' => $view_function,
