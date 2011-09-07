@@ -7,6 +7,158 @@
  *
  * Defines a class that is used for reterive a paged list of datastream's and thier properties.
  */
+class DerivedDatastreamResolver {
+
+  /**
+   * The Fedora Object.
+   *  
+   * @var Fedora_Item
+   */
+  protected $item;
+
+  /**
+   * The Fedora Objects ID.
+   * 
+   * @var string
+   */
+  protected $pid;
+  /**
+   * The datastream in question.
+   * 
+   * @var string
+   */
+  protected $dsid;
+
+  /**
+   * Create an DerivedDatastreamResolver Instance.
+   * 
+   * @param string $pid
+   *   The Fedora Objects PID
+   * @param string $dsid 
+   *   The Datastream whose derivative we need to resolve.
+   */
+  public function __construct($pid, $dsid) {
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    $this->pid = $pid;
+    $this->dsid = $dsid;
+    $this->item = new Fedora_Item($pid);
+  }
+
+  /**
+   * 
+   */
+  public function getViewableDerivedDatastream() {
+    $derived_dsid = $this->getDerivedViewDatastreamFromRelsInt();
+    if ($derived_dsid) {
+      return $derived_dsid;
+    }
+    return $this->getDerivedViewDatastreamFromDsid();
+  }
+
+  private function getDerivedViewDatastreamFromRelsInt() {
+    $rule = $this->getRelsIntViewDerivedRule();
+    $rels_int = $this->getRelsInt();
+    if ($rule && $rels_int) { // Should Query RELS-INT for the derived datastream.
+      $selection = $this->queryRelsIntForDerivedType($rels_int, $rule['xpath']);
+      $matches = array();
+      $pattern = str_replace(array('%pid%', '%dsid%'), array($this->pid, $this->dsid), $rule['matching']);
+      if (preg_match($pattern, $selection->nodeValue, $matches)) {
+        $derived_dsid = array_shift($matches);
+        if (isset($this->item[$derived_dsid])) {
+          return $derived_dsid;
+        }
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   *
+   * @return DOMDocument 
+   */
+  private function getRelsInt() {
+    if (isset($this->item->datastreams['RELS-INT'])) {
+      $rels_int = $this->item->get_datastream_dissemination('RELS-INT');
+      $document = new DOMDocument();
+      $document->loadXML($rels_int);
+      return $document;
+    }
+    return FALSE;
+  }
+
+  /**
+   *
+   * @param DOMDocument $rels_int 
+   */
+  private function queryRelsIntForDerivedType(DOMDocument $rels_int, $path) {
+    $xpath = new DOMXPath($rels_int);
+    $results = $xpath->query("//rdf:Description[@rdf:about='info:fedora/{$this->pid}/$this->dsid']");
+    if ($results->length == 1) {
+      $description = $results->item(0);
+      $results = $xpath->query($path, $description);
+      if ($results->length == 1) {
+        return $results->item(0);
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * 
+   */
+  public function getDownloadableDerviedDatastream() {
+    return $this->dsid; // @todo implement.
+  }
+
+  /**
+   * Gets a RELS-INT search rule for the given datastream if it exists.
+   * 
+   * @return array
+   *   The row from the rels view derived rules table that governs this datastreams vieable derived datastream.
+   */
+  private function getRelsIntViewDerivedRule() {
+    $mime = $this->item->datastreams[$this->dsid]['MIMEType'];
+    $query = db_query('SELECT * FROM %s WHERE mime = "%s"', CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $mime);
+    return db_fetch_array($query);
+  }
+
+  private function getDsidViewDerivedRules() {
+    $rules = array();
+    $query = db_query('SELECT * FROM %s', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE);
+    while ($row = db_fetch_array($query)) {
+      $pattern = $row['src_dsid'];
+      $regex = $row['src_type'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX;
+      $datastreams = $this->item->datastreams;
+      foreach ($datastreams as $dsid => $properties) {
+        $matches = ($regex) ?
+            preg_match('/' . $pattern . '/', $dsid) :
+            trim($pattern) == trim($dsid);
+        if ($matches) {
+          $rules[] = $row;
+        }
+      }
+    }
+    return $rules;
+  }
+
+  private function getDerivedViewDatastreamFromDsid() {
+    $rules = $this->getDsidViewDerivedRules();
+    foreach ($rules as $rule) {
+      $pattern = $rule['dest_dsid'];
+      $regex = $rule['dest_type'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX;
+      foreach ($this->item->datastreams as $dsid => $properties) {
+        $matches = ($regex) ?
+            preg_match('/' . $pattern . '/', $dsid) :
+            trim($pattern) == trim($dsid);
+        if ($matches) {
+          return $dsid;
+        }
+      }
+    }
+    return NULL;
+  }
+
+}
 
 /**
  * Get datastreams properties of a given Fedora Object.
@@ -180,16 +332,53 @@ class Datastreams {
    *   The function to call to initialize the viewer, NULL if none is required.
    */
   private function getViewableDatastream($dsid, $mime) {
-    // Check to see if their is a viewer associated with the given MIME type.
-    if ($this->hasViewer($mime)) {
+    if ($this->hasViewer($mime)) { // Check to see if their is a viewer associated with the given MIME type.
       return $dsid;
     }
-    // Look for a rule for loading this mime type's derived type.
-    // If found try to execute this rule.
-    // A match on dsid or rdf, this way it can be used with existing data like coalliance or the library.
-    //if ($this->searchRDF($dsid)) {
-    //}
-    // If not derived type is found return NULL.
+    $resolver = new DerivedDatastreamResolver($this->item->pid, $dsid);
+    return $resolver->getViewableDerivedDatastream();
+  }
+
+  /**
+   * Check
+   * 
+   * @param string $dsid
+   *   The Datastream to view.
+   * 
+   * @return string
+   *   The Datastream ID of the derived viewable type, or NULL.
+   */
+  private function getViewableDerivedType($dsid, $mime) {
+    // Check RELS-INT
+    // Check for a rule
+    $query = db_query('SELECT * FROM %s WHERE mime = "%s"', CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $mime);
+    $rels_int_rule = db_fetch_array($query);
+    if (isset($rels_int_rule) && isset($this->item->datastreams['RELS-INT'])) {
+      $rels_int = $this->item->get_datastream_dissemination('RELS-INT');
+      $document = new DOMDocument();
+      $document->loadXML($rels_int);
+      $xpath = new DOMXPath($document);
+      $results = $xpath->query("//rdf:Description[@rdf:about='info:fedora/$pid/$dsid']");
+      if ($results->length == 1) {
+        $description = $results->item(0);
+        $results = $xpath->query($rels_int_rule['xpath'], $description);
+        if ($results->length == 1) {
+          $matching = $rels_int_rule['matching'];
+          if ($rels_int_rule['type'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT) {
+            if (isset($this->item->datastreams[$matching])) {
+              return $matching;
+            }
+          }
+          else if ($rels_int_rule['type'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX) {
+            $matches = array();
+            if (preg_match($rels_int_rule['matching'], $results->item(0)->nodeValue, $matches)) {
+              $dervied_dsid = $matches[0];
+            }
+          }
+        }
+      }
+    }
+    // Check DSID's.
     return NULL;
   }
 

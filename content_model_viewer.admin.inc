@@ -475,7 +475,7 @@ function content_model_viewer_datastream_rels_view_derived_form($form_state, $mo
       '#type' => 'textfield',
       '#title' => t(''),
       '#description' => t('A valid xpath for RELS-INT.'),
-      '#size' => 20,
+      '#size' => 60,
     ),
     'matching' => array(
       '#type' => 'textfield',
@@ -778,7 +778,6 @@ function content_model_viewer_add_datastream_dsid_rule(array $form, array &$form
  *   The Drupal Form State.
  */
 function content_model_viewer_add_datastream_rels_view_derived_rule(array $form, array &$form_state) {
-  drupal_set_message(print_r($form_state['values'], true));
   $row = new stdClass();
   $row->model_id = (int) $form_state['clicked_button']['#model_id'];
   $row->mime = (string) $form_state['values']['mime'];
