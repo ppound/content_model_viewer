@@ -10,6 +10,7 @@ Ext.onReady(function(){
             xtype: 'panel',
             region: 'center',
             id: 'datastream-viewer',
+            autoScroll: true,
             loader: {
                 url: ContentModelViewer.properties.url.datastream.view(ContentModelViewer.properties.dsid),
                 renderer: 'html',
