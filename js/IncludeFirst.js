@@ -153,6 +153,9 @@ Ext.onReady(function(){
     }, {
       name: 'view_function', 
       type: 'string'
+    }, {
+      name: 'edit', 
+      type: 'bool'
     }],
     validations: [{
       type: 'inclusion', 

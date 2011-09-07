@@ -148,6 +148,10 @@ function content_model_viewer_theme() {
       'arguments' => array('pid' => NULL),
       'template' => 'Viewer',
     ),
+    'content_model_viewer_metadata_form' => array(
+      'arguments' => array('pid' => NULL, 'action' => NULL),
+      'template' => 'Form',
+    ),
     'content_model_viewer_settings' => array(
       'template' => 'templates/Settings',
     ),
@@ -374,29 +378,36 @@ function template_preprocess_content_model_viewer(array &$variables) {
  * @param string $pid
  */
 function content_model_viewer($pid) {
-  global $base_url;
-  $path = drupal_get_path('module', 'content_model_viewer');
-  /* Load ExtJS */
-  $ext_path = $path . '/lib/ext';
-  drupal_add_js($ext_path . '/ext-all-dev.js');
-  drupal_add_css($path . '/css/Clear.css');
-  drupal_add_css($ext_path . '/resources/css/ext-all-gray.css', 'theme', 'all');
-  /* Load Panels/Widgets */
-  $js_path = $path . '/js';
-  drupal_add_js($js_path . '/IncludeFirst.js');
-  drupal_add_js($js_path . '/SortButton.js');
-  drupal_add_js($js_path . '/OverviewPanel.js');
-  drupal_add_js($js_path . '/ViewerPanel.js');
-  drupal_add_js($js_path . '/ManagePanel.js');
-  if (content_model_viewer_object_has_members($pid)) {
-    drupal_add_js($js_path . '/CollectionPanel.js');
+  $render_metadata_form = isset($_POST['action']);
+  if ($render_metadata_form) {
+    $action = $_POST['action'];
+    return theme('content_model_viewer_metadata_form', $pid, $action);
   }
-  drupal_add_js($js_path . '/ContentModelViewer.js');
-  drupal_add_css($path . '/css/ContentModelViewer.css');
-  /* Load Viewers */
-  module_load_include('inc', 'content_model_viewer', 'viewers/AbstractViewer');
-  AbstractViewer::LoadRequiredResourcesForAllViewers();
-  return theme('content_model_viewer', $pid);
+  else {
+    global $base_url;
+    $path = drupal_get_path('module', 'content_model_viewer');
+    /* Load ExtJS */
+    $ext_path = $path . '/lib/ext';
+    drupal_add_js($ext_path . '/ext-all-dev.js');
+    drupal_add_css($path . '/css/Clear.css');
+    drupal_add_css($ext_path . '/resources/css/ext-all-gray.css', 'theme', 'all');
+    /* Load Panels/Widgets */
+    $js_path = $path . '/js';
+    drupal_add_js($js_path . '/IncludeFirst.js');
+    drupal_add_js($js_path . '/SortButton.js');
+    drupal_add_js($js_path . '/OverviewPanel.js');
+    drupal_add_js($js_path . '/ViewerPanel.js');
+    drupal_add_js($js_path . '/ManagePanel.js');
+    if (content_model_viewer_object_has_members($pid)) {
+      drupal_add_js($js_path . '/CollectionPanel.js');
+    }
+    drupal_add_js($js_path . '/ContentModelViewer.js');
+    drupal_add_css($path . '/css/ContentModelViewer.css');
+    /* Load Viewers */
+    module_load_include('inc', 'content_model_viewer', 'viewers/AbstractViewer');
+    AbstractViewer::LoadRequiredResourcesForAllViewers();
+    return theme('content_model_viewer', $pid);
+  }
 }
 
 /**
@@ -620,4 +631,130 @@ function content_model_viewer_object_has_members($pid) {
     return $count > 0;
   }
   return FALSE;
+}
+
+/**
+ *
+ * @param type $pid 
+ */
+function content_model_viewer_edit_metadata_form(array &$form_state, $pid) {
+  module_load_include('inc', 'islandora_content_model_forms', 'EditObjectMetadataForm');
+  module_load_include('inc', 'fedora_repository', 'ConnectionHelper');
+  $connection_helper = new ConnectionHelper();
+  $client = $connection_helper->getSoapClient(variable_get('fedora_soap_url', 'http://localhost:8080/fedora/services/access?wsdl'));
+  try {
+    $edit_form = new EditObjectMetadataForm();
+    $output = $edit_form->create($pid, $client, $form_state);
+    $output['action'] = array(
+      '#type' => 'hidden',
+      '#value' => 'edit'
+    );
+    return $output;
+  } catch (Exception $e) {
+    $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
+    drupal_set_message($msg, 'error');
+    return array();
+  }
+}
+
+/**
+ * Validate Edit Form.
+ * 
+ * @param array $form
+ * @param array $form_state
+ */
+function content_model_viewer_edit_metadata_form_validate(array &$form, array &$form_state) {
+  if ($form_state['storage']['step'] == 1) {
+    $form_state['storage']['step']++;
+    $form_state['rebuild'] = TRUE;
+  }
+  else {
+    module_load_include('inc', 'xml_form_api', 'XMLForm');
+    $xml_form = new XMLForm($form_state);
+    $xml_form->validate($form, $form_state);
+  }
+}
+
+/**
+ * Submit Edit Form.
+ * 
+ * @param array $form
+ * @param array $form_state
+ */
+function content_model_viewer_edit_metadata_form_submit(array &$form, array &$form_state) {
+  module_load_include('inc', 'islandora_content_model_forms', 'EditObjectMetadataForm');
+  try {
+    $edit_form = new EditObjectMetadataForm();
+    $edit_form->submit($form, $form_state);
+  } catch (Exception $e) {
+    $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
+    drupal_set_message($msg, 'error');
+    $form_state['rebuild'] = TRUE;
+  }
+}
+
+function content_model_viewer_ingest_metadata_form(array &$form_state, $collection_pid) {
+  if (!user_access('ingest new fedora objects')) {
+    drupal_set_message(t('You do not have permission to ingest.'), 'error');
+    return FALSE;
+  }
+  module_load_include('inc', 'fedora_repository', 'SecurityClass');
+  $security_class = new SecurityClass();
+  if (!$security_class->canIngestHere($collection_pid)) {
+    // Queries the collection object for a child security datastream and if found parses it
+    // to determine if this user is allowed to ingest in this collection
+    // we assume if they are able to modify objects in the collection they can ingest as well.
+    drupal_set_message(t('You do not have premission to ingest here.'));
+    return FALSE;
+  }
+  if ($collection_pid == NULL) {
+    drupal_set_message(t('You must specify an collection object pid to ingest an object.'), 'error');
+    return FALSE;
+  }
+  module_load_include('inc', 'islandora_content_model_forms', 'IngestObjectMetadataForm');
+  try {
+    $ingest_form = new IngestObjectMetadataForm();
+    $output = $ingest_form->create($collection_pid, NULL, $form_state);
+    $output['action'] = array(
+      '#type' => 'hidden',
+      '#value' => 'ingest'
+    );
+    return $output;
+  } catch (Exception $e) {
+    $msg = "File: {$e->getFile()}<br/>Line: {$e->getLine()}<br/>Error: {$e->getMessage()}";
+    drupal_set_message($msg, 'error');
+    return array();
+  }
+}
+
+/**
+ * Validate Ingest Form.
+ * 
+ * @param array $form
+ * @param array $form_state
+ */
+function content_model_viewer_ingest_metadata_form_validate(array &$form, array &$form_state) {
+  if ($form_state['storage']['step'] == 1) {
+    $form_state['storage']['step']++;
+    $form_state['rebuild'] = TRUE;
+  }
+  else {
+    module_load_include('inc', 'xml_form_api', 'XMLForm');
+    $xml_form = new XMLForm($form_state);
+    $xml_form->validate($form, $form_state);
+  }
+}
+
+/**
+ * Submit Ingest Form.
+ * 
+ * @param array $form
+ * @param array $form_state
+ */
+function content_model_viewer_ingest_metadata_form_submit(array &$form, array &$form_state) {
+  module_load_include('inc', 'islandora_content_model_forms', 'IngestObjectMetadataForm');
+  if ($form_state['storage']['step'] == 2) {
+    $ingest_form = new IngestObjectMetadataForm();
+    $ingest_form->submit($form, $form_state);
+  }
 }

@@ -21,4 +21,11 @@
       <input type="submit">Download</input>
     </form>
   </div>
+  <div style="display:none" id="datastream-edit">
+    <form id="datastream-edit-form" method="POST" action="edit">
+      <input type="hidden" name="dsid"/>
+      <input type="hidden" name="action"/>
+      <input type="submit">Download</input>
+    </form>
+  </div>
 </div>

@@ -266,6 +266,7 @@ class DatastreamProperties {
         'state' => $state,
         'mime' => $mime,
         'created' => $create,
+        'edit' => $this->canEditDatastream($dsid),
         'view' => $view,
         'view_function' => $view_function,
         'download' => $download,
@@ -381,46 +382,22 @@ class DatastreamProperties {
   }
 
   /**
-   * Check
-   * 
-   * @param string $dsid
-   *   The Datastream to view.
-   * 
-   * @return string
-   *   The Datastream ID of the derived viewable type, or NULL.
+   * Checks if the given datastream can be edited, at the moment only xml metadata can be edited.
+   *
+   * @param string $dsid 
+   *   The datastream ID of the datastream in question. 
+   * @return boolean
+   *   Returns TRUE if it the datastream can be edited, FALSE otherwise.
    */
-  private function getViewableDerivedType($dsid, $mime) {
-    // Check RELS-INT
-    // Check for a rule
-    $query = db_query('SELECT * FROM %s WHERE mime = "%s"', CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $mime);
-    $rels_int_rule = db_fetch_array($query);
-    if (isset($rels_int_rule) && isset($this->item->datastreams['RELS-INT'])) {
-      $rels_int = $this->item->get_datastream_dissemination('RELS-INT');
-      $document = new DOMDocument();
-      $document->loadXML($rels_int);
-      $xpath = new DOMXPath($document);
-      $results = $xpath->query("//rdf:Description[@rdf:about='info:fedora/$pid/$dsid']");
-      if ($results->length == 1) {
-        $description = $results->item(0);
-        $results = $xpath->query($rels_int_rule['xpath'], $description);
-        if ($results->length == 1) {
-          $matching = $rels_int_rule['matching'];
-          if ($rels_int_rule['type'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT) {
-            if (isset($this->item->datastreams[$matching])) {
-              return $matching;
-            }
-          }
-          else if ($rels_int_rule['type'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX) {
-            $matches = array();
-            if (preg_match($rels_int_rule['matching'], $results->item(0)->nodeValue, $matches)) {
-              $dervied_dsid = $matches[0];
-            }
-          }
-        }
-      }
+  private function canEditDatastream($dsid) {
+    module_load_include('inc', 'fedora_repository', 'ContentModel');
+    $content_model = ContentModel::loadFromObject($this->item->pid);
+    $query = db_query('SELECT COUNT(content_model) FROM {islandora_content_model_forms} WHERE content_model = "%s" AND dsid = "%s"', $content_model->pid, $dsid);
+    $result = db_result($query);
+    if ($result > 0) {
+      return TRUE;
     }
-    // Check DSID's.
-    return NULL;
+    return FALSE;
   }
 
   /**
