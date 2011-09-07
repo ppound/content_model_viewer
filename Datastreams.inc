@@ -5,7 +5,12 @@
 /**
  * @file
  *
- * Defines a class that is used for reterive a paged list of datastream's and thier properties.
+ * Defines a class that is used for retreive a paged list of datastream's and thier properties.
+ */
+
+/**
+ * This class is used to determine if any datastream's derived form the provided datastream, for either 
+ * viewing or downloading.
  */
 class DerivedDatastreamResolver {
 
@@ -17,13 +22,14 @@ class DerivedDatastreamResolver {
   protected $item;
 
   /**
-   * The Fedora Objects ID.
+   * The Fedora Object's Unique ID.
    * 
    * @var string
    */
   protected $pid;
+
   /**
-   * The datastream in question.
+   * The Fedora Object's Datastream ID.
    * 
    * @var string
    */
@@ -33,7 +39,7 @@ class DerivedDatastreamResolver {
    * Create an DerivedDatastreamResolver Instance.
    * 
    * @param string $pid
-   *   The Fedora Objects PID
+   *   The Fedora Object's Unique ID.
    * @param string $dsid 
    *   The Datastream whose derivative we need to resolve.
    */
@@ -45,7 +51,10 @@ class DerivedDatastreamResolver {
   }
 
   /**
+   * Gets a Derived datastream that can be displayed to the user in the viewer panel.
    * 
+   * @return string
+   *   The Datastream ID of a viewable derived datastream, or NULL if none was found.
    */
   public function getViewableDerivedDatastream() {
     $derived_dsid = $this->getDerivedViewDatastreamFromRelsInt();
@@ -55,6 +64,12 @@ class DerivedDatastreamResolver {
     return $this->getDerivedViewDatastreamFromDsid();
   }
 
+  /**
+   * Attempts to retrieve the derived viewable datastream from this Objects RELS-INT.
+   * 
+   * @return string
+   *   The Datastream ID of a viewable derived datastream, or NULL if none was found.
+   */
   private function getDerivedViewDatastreamFromRelsInt() {
     $rule = $this->getRelsIntViewDerivedRule();
     $rels_int = $this->getRelsInt();
@@ -73,8 +88,10 @@ class DerivedDatastreamResolver {
   }
 
   /**
-   *
-   * @return DOMDocument 
+   * Gets the RELS-EXT metadata as a DOMDocment if it exists.
+   * 
+   * @return DOMDocument
+   *   The RELS-EXT datastream.
    */
   private function getRelsInt() {
     if (isset($this->item->datastreams['RELS-INT'])) {
@@ -87,8 +104,15 @@ class DerivedDatastreamResolver {
   }
 
   /**
+   * Queries this Object's RELS-INT for the DOMNode that contains the viewable derived Datastream ID.
    *
-   * @param DOMDocument $rels_int 
+   * @param DOMDocument $rels_int
+   *   This Object's RELS-INT.
+   * @param string $path
+   *   The XPath to the DOMNode that contains the derived Datastream ID.
+   * 
+   * @return DOMNode
+   *   The DOMNode that $path selects if found, otherwise FALSE.
    */
   private function queryRelsIntForDerivedType(DOMDocument $rels_int, $path) {
     $xpath = new DOMXPath($rels_int);
@@ -104,7 +128,10 @@ class DerivedDatastreamResolver {
   }
 
   /**
+   * Attempts to retrieve the derived downloadable datastream from this Object.
    * 
+   * @return string
+   *   The Datastream ID of a downloadable derived datastream, or NULL if none was found.
    */
   public function getDownloadableDerviedDatastream() {
     return $this->dsid; // @todo implement.
@@ -122,6 +149,13 @@ class DerivedDatastreamResolver {
     return db_fetch_array($query);
   }
 
+  /**
+   * Gets the rules that denote what datastreams should be used as a dervied viewable type.
+   * 
+   * @return array
+   *   An array of the rules from the 'CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE' where
+   *   the 'src_dsid' matches this datastream.
+   */
   private function getDsidViewDerivedRules() {
     $rules = array();
     $query = db_query('SELECT * FROM %s', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE);
@@ -141,6 +175,13 @@ class DerivedDatastreamResolver {
     return $rules;
   }
 
+  /**
+   * Attempts to retrieve the derived viewable datastream from matching this Objects datastream ID's with
+   * a rule.
+   * 
+   * @return string
+   *   The Datastream ID of a viewable derived datastream, or NULL if none was found.
+   */
   private function getDerivedViewDatastreamFromDsid() {
     $rules = $this->getDsidViewDerivedRules();
     foreach ($rules as $rule) {
