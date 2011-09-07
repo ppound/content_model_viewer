@@ -378,21 +378,20 @@ function template_preprocess_content_model_viewer(array &$variables) {
  * @param string $pid
  */
 function content_model_viewer($pid) {
-  $render_metadata_form = isset($_POST['action']);
-  if ($render_metadata_form) {
+  $path = drupal_get_path('module', 'content_model_viewer');
+  $js_path = $path . '/js';
+  if (isset($_POST['action'])) { // Render Metadata Form
     $action = $_POST['action'];
+    drupal_add_js($js_path . '/Form.js');
     return theme('content_model_viewer_metadata_form', $pid, $action);
   }
   else {
-    global $base_url;
-    $path = drupal_get_path('module', 'content_model_viewer');
     /* Load ExtJS */
     $ext_path = $path . '/lib/ext';
     drupal_add_js($ext_path . '/ext-all.js');
     drupal_add_css($path . '/css/Clear.css');
     drupal_add_css($ext_path . '/resources/css/ext-all-gray.css', 'theme', 'all');
     /* Load Panels/Widgets */
-    $js_path = $path . '/js';
     drupal_add_js($js_path . '/IncludeFirst.js');
     drupal_add_js($js_path . '/SortButton.js');
     drupal_add_js($js_path . '/OverviewPanel.js');
@@ -546,7 +545,7 @@ function content_model_viewer_add_datastream($pid) {
         $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, NULL, $control);
       }
     } catch (Exception $e) {
-      // log some error...
+// log some error...
     }
   }
   $message = $success ? t('Successfully added datastream.') : t('Failed to add datastream.');
@@ -701,9 +700,9 @@ function content_model_viewer_ingest_metadata_form(array &$form_state, $collecti
   module_load_include('inc', 'fedora_repository', 'SecurityClass');
   $security_class = new SecurityClass();
   if (!$security_class->canIngestHere($collection_pid)) {
-    // Queries the collection object for a child security datastream and if found parses it
-    // to determine if this user is allowed to ingest in this collection
-    // we assume if they are able to modify objects in the collection they can ingest as well.
+// Queries the collection object for a child security datastream and if found parses it
+// to determine if this user is allowed to ingest in this collection
+// we assume if they are able to modify objects in the collection they can ingest as well.
     drupal_set_message(t('You do not have premission to ingest here.'));
     return FALSE;
   }
