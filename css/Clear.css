@@ -23,3 +23,7 @@
 #content-model-viewer form tbody, #content-model-viewer form tbody th, .x-window th, .x-window td {
     border: 0;
 }
+
+.x-boundlist-item {
+  background: none;
+}

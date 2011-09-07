@@ -87,7 +87,7 @@ function content_model_viewer_set_default_rules() {
   $row = new stdClass();
   $row->model_id = CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID;
   $row->mime = 'application/pdf';
-  $row->xpath = '/*[local-name() = "hasSWF"/@rdf:resource';
+  $row->xpath = '/*[local-name() = "hasSWF"]/@rdf:resource';
   $row->matching = '[^\/]*$';
   $row->dest_type = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX;
   drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $row);
