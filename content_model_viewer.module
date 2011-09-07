@@ -445,11 +445,11 @@ function content_model_viewer_members($pid) {
  *   The PID of the Fedora Object, whose data streams this function will get/set.s
  */
 function content_model_viewer_datastreams($pid, $dsid = NULL) {
-  module_load_include('inc', 'content_model_viewer', 'Datastreams');
+  module_load_include('inc', 'content_model_viewer', 'DatastreamProperties');
   switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
       $filter = isset($_GET['filter']) ? $_GET['filter'] : FALSE;
-      $datastreams = new Datastreams($pid);
+      $datastreams = new DatastreamProperties($pid);
       list($data, $total) = $datastreams->get($_GET['start'], $_GET['limit'], $filter);
       echo json_encode(array('success' => TRUE, 'data' => $data, 'total' => $total));
       exit();
@@ -458,7 +458,7 @@ function content_model_viewer_datastreams($pid, $dsid = NULL) {
         $stdin = fopen("php://input", "r");
         $json = fread($stdin, $_SERVER['CONTENT_LENGTH']);
         $data = json_decode($json);
-        $datastreams = new Datastreams($pid);
+        $datastreams = new DatastreamProperties($pid);
         $data = $datastreams->setProperties($dsid, $data);
         echo json_encode(array('success' => TRUE, 'msg' => "Successfully modified $dsid's properties", 'data' => $data));
         exit();
