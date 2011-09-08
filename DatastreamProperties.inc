@@ -287,7 +287,37 @@ class DatastreamProperties {
    * @return array
    */
   public function setProperties($dsid, $properties) {
-    $properties->created = $dsid;
+    $detailed_info = $this->item->get_datastream_info($dsid);
+    $datastream = $detailed_info->datastream;
+    $control_group = $datastream->controlGroup;
+    $label = $properties->label;
+    $state = $properties->state;
+    $mime = $properties->mime;
+    $label_or_mime_has_changed = ($label != $datastream->label) || ($mime != $datastream->MIMEType);
+    if ($label_or_mime_has_changed) {
+      $content = $this->item->get_datastream_dissemination($dsid);
+      if ($control_group == 'X') {
+        $this->item->modify_datastream_by_value($content, $dsid, $label, $mime);
+      }
+      else {
+        $temp_file_dir = file_directory_temp();
+        $temp_file_path = file_create_filename("datastream.xml", $temp_file_dir);
+        $doc = new DOMDocument();
+        $doc->loadXML($content);
+        if ($doc->save($temp_file_path)) {
+          $temp_file_url = file_create_url($temp_file_path);
+          $this->item->modify_datastream_by_reference($temp_file_url, $dsid, $label, $mime_type);
+        }
+      }
+    }
+    $state_has_changed = $state != $datastream->state;
+    if ($state_has_changed) {
+      $this->item->set_datastream_state($dsid, $state);
+    }
+    // Update Created
+    $detailed_info = $this->item->get_datastream_info($dsid);
+    $datastream = $detailed_info->datastream;
+    $properties->created = $datastream->createDate;
     return $properties;
   }
 
