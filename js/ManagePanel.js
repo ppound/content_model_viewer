@@ -140,7 +140,8 @@ Ext.onReady(function(){
       })],
       columns: [{
         header: 'ID',  
-        dataIndex: 'dsid'
+        dataIndex: 'dsid',
+        flex: 1
       }, {
         header: 'Label', 
         dataIndex: 'label', 
@@ -148,7 +149,7 @@ Ext.onReady(function(){
           xtype:'textfield',
           allowBlank:false
         },
-        flex:1
+        flex: 1
       }, {
         header: 'State', 
         dataIndex: 'state',
@@ -171,10 +172,16 @@ Ext.onReady(function(){
         }
       }, {
         header: 'Mime Type', 
-        dataIndex: 'mime'
+        dataIndex: 'mime',
+        field:{
+          xtype:'textfield',
+          allowBlank:false
+        },
+        flex: 1
       }, {
         header: 'Date Created', 
-        dataIndex: 'created'
+        dataIndex: 'created',
+        flex: 1
       }],
       listeners: {
         selectionchange: function(view, selections, options) {
@@ -377,9 +384,13 @@ Ext.onReady(function(){
                 action: window.location // Same Spot.
               });
               var dsid = form.down('input[name="dsid"]');
-              dsid.set({value: record.get('dsid')});
+              dsid.set({
+                value: record.get('dsid')
+                });
               var action = form.down('input[name="action"]');
-              action.set({value: 'edit'});
+              action.set({
+                value: 'edit'
+              });
               document.forms["datastream-edit-form"].submit();              
             }
           }
