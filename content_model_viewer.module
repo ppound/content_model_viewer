@@ -738,6 +738,38 @@ function content_model_viewer_ingest_metadata_form_validate(array &$form, array 
     $form_state['rebuild'] = TRUE;
   }
   else {
+    if (!empty($_FILES['files']['name']['ingest-file-location'])) {
+      $file = file_save_upload('ingest-file-location');
+      file_move($file->filepath, 0, 'FILE_EXISTS_RENAME');
+      $form_state['values']['ingest-file-location'] = $file->filepath;
+    }
+    if (isset($form_state['values']['ingest-file-location']) && file_exists($form_state['values']['ingest-file-location'])) {
+      module_load_include('inc', 'fedora_repository', 'ContentModel');
+      module_load_include('inc', 'fedora_repository', 'MimeClass');
+      $file = $form_state['values']['ingest-file-location'];
+      $content_model_pid = ContentModel::getPidFromIdentifier($form_state['values']['models']);
+      $content_model_pid;
+      $content_model_dsid = ContentModel::getDSIDFromIdentifier($form_state['values']['models']);
+      if (($content_model = ContentModel::loadFromModel($content_model_pid, $content_model_dsid)) !== FALSE) {
+        $allowed_mime_types = $content_model->getMimetypes();
+        $mimetype = new MimeClass();
+        $format = $mimetype->getType($file);
+        if (!empty($file)) {
+          if (!in_array($format, $allowed_mime_types)) {
+            form_set_error('ingest-file-location', t('The uploaded file\'s mimetype (' . $format . ') is not associated with this Content Model. The allowed types are ' .
+                    implode(' ', $allowed_mime_types)));
+            file_delete($file);
+            return;
+          }
+          elseif (!$content_model->execIngestRules($file, $format)) {
+            drupal_set_message(t('Error following Content Model Rules'), 'error');
+            foreach (ContentModel::$errors as $error) {
+              drupal_set_message($error, 'error');
+            }
+          }
+        }
+      }
+    }
     module_load_include('inc', 'xml_form_api', 'XMLForm');
     $xml_form = new XMLForm($form_state);
     $xml_form->validate($form, $form_state);
