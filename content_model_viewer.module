@@ -210,7 +210,7 @@ function content_model_viewer_content_model_datastream_viewers() {
     'application/x-shockwave-flash' => $flexpaper,
     'text/xml' => $xml,
     'application/rdf+xml' => $xml,
-    'image/jpeg' => $image_basic
+    'image/jpeg' => $image_djatoka
   );
 }
 

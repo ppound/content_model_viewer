@@ -41,9 +41,8 @@ class DjatokaViewer extends AbstractViewer {
    *   The rendered HTML required for showing this viewer.
    */
   public function render($pid, $dsid) {
-    global $base_url;
-    $url = $base_url . '/fedora/repository/' . $pid . '/' . $dsid;
-    return "<img src='$url'/>";
+    $viewer_url = variable_get('fedora_base_url', '') . '/get/' . $this->pid . '/ilives:viewerSdef/getViewer?dsid=' . $this->dsid;
+    return '<iframe src="' . $viewer_url . '" frameborder="0" style="width: 100%; height: 835px;" scrolling="no">Errors: unable to load viewer</iframe>';
   }
 
 }
