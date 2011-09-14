@@ -200,7 +200,7 @@ function content_model_viewer_content_model_datastream_viewers() {
     'file' => 'viewers/BasicImageViewer',
     'class' => 'BasicImageViewer',
   );
-  $image_djatoka = array(
+  $image_djatoka = array( // Adore Djatoka is required. Should check the content model for service def or something.
     'type' => 'inc',
     'module' => 'content_model_viewer',
     'file' => 'viewers/Djatoka',
@@ -210,7 +210,14 @@ function content_model_viewer_content_model_datastream_viewers() {
     'application/x-shockwave-flash' => $flexpaper,
     'text/xml' => $xml,
     'application/rdf+xml' => $xml,
-    'image/jpeg' => $image_djatoka
+    'image/jpeg' => $image_basic,
+    'image/gif' => $image_basic,
+    'image/jp2' => $image_basic,
+    'image/jpeg' => $image_basic,
+    'image/png' => $image_basic,
+    'image/raw' => $image_basic,
+    'image/tiff' => $image_basic,
+    'image/tif' => $image_basic,
   );
 }
 
