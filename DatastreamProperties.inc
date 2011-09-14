@@ -301,12 +301,10 @@ class DatastreamProperties {
       }
       else {
         $temp_file_dir = file_directory_temp();
-        $temp_file_path = file_create_filename("datastream.xml", $temp_file_dir);
-        $doc = new DOMDocument();
-        $doc->loadXML($content);
-        if ($doc->save($temp_file_path)) {
+        $temp_file_path = file_create_filename("datastream", $temp_file_dir);
+        if (file_save_data($content, $temp_file_path)) {
           $temp_file_url = file_create_url($temp_file_path);
-          $this->item->modify_datastream_by_reference($temp_file_url, $dsid, $label, $mime_type);
+          $this->item->modify_datastream_by_reference($temp_file_url, $dsid, $label, $mime);
         }
       }
     }

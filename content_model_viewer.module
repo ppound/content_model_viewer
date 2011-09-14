@@ -194,10 +194,23 @@ function content_model_viewer_content_model_datastream_viewers() {
     'file' => 'viewers/XML',
     'class' => 'XMLDatastreamViewer',
   );
+  $image_basic = array(
+    'type' => 'inc',
+    'module' => 'content_model_viewer',
+    'file' => 'viewers/BasicImageViewer',
+    'class' => 'BasicImageViewer',
+  );
+  $image_djatoka = array(
+    'type' => 'inc',
+    'module' => 'content_model_viewer',
+    'file' => 'viewers/Djatoka',
+    'class' => 'DjatokaViewer',
+  );
   return array(
     'application/x-shockwave-flash' => $flexpaper,
     'text/xml' => $xml,
-    'application/rdf+xml' => $xml
+    'application/rdf+xml' => $xml,
+    'image/jpeg' => $image_basic
   );
 }
 
@@ -636,32 +649,32 @@ function content_model_viewer_object_has_members($pid) {
  * @param <type> $pid
  * for this to work an objects cmodel must have a cmodel of islandora:collectionCModel
  */
-function content_model_viewer_is_object_collection($pid){
-   $itql_query = 'select $object $title $content from <#ri>
+function content_model_viewer_is_object_collection($pid) {
+  $itql_query = 'select $object $title $content from <#ri>
                              where ($object <info:fedora/fedora-system:def/model#label> $title
                              and $object <fedora-model:hasModel> $content
                              and ($content <fedora-model:hasModel> <info:fedora/islandora:collectionCModel>)
                              and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>)
                              order by $title';
-   module_load_include('inc', 'fedora_repository', 'CollectionClass');
+  module_load_include('inc', 'fedora_repository', 'CollectionClass');
   $collection = new CollectionClass();
-  $results = $collection->getRelatedItems(NULL,$itql_query);
+  $results = $collection->getRelatedItems(NULL, $itql_query);
   $xml = simplexml_load_string($results);
-  if(!$xml){
-     drupal_set_message(t('Error getting list of collection objects !e', array('!e' => $e->getMessage())), 'error');
+  if (!$xml) {
+    drupal_set_message(t('Error getting list of collection objects !e', array('!e' => $e->getMessage())), 'error');
     return;
   }
   foreach ($xml->results->result as $result) {
     $a = $result->object->attributes();
     $temp = $a['uri'];
     $object = substr($temp, strrpos($temp, '/') + 1);
-    if($pid === $object){
-	return true;
-}
+    if ($pid === $object) {
+      return true;
+    }
   }
   return FALSE;
-
 }
+
 /**
  *
  * @param type $pid 

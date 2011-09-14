@@ -8,7 +8,7 @@
  */
 module_load_include('inc', 'content_model_viewer', 'viewers/AbstractViewer');
 
-class DjatokaViewer extends AbstractViewer {
+class BasicImageViewer extends AbstractViewer {
 
   /**
    * Adds all of the required javascript/css/etc that this viewer needs to run.
