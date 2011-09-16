@@ -88,16 +88,13 @@ class Collection {
    * @return array
    */
   private function findAllMembers() {
-    $query = 'select $object $title $model $parent_model $created from <#ri>
+    $query = 'select $object $title $model $created from <#ri>
                              where ($object <info:fedora/fedora-system:def/model#label> $title
                              and $object <fedora-model:hasModel> $model
                              and $object <fedora-model:createdDate> $created
-                             and $model <fedora-model:hasModel> $parent_model
                              and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
                              and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
                              or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
-                             minus $parent_model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-                             minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
                              minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
                              minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
                              order by $title';

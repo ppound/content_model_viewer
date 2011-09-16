@@ -416,7 +416,7 @@ function content_model_viewer($pid) {
     drupal_add_js($js_path . '/OverviewPanel.js');
     drupal_add_js($js_path . '/ViewerPanel.js');
     drupal_add_js($js_path . '/ManagePanel.js');
-    if (content_model_viewer_is_object_collection($pid)) {
+    if (content_model_viewer_is_object_collection($pid) || content_model_viewer_object_has_members($pid)) {
       drupal_add_js($js_path . '/CollectionPanel.js');
     }
     drupal_add_js($js_path . '/ContentModelViewer.js');
