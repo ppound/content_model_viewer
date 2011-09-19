@@ -201,7 +201,7 @@ function content_model_viewer_content_model_datastream_viewers() {
     'file' => 'viewers/BasicImageViewer',
     'class' => 'BasicImageViewer',
   );
-  $image_djatoka = array( // Adore Djatoka is required. Should check the content model for service def or something.
+  $image_djatoka = array(// Adore Djatoka is required. Should check the content model for service def or something.
     'type' => 'inc',
     'module' => 'content_model_viewer',
     'file' => 'viewers/Djatoka',
@@ -562,7 +562,10 @@ function content_model_viewer_add_datastream($pid) {
     try {
       $item = new Fedora_Item($pid);
       if (empty($item->datastreams[$dsid])) {
-        $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, NULL, $control);
+        module_load_include('inc', 'fedora_repository', 'MimeClass');
+        $mimetype_helper = new MimeClass();
+        $mime = $mimetype_helper->getType($file['name']);
+        $success = $item->add_datastream_from_file($file['tmp_name'], $dsid, $label, $mime, $control);
       }
     } catch (Exception $e) {
 // log some error...
