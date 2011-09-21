@@ -417,7 +417,7 @@ function content_model_viewer($pid) {
     drupal_add_js($js_path . '/OverviewPanel.js');
     drupal_add_js($js_path . '/ViewerPanel.js');
     drupal_add_js($js_path . '/ManagePanel.js');
-    if (content_model_viewer_is_object_collection($pid) || content_model_viewer_object_has_members($pid)) {
+    if (content_model_viewer_is_object_collection($pid) || content_model_viewer_object_has_members($pid) || content_model_viewer_object_has_collection_model($pid)) {
       drupal_add_js($js_path . '/CollectionPanel.js');
     }
     drupal_add_js($js_path . '/ContentModelViewer.js');
@@ -681,6 +681,29 @@ function content_model_viewer_is_object_collection($pid) {
     $object = substr($temp, strrpos($temp, '/') + 1);
     if ($pid === $object) {
       return true;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Checks to see if the content model of the given object is a collection.
+ * 
+ * Checks for the presence of a COLLECTION_POLICY datastream.
+ * 
+ * @param string $pid
+ *   The object pid.
+ * 
+ * @return bool
+ *   Return TRUE if the object has a collection model.
+ */
+function content_model_viewer_object_has_collection_model($pid) {
+  module_load_include('inc', 'fedora_repository', 'ContentModel');
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  $item = new Fedora_Item($pid);
+  if ($item->exists()) {
+    if (isset($item->datastreams['COLLECTION_POLICY'])) {
+      return TRUE;
     }
   }
   return FALSE;
