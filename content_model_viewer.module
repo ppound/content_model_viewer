@@ -424,7 +424,9 @@ function content_model_viewer($pid) {
     drupal_add_css($path . '/css/ContentModelViewer.css');
     /* Load Viewers */
     module_load_include('inc', 'content_model_viewer', 'viewers/AbstractViewer');
+    module_load_include('inc', 'content_model_viewer', 'models/AbstractModel');
     AbstractViewer::LoadRequiredResourcesForAllViewers();
+    AbstractModel::LoadRequiredResourcesFor($pid);
     return theme('content_model_viewer', $pid);
   }
 }
@@ -439,7 +441,9 @@ function content_model_viewer($pid) {
 function content_model_viewer_overview($pid) {
   $viewer = content_model_viewer_get_registered_content_model_viewer($pid);
   try {
-    echo $viewer->getOverview();
+    $data = $viewer->render();
+    $func = $viewer->getInitializationFunction();
+    echo json_encode(array('success' => TRUE, 'data' => $data, 'func' => $func));
   } catch (Exception $e) {
     drupal_set_message($e->getMessage());
   }
@@ -458,6 +462,8 @@ function content_model_viewer_members($pid) {
   echo json_encode(array('success' => TRUE, 'data' => $data, 'total' => $total));
   exit();
   /**
+   * Expected Data:
+   * 
    * 'link' => $base_url . '/viewer/' . 'coccc:1675',
    * 'label' => 'Some Colorado College Object',
    * 'description' => 'The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the The Colorado College Nugget, formerly the Pikes Peak Nugget from 1900-1941, was issued until 2006-2007. The 1969-1970 Nugget was issued as loose photosheets contained in a box and named the',

@@ -7,11 +7,12 @@
  *
  */
 module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+module_load_include('inc', 'content_model_viewer', 'models/AbstractModel');
 
 /**
  * Models the display information a field books should have.
  */
-class FieldBookModelViewer {
+class FieldBookModelViewer extends AbstractModel {
 
   /**
    * Object Pid.
@@ -19,6 +20,7 @@ class FieldBookModelViewer {
    * @var string
    */
   protected $pid;
+
   /**
    * The Object.
    * 
@@ -37,11 +39,18 @@ class FieldBookModelViewer {
   }
 
   /**
+   * Adds all of the required javascript/css/etc that this model needs to run.
+   */
+  public function addRequiredResources() {
+    
+  }
+
+  /**
    * Gets HTML to be rendered into the overview Panel.
    * 
    * @return string
    */
-  public function getOverview() {
+  public function render() {
     // Get some data render a template with the info!
     // @todo get some metdata info, and run some itql queries.
     return '<div>FieldBook</div>';
@@ -109,7 +118,7 @@ class FieldBookModelViewer {
   private function isDatastreamVisibleToUser($dsid) {
     return true;
   }
-  
+
   /**
    *
    * @param string $dsid 
