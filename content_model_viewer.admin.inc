@@ -176,7 +176,7 @@ function content_model_viewer_add_setting(array $form, array &$form_state) {
  */
 function content_model_viewer_delete_setting(array $form, array &$form_state) {
   $pid = $form_state['clicked_button']['#pid'];
-  db_query('DELETE FROM content_model_viewer_models WHERE pid = "%s"', $pid);
+  db_query('DELETE FROM {content_model_viewer_models} WHERE pid = "%s"', $pid);
   drupal_set_message(t('Successfully removed settings for ') . $pid . '.');
   drupal_goto('admin/settings/content_model_viewer');
 }
@@ -193,8 +193,8 @@ function content_model_viewer_delete_setting(array $form, array &$form_state) {
  *   The Drupal Form.
  */
 function content_model_viewer_datastream_default_rules_form(array &$form_state, $model_id = 1) {
-  $view = db_result(db_query('SELECT view FROM %s WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $model_id));
-  $download = db_result(db_query('SELECT download FROM %s WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $model_id));
+  $view = db_result(db_query('SELECT view FROM {%s} WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $model_id));
+  $download = db_result(db_query('SELECT download FROM {%s} WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $model_id));
   return array(
     'datastreams' => array(
       '#type' => 'fieldset',
@@ -267,7 +267,7 @@ function content_model_viewer_datastream_mimetype_rules_form($form_state, $model
     '#header' => array(t('MIME Type'), t('View'), t('Download'), ''),
     '#theme' => 'content_model_viewer_form_table',
   );
-  $query = db_query("SELECT * FROM %s WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE, $model_id);
+  $query = db_query("SELECT * FROM {%s} WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE, $model_id);
   while ($row = db_fetch_array($query)) {
     $rows[] = array(
       '#tree' => TRUE,
@@ -353,7 +353,7 @@ function content_model_viewer_datastream_dsid_rules_form($form_state, $model_id 
     '#header' => array(t('Datastream ID'), t('Match Type'), t('View'), t('Download'), ''),
     '#theme' => 'content_model_viewer_form_table',
   );
-  $query = db_query("SELECT * FROM %s WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $model_id);
+  $query = db_query("SELECT * FROM {%s} WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $model_id);
   while ($row = db_fetch_array($query)) {
     $rows[] = array(
       '#tree' => TRUE,
@@ -444,7 +444,7 @@ function content_model_viewer_datastream_rels_view_derived_form($form_state, $mo
     '#header' => array(t('MIME type'), t('Select'), t('Match'), t('Match Type'), ''),
     '#theme' => 'content_model_viewer_form_table',
   );
-  $query = db_query("SELECT * FROM %s WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $model_id);
+  $query = db_query("SELECT * FROM {%s} WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $model_id);
   while ($row = db_fetch_array($query)) {
     $rows[] = array(
       '#tree' => TRUE,
@@ -527,7 +527,7 @@ function content_model_viewer_datastream_dsid_view_derived_form($form_state, $mo
     '#header' => array(t('Source Datastream ID'), t('Match Type'), t('Derived Datastream ID'), t('Match Type'), ''),
     '#theme' => 'content_model_viewer_form_table',
   );
-  $query = db_query("SELECT * FROM %s WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE, $model_id);
+  $query = db_query("SELECT * FROM {%s} WHERE model_id = '%d'", CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE, $model_id);
   while ($row = db_fetch_array($query)) {
     $rows[] = array(
       '#tree' => TRUE,
@@ -677,7 +677,7 @@ function theme_content_model_viewer_form_table(array $element) {
 function content_model_viewer_delete_datastream_mimetype_rule(array $form, array &$form_state) {
   if (isset($form_state['clicked_button']['#rule_id'])) {
     $id = $form_state['clicked_button']['#rule_id'];
-    db_query('DELETE FROM %s WHERE id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE, $id);
+    db_query('DELETE FROM {%s} WHERE id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE, $id);
     drupal_set_message('Successfully Deleted Datastream Setting');
   }
 }
@@ -693,7 +693,7 @@ function content_model_viewer_delete_datastream_mimetype_rule(array $form, array
 function content_model_viewer_delete_datastream_dsid_rule(array $form, array &$form_state) {
   if (isset($form_state['clicked_button']['#rule_id'])) {
     $id = $form_state['clicked_button']['#rule_id'];
-    db_query('DELETE FROM %s WHERE id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $id);
+    db_query('DELETE FROM {%s} WHERE id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $id);
     drupal_set_message('Successfully Deleted Datastream Setting');
   }
 }
@@ -709,7 +709,7 @@ function content_model_viewer_delete_datastream_dsid_rule(array $form, array &$f
 function content_model_viewer_delete_datastream_rels_view_derived_rule(array $form, array &$form_state) {
   if (isset($form_state['clicked_button']['#rule_id'])) {
     $id = $form_state['clicked_button']['#rule_id'];
-    db_query('DELETE FROM %s WHERE id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $id);
+    db_query('DELETE FROM {%s} WHERE id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $id);
     drupal_set_message('Successfully Deleted Datastream Setting');
   }
 }
@@ -725,7 +725,7 @@ function content_model_viewer_delete_datastream_rels_view_derived_rule(array $fo
 function content_model_viewer_delete_datastream_dsid_view_derived_rule(array $form, array &$form_state) {
   if (isset($form_state['clicked_button']['#rule_id'])) {
     $id = $form_state['clicked_button']['#rule_id'];
-    db_query('DELETE FROM %s WHERE id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE, $id);
+    db_query('DELETE FROM {%s} WHERE id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE, $id);
     drupal_set_message('Successfully Deleted Datastream Setting');
   }
 }

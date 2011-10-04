@@ -145,7 +145,7 @@ class DerivedDatastreamResolver {
    */
   private function getRelsIntViewDerivedRule() {
     $mime = $this->item->datastreams[$this->dsid]['MIMEType'];
-    $query = db_query('SELECT * FROM %s WHERE mime = "%s"', CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $mime);
+    $query = db_query('SELECT * FROM {%s} WHERE mime = "%s"', CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $mime);
     return db_fetch_array($query);
   }
 
@@ -158,7 +158,7 @@ class DerivedDatastreamResolver {
    */
   private function getDsidViewDerivedRules() {
     $rules = array();
-    $query = db_query('SELECT * FROM %s', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE);
+    $query = db_query('SELECT * FROM {%s}', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE);
     while ($row = db_fetch_array($query)) {
       $pattern = $row['src_dsid'];
       $regex = $row['src_type'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX;
@@ -354,7 +354,7 @@ class DatastreamProperties {
    */
   private function getViewDownloadPermissions($dsid, $mime) {
     $id = content_model_viewer_get_model_id($this->item->pid); // Custom or Default Settings.
-    $result = db_fetch_array(db_query('SELECT view, download FROM %s WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $id));
+    $result = db_fetch_array(db_query('SELECT view, download FROM {%s} WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $id));
     $view = $result['view'];
     $download = $result['download'];
     if (content_model_viewer_model_has_datastream_mimetype_rule($id, $mime)) {
