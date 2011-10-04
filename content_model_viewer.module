@@ -678,7 +678,7 @@ function content_model_viewer_is_object_collection($pid) {
   $results = $collection->getRelatedItems(NULL, $itql_query);
   $xml = simplexml_load_string($results);
   if (!$xml) {
-    drupal_set_message(t('Error getting list of collection objects !e', array('!e' => $e->getMessage())), 'error');
+    drupal_set_message(t('Error getting list of collection objects'), 'error');
     return;
   }
   foreach ($xml->results->result as $result) {
