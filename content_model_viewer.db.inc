@@ -27,7 +27,7 @@ define("CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX", 1);
  *   TRUE if there are settings defined for the given Content Model, FALSE otherwise.
  */
 function content_model_viewer_model_has_settings($pid) {
-  $query = db_query('SELECT count(pid) FROM content_model_viewer_models WHERE id > 1 AND pid = "%s"', $pid);
+  $query = db_query('SELECT count(pid) FROM {content_model_viewer_models} WHERE id > 1 AND pid = "%s"', $pid);
   return (db_result($query) > 0) ? TRUE : FALSE;
 }
 
@@ -39,7 +39,7 @@ function content_model_viewer_model_has_settings($pid) {
  *   TRUE if there are settings defined for the given Content Model, FALSE otherwise.
  */
 function content_model_viewer_model_has_datastream_mimetype_rule($model_id, $mime) {
-  $query = db_query('SELECT count(id) FROM %s WHERE model_id = "%d" AND mime = "%s"', CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE, $model_id, $mime);
+  $query = db_query('SELECT count(id) FROM {%s} WHERE model_id = "%d" AND mime = "%s"', CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE, $model_id, $mime);
   return (db_result($query) > 0) ? TRUE : FALSE;
 }
 
@@ -47,7 +47,7 @@ function content_model_viewer_model_has_datastream_mimetype_rule($model_id, $mim
  * 
  */
 function content_model_viewer_model_get_datastream_mimetype_rule($model_id, $mime) {
-  $query = db_query('SELECT view, download FROM %s WHERE model_id = "%d" AND mime = "%s"', CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE, $model_id, $mime);
+  $query = db_query('SELECT view, download FROM {%s} WHERE model_id = "%d" AND mime = "%s"', CONTENT_MODEL_VIEWER_DATASTREAM_MIMETYPE_RULES_TABLE, $model_id, $mime);
   return db_fetch_array($query);
 }
 
@@ -55,7 +55,7 @@ function content_model_viewer_model_get_datastream_mimetype_rule($model_id, $mim
  * 
  */
 function content_model_viewer_model_has_datastream_dsid_rules($model_id) {
-  $query = db_query('SELECT count(id) FROM %s WHERE model_id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $model_id);
+  $query = db_query('SELECT count(id) FROM {%s} WHERE model_id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $model_id);
   return (db_result($query) > 0) ? TRUE : FALSE;
 }
 
@@ -64,7 +64,7 @@ function content_model_viewer_model_has_datastream_dsid_rules($model_id) {
  */
 function content_model_viewer_model_get_datastream_dsid_rules($model_id) {
   $rules = array();
-  $query = db_query('SELECT * FROM %s WHERE model_id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $model_id);
+  $query = db_query('SELECT * FROM {%s} WHERE model_id = "%d"', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $model_id);
   while ($row = db_fetch_array($query)) {
     $rules[] = $row;
   }
@@ -84,7 +84,7 @@ function content_model_viewer_model_get_datastream_dsid_rules($model_id) {
  */
 function content_model_viewer_get_settings($model_id = 1) {
   $settings = array();
-  $query = db_query('SELECT * FROM content_model_viewer_datastream_rules WHERE model_id = "%d"', $model_id);
+  $query = db_query('SELECT * FROM {content_model_viewer_datastream_rules} WHERE model_id = "%d"', $model_id);
   while ($data = db_fetch_object($query)) {
     $item = array();
     foreach ($data as $key => $value) {
@@ -121,12 +121,12 @@ function content_model_viewer_order_settings(array $settings) {
  *   Returns the model_id  
  */
 function content_model_viewer_get_model_id($pid) {
-  $model_id = db_result(db_query('SELECT id FROM %s WHERE id > 1 AND pid = "%s"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $pid));
+  $model_id = db_result(db_query('SELECT id FROM {%s} WHERE id > 1 AND pid = "%s"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $pid));
   if (!$model_id) {
     module_load_include('inc', 'fedora_repository', 'ContentModel');
     $content_model = ContentModel::loadFromObject($pid);
     $model_id = $content_model ?
-        db_result(db_query('SELECT id FROM %s WHERE id > 1 AND pid = "%s"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $content_model->pid)) :
+        db_result(db_query('SELECT id FROM {%s} WHERE id > 1 AND pid = "%s"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $content_model->pid)) :
         FALSE;
   }
   return $model_id ? $model_id : CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID;
