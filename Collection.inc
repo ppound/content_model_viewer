@@ -319,9 +319,41 @@ class Collection {
       $content_model_pid = $this->getContentModelPid($pid);
       $result['link'] = "$base_url/fedora/repository/$pid";
       $result['tn'] = $image_path . '/object.png';
-      $result['description'] = 'Default Description, Check this object\'s metadata and ensure a description is present.';
+      $result['description'] = $this->getDescription($pid);
     }
     return $results;
+  }
+
+  /**
+   * Attempts to get the description from the objects DC datastream.
+   * 
+   * @param string $pid 
+   *   The Fedora Object.
+   * 
+   * @return string
+   *   The description from the objects DC if possible, otherwise a default description is returned.
+   */
+  private function getDescription($pid) {
+    module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+    $default_description = 'Default Description, Check this object\'s metadata and ensure a description is present.';
+    $item = new Fedora_Item($pid);
+    $dc = $item->get_datastream_dissemination('DC');
+    $document = new DOMDocument();
+    $document->loadXML($dc);
+    $xpath = new DOMXPath($document);
+    $xpath->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+    $results = $xpath->query('//dc:description');
+    $count = $results->length;
+    if ($count > 0) {
+      $description = '';
+      for ($i = 0; $i < $count; $i++) {
+        $node = $results->item($i);
+        $description .= $node->textContent . ' ';
+      }
+      $description = trim($description);
+      return empty($description) ? $default_description : $description;
+    }
+    return $default_description;
   }
 
   /**
