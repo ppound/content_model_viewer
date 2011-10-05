@@ -52,7 +52,7 @@ class Collection {
   public function getMembers() {
 
     $offset = isset($_REQUEST['start']) ? $_REQUEST['start'] : 0;
-    $limit = isset($_REQUEST['limit']) ? $_REQUEST['limit'] : 7;
+    $limit = isset($_REQUEST['limit']) ? $_REQUEST['limit'] : 5;
     $filter = isset($_REQUEST['filter']) ? json_decode($_REQUEST['filter']) : $this->default['filter'];
     $sort = isset($_REQUEST['sort']) ? json_decode($_REQUEST['sort']) : $this->default['sort'];
     $results = $this->findMembers('all');
