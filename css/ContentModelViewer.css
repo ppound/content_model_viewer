@@ -7,76 +7,88 @@
 */
 
 #playerFLV embed {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #playerFlexPaper embed {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .add-datastream-icon {
-    background-image:url(../images/icon/add.png);
+  background-image:url(../images/icon/add.png);
 }
 
 .edit-datastream-icon {
-    background-image:url(../images/icon/edit.gif);
+  background-image:url(../images/icon/edit.gif);
 }
 
 .view-datastream-icon {
-    background-image:url(../images/icon/view.gif);
+  background-image:url(../images/icon/view.gif);
 }
 
 .download-datastream-icon {
-    background-image:url(../images/icon/blue_down.png);
+  background-image:url(../images/icon/blue_down.png);
 }
 
 .remove-datastream-icon {
-    background-image:url(../images/icon/remove.png);
+  background-image:url(../images/icon/remove.png);
 }
 
 .file-item {
-    padding-top: 5px;
-    padding-bottom: 10px;
-    cursor: pointer;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  cursor: pointer;
 }
 .file-item.x-item-selected {
-    background-color: #D3E1F1 !important;
+  background-color: #D3E1F1 !important;
 }
 
 .file-item .file-item-label {
-    text-align: center;
+  text-align: center;
 }
 
 .file-item .file-item-img {
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-    height: 96px;
-    width: 96px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  height: 96px;
+  width: 96px;
 }
 
 .file-item .file-item-dsid {
-    text-align: center;
-    font-size: 1.3em;
+  text-align: center;
+  font-size: 1.3em;
 }
 
 .member-item {
-    padding-top: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
-    height: 112px;
+  padding-top: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  height: 112px;
+}
+
+.member-item-label { 
+  white-space: nowrap; 
+  text-overflow: ellipsis; 
+  overflow: hidden; 
+}
+
+.member-item-description {
+  text-overflow: ellipsis;
+  height: 50px;
+  overflow: hidden;
 }
 
 .member-item-img {
-    margin-left: auto;
-    margin-right: auto;
-    float: left;
-    height: 64px;
-    width: 64px;
+  margin-left: auto;
+  margin-right: auto;
+  float: left;
+  height: 64px;
+  width: 64px;
 }
 
 /*
@@ -92,23 +104,23 @@
 }*/
 
 .x-list-selected {
-    background-color: #ffff00;
+  background-color: #ffff00;
 }
 
 .x-list-over {
-    background-color: #eeeebb;
+  background-color: #eeeebb;
 }
 
 .x-btn .direction-asc {
-    background-image: url("../lib/ext/resources/themes/images/default/grid/sort_asc.gif");
-    background-position: 4px 6px !important;
+  background-image: url("../lib/ext/resources/themes/images/default/grid/sort_asc.gif");
+  background-position: 4px 6px !important;
 }
 
 .x-btn .direction-desc {
-    background-image: url("../lib/ext/resources/themes/images/default/grid/sort_desc.gif");
-    background-position: 4px 6px !important;
+  background-image: url("../lib/ext/resources/themes/images/default/grid/sort_desc.gif");
+  background-position: 4px 6px !important;
 }
 
 .x-btn-inner {
-  
+
 }
