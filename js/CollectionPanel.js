@@ -120,9 +120,9 @@ Ext.onReady(function(){
         '           <img class="member-item-img" src="{tn}"></img>',
         '       </a>',
         '       <a href="{link}">',
-        '       <h2 class="member-item-label">{[fm.ellipsis(this.getLabel(values.label), 100, true)]}</h2>',
-        '       </a>',
-        '       <p class="member-item-description">{[fm.ellipsis(values.description, 350, true)]}</p>',
+        '       <h2 class="member-item-label">{label}</h2>',
+        '       </a><br/>',
+        '       <div class="member-item-description">{[fm.ellipsis(values.description, 500, true)]}</div>',
         '   </div>',
         '</tpl>',
         {

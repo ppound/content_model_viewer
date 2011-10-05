@@ -68,7 +68,8 @@
   padding-top: 5px;
   padding-left: 5px;
   padding-right: 5px;
-  height: 112px;
+  margin-top: 15px;
+  max-height: 115px;
 }
 
 .member-item-label { 
@@ -78,9 +79,8 @@
 }
 
 .member-item-description {
-  text-overflow: ellipsis;
-  height: 50px;
   overflow: hidden;
+  display: inline;
 }
 
 .member-item-img {
