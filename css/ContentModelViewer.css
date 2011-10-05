@@ -69,7 +69,17 @@
   padding-left: 5px;
   padding-right: 5px;
   margin-top: 15px;
-  max-height: 115px;
+  height: 112px;
+}
+
+.x-dataview-item > .member-item {
+  border-bottom-style: dashed;
+  border-bottom-color: #D0D0D0;
+  border-width: 1px;
+}
+
+.x-dataview-item:last-child > .member-item {
+  border-bottom-style: none;
 }
 
 .member-item-label { 
@@ -80,7 +90,7 @@
 
 .member-item-description {
   overflow: hidden;
-  display: inline;
+  max-height: 55px;
 }
 
 .member-item-img {

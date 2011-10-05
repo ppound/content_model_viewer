@@ -122,7 +122,7 @@ Ext.onReady(function(){
         '       <a href="{link}">',
         '       <h2 class="member-item-label">{label}</h2>',
         '       </a><br/>',
-        '       <div class="member-item-description">{[fm.ellipsis(values.description, 500, true)]}</div>',
+        '       <div class="member-item-description">{[fm.ellipsis(values.description, 400, true)]}</div>',
         '   </div>',
         '</tpl>',
         {
