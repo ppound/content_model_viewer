@@ -506,7 +506,42 @@ class DatastreamProperties {
    *   A URL to the image, or FALSE if none was found.
    */
   private function getThumbnailFromRELSINT($dsid) {
+    global $base_url;
+    if ($this->item->datastreams['RELS-INT']) {
+      $rels_int = $this->item->get_datastream_dissemination("RELS-INT");
+      if (trim($rels_int) != '') {
+        $rels_int = new SimpleXMLElement($rels_int);
+        $description = "/rdf:RDF/rdf:Description[@rdf:about='info:fedora/{$this->pid}/{$dsid}']";
+        $path = $description . "/*[local-name() = 'hasThumbnail']"; // hasThumbnail.
+        $results = $rels_int->xpath($path);
+        if (is_array($results) && count($results) > 0) {
+          $attributes = $results[0]->attributes('rdf', TRUE);
+          if (isset($attributes['resource'])) {
+            $dsid = sprintf("%s", $attributes['resource']);
+            $dsid = preg_filter('/^.*\/([^\/]*)$/', '$1', $dsid);
+            return "$base_url/fedora/repository/{$this->pid}/{$dsid}";
+          }
+        }
+      }
+    }
     return FALSE;
+  }
+
+  /**
+   * Gets the url from this datastreams dsid, if it exists.
+   * 
+   * @global string $base_url
+   * @return string
+   */
+  private function getUrlFromName() {
+    global $base_url;
+    if (preg_match('/\..+$/i', $this->dsid) > 0) { // Has extension.
+      $dsid = preg_replace('/\..+$/i', '-tn.jpg', $this->dsid);
+      if (array_key_exists($dsid, $this->item->datastreams)) {
+        return $this->getDatastreamUrl($dsid);
+      }
+    }
+    return NULL;
   }
 
   /**
