@@ -32,6 +32,7 @@ Ext.onReady(function(){
       xtype: 'panel',
       title: 'Files',
       width: 260,
+      collapsed: true,
       collapsible: true,
       split: true,
       region: 'east',
@@ -105,6 +106,20 @@ Ext.onReady(function(){
             }
           }),
         listeners: {
+          beforerender: function(view) {
+            var store = view.getStore();
+            var expand = (function() {
+              var panel = view.up('panel');
+              if(store.getCount() > 0) {
+                panel.expand(false);
+                return true;
+              }
+              return false;
+            });
+            if(!expand()) { // There is no data wait for it to load first.
+              store.on('load', expand);
+            }
+          },
           selectionchange: function(view, selections, options) {
             var button, record = selections[0];
             if(record) {

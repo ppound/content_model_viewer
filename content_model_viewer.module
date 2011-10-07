@@ -408,7 +408,8 @@ function content_model_viewer($pid) {
   else {
     /* Load ExtJS */
     $ext_path = $path . '/lib/ext';
-    drupal_add_js($ext_path . '/ext-all.js');
+    //drupal_add_js($ext_path . '/ext-all.js');
+    drupal_add_js($ext_path . '/ext-all-debug-w-comments.js');
     drupal_add_css($path . '/css/Clear.css');
     drupal_add_css($ext_path . '/resources/css/ext-all-gray.css', 'theme', 'all');
     /* Load Panels/Widgets */
