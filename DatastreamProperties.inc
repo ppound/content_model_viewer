@@ -273,7 +273,7 @@ class DatastreamProperties {
         'view' => $view,
         'view_function' => $view_function,
         'download' => $download,
-        'tn' => $this->getThumbnail($dsid)
+        'tn' => $this->getThumbnail($dsid, $mime)
       );
     }
     return array($data, $total);
@@ -480,15 +480,80 @@ class DatastreamProperties {
    * will be used, if there is no image associated with the MIME type of the datastream, a default image will be used.
    * 
    * @param string $dsid 
+   *   The datastream ID.
+   * @param string $mime
+   *   The mime type for the given datastream.
    * 
    * @return string
    *   A URL to the image that will be used as a thumbnail for the datastream.
    */
-  private function getThumbnail($dsid) {
+  private function getThumbnail($dsid, $mime) {
+    if (($thumbnail = $this->getThumbnailFromRELSINT($dsid)) !== FALSE) {
+      return $thumbnail;
+    }
+    if (($thumbnail = $this->getMimeTypeIcon($mime)) !== FALSE) {
+      return $thumbnail;
+    }
+    return $this->getDefaultIcon($dsid, $mime);
+  }
+
+  /**
+   * Searches the RELS-INT for a thumbnail relation.
+   * 
+   * @param string $dsid
+   *   The datastream ID.
+   * @return string
+   *   A URL to the image, or FALSE if none was found.
+   */
+  private function getThumbnailFromRELSINT($dsid) {
+    return FALSE;
+  }
+
+  /**
+   *
+   * @param string $mime
+   *   The MIME type of the datastream.
+   * @return string
+   *   A URL to the image, or FALSE if none was found.
+   */
+  private function getMimeTypeIcon($mime) {
+    $mime_type_images = array(
+      'application/pdf' => 'application-pdf.png',
+      'application/rdf+xml' => 'text-txt.png',
+      'application/xml' => 'text-txt.png',
+      'text/xml' => 'text-txt.png',
+      'audio/midi' => 'audio.png',
+      'audio/x-aiff' => 'audio.png',
+      'audio/x-mpeg' => 'audio.png',
+      'audio/x-wav' => 'audio.png',
+      'audio/x-pn-realaudio' => 'audio.png',
+      'audio/mpeg' => 'audio.png',
+      'audio/mp3' => 'audio.png',
+      'audio/wav' => 'audio.png',
+      'video/x-msvideo' => 'video.png',
+      'video/x-flv' => 'video.png',
+      'video/mpeg' => 'video.png',
+      'video/mp4' => 'video.png',
+      'video/quicktime' => 'video.png',
+    );
     $module_path = '/' . drupal_get_path('module', 'content_model_viewer');
     $image_path = $module_path . '/images/mime/';
-    $default_image = $image_path . 'default.png';
-    return $default_image;
+    if (isset($mime_type_images[$mime])) {
+      return $image_path . $mime_type_images[$mime];
+    }
+    return FALSE;
+  }
+
+  /**
+   * Gets the Default icon to use when all else fails.
+   * 
+   * @return string
+   *   A URL to the default image.
+   */
+  private function getDefaultIcon() {
+    $module_path = '/' . drupal_get_path('module', 'content_model_viewer');
+    $image_path = $module_path . '/images/mime/';
+    return $image_path . 'default.png';
   }
 
 }
