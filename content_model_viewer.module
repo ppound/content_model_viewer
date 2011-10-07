@@ -623,17 +623,18 @@ function content_model_viewer_download_datastream($pid, $dsid) {
 function content_model_viewer_view_datastream($pid, $dsid) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   $item = new Fedora_Item($pid);
-  $mime = $item->datastreams[$dsid]['MIMEType'];
-  $properties = content_model_viewer_get_viewer_properties($mime);
-  if ($properties) {
-    module_load_include($properties['type'], $properties['module'], $properties['file']);
-    $class = $properties['class'];
-    $viewer = new $class();
-    echo $viewer->render($pid, $dsid);
+  if (isset($item->datastreams[$dsid])) {
+    $mime = $item->datastreams[$dsid]['MIMEType'];
+    $properties = content_model_viewer_get_viewer_properties($mime);
+    if ($properties) {
+      module_load_include($properties['type'], $properties['module'], $properties['file']);
+      $class = $properties['class'];
+      $viewer = new $class();
+      echo $viewer->render($pid, $dsid);
+      exit();
+    }
   }
-  else {
-    echo '<div>' . t('No Viewer Avaliable') . '</div>';
-  }
+  echo '<div>' . t('No Viewer Avaliable') . '</div>';
   exit();
 }
 
