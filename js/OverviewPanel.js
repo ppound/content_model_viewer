@@ -15,6 +15,10 @@ Ext.onReady(function(){
         renderer: function(loader, response, active) {
           var json = Ext.JSON.decode(response.responseText);
           loader.getTarget().update(json.data);
+          if(json.settings !== null) { // Update settings.
+            jQuery.extend(Drupal.settings, json.settings);
+            Drupal.attachBehaviors();
+          }
           if(json.func) {
             eval(json.func)();
           }

@@ -444,7 +444,10 @@ function content_model_viewer_overview($pid) {
   try {
     $data = $viewer->render();
     $func = $viewer->getInitializationFunction();
-    echo json_encode(array('success' => TRUE, 'data' => $data, 'func' => $func));
+    $javascript = drupal_add_js(NULL, NULL, 'header');
+    $settings = call_user_func_array('array_merge_recursive', $javascript['setting']);
+    unset($settings['ahah']['']);
+    echo json_encode(array('success' => TRUE, 'data' => $data, 'func' => $func, 'settings' => $settings));
   } catch (Exception $e) {
     drupal_set_message($e->getMessage());
   }

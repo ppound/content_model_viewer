@@ -195,6 +195,7 @@ Ext.onReady(function(){
             record.get('view') ? button.enable() : button.disable();
             button = Ext.getCmp('download-datastream');
             record.get('download') ? button.enable() : button.disable();
+            // Load some info into the preview panel.
           }
         }      
       },
