@@ -120,6 +120,16 @@ function content_model_viewer_menu() {
 }
 
 /**
+ * Implements hook_menu_alter().
+ * 
+ * @param array $items 
+ */
+function content_model_viewer_menu_alter(&$items) {
+  $items['fedora']['page callback'] = 'content_model_viewer';
+  $items['fedora/repository']['page callback'] = 'content_model_viewer';  
+}
+
+/**
  * Implements hook_perm. Register permissions.
  *
  * @return array
@@ -397,7 +407,26 @@ function template_preprocess_content_model_viewer(array &$variables) {
  *
  * @param string $pid
  */
-function content_model_viewer($pid) {
+function content_model_viewer($pid = NULL) {
+  // Copied from islandora.
+  if (!fedora_available()) {
+    drupal_set_message(t('The Fedora repository server is currently unavailable. Please contact the site administrator.'), 'warning', FALSE);
+    return '';
+  }
+  if (!risearch_available()) {
+    drupal_set_message(t('The Fedora resource index search is currently unavailable. Please contact the site administrator.'), 'warning', FALSE);
+    return '';
+  }
+  if ($pid == NULL) {
+    $pid = variable_get('fedora_repository_pid', 'islandora:root');
+  }
+  $item = new fedora_item($pid);
+  if (!$item->exists()) {
+    drupal_not_found();
+    exit();
+  }
+  // End of COPY
+  $pid = isset($pid) ? $pid : variable_get('fedora_repository_pid', 'islandora:root');
   $path = drupal_get_path('module', 'content_model_viewer');
   $js_path = $path . '/js';
   if (isset($_POST['action'])) { // Render Metadata Form
