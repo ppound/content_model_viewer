@@ -409,6 +409,7 @@ function template_preprocess_content_model_viewer(array &$variables) {
  */
 function content_model_viewer($pid = NULL) {
   module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
   // Copied from islandora.
   if (!fedora_available()) {
     drupal_set_message(t('The Fedora repository server is currently unavailable. Please contact the site administrator.'), 'warning', FALSE);
