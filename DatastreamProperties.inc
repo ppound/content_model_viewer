@@ -255,7 +255,7 @@ class DatastreamProperties {
       if ($filter) { // Overides the defaults
         list($viewable, $downloadable) = $this->getViewDownloadPermissions($dsid, $mime);
         $view = $viewable ? $this->getViewableDatastream($dsid, $mime) : NULL; // Might not be the current datastream.
-        $view_function = $view ? $this->getViewFunction($view, $datastreams[$view]['MIMEType']) : NULL;
+        $view_function = $view ? $this->getViewFunction($view, $this->item->datastreams[$view]['MIMEType']) : NULL;
         $download = $downloadable ? $this->getDownloadableDatastream($dsid, $mime) : NULL;
         if (empty($view) && empty($download)) { // TEMP HACK.
           $total--;
