@@ -160,7 +160,7 @@ class DerivedDatastreamResolver {
     $rules = array();
     $query = db_query('SELECT * FROM {%s}', CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE);
     while ($row = db_fetch_array($query)) {
-      $pattern = $row['src_dsid'];
+      $pattern = str_replace(array('%pid%', '%dsid%'), array($this->pid, $this->dsid), $row['src_dsid']);
       $regex = $row['src_type'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX;
       $datastreams = $this->item->datastreams;
       foreach ($datastreams as $dsid => $properties) {
@@ -185,7 +185,7 @@ class DerivedDatastreamResolver {
   private function getDerivedViewDatastreamFromDsid() {
     $rules = $this->getDsidViewDerivedRules();
     foreach ($rules as $rule) {
-      $pattern = $rule['dest_dsid'];
+      $pattern = str_replace(array('%pid%', '%dsid%'), array($this->pid, $this->dsid), $rule['dest_dsid']);
       $regex = $rule['dest_type'] == CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX;
       foreach ($this->item->datastreams as $dsid => $properties) {
         $matches = ($regex) ?
