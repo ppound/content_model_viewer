@@ -196,7 +196,7 @@ function content_model_viewer_content_model_datastream_viewers() {
   $flexpaper = array(
     'type' => 'inc',
     'module' => 'content_model_viewer',
-    'file' => 'viewers/Flexpaper',
+    'file' => 'viewers/FlexPaper',
     'class' => 'FlexPaperViewer',
   );
   $xml = array(
