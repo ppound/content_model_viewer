@@ -1,5 +1,6 @@
 <div id="content-model-viewer">
   <h1><?php print $label; ?></h1>
+  <br/>
   <div style="display:none" id="properties">
     <div id="pid"><?php print $pid; ?></div>
     <div id="dsid"><?php print $dsid; ?></div>
