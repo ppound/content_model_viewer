@@ -8,6 +8,7 @@ Ext.onReady(function(){
     },
     items: [{
       xtype: 'panel',
+      autoScroll: true,
       html: '<div>Loading...</div>',
       loader: {
         url: ContentModelViewer.properties.url.object.overview,
