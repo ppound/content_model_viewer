@@ -241,7 +241,7 @@ function content_model_viewer_datastream_default_rules_form_submit(array $form, 
       'download' => $form_state['values']['download'],
     );
     foreach ($update as $column => $value) {
-      db_query('UPDATE %s SET %s = "%d" where id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $column, $value, $form_state['clicked_button']['#model_id']);
+      db_query('UPDATE {%s} SET %s = "%d" where id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $column, $value, $form_state['clicked_button']['#model_id']);
     }
   }
 }
