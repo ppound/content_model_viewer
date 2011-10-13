@@ -219,6 +219,7 @@ function content_model_viewer_content_model_datastream_viewers() {
   );
   return array(
     'application/x-shockwave-flash' => $flexpaper,
+    'application/shockwave-flash' => $flexpaper,
     'text/xml' => $xml,
     'application/rdf+xml' => $xml,
     'image/jpeg' => $image_basic,
