@@ -25,7 +25,8 @@ function content_model_viewer_install() {
  * On Delete of a Settings all tables with foreign key constrains will cascade the deletes.
  */
 function content_model_viewer_add_foreign_key_constraints() {
-  $table = CONTENT_MODEL_VIEWER_SETTINGS_TABLE;
+  return;
+  /*$table = CONTENT_MODEL_VIEWER_SETTINGS_TABLE;
   $constraint_query = <<<EOT
   ALTER TABLE `%table%` ADD CONSTRAINT `%table%_model_id`
   FOREIGN KEY (`model_id`)
@@ -42,7 +43,7 @@ EOT;
   foreach ($tables as $table) {
     $query = str_replace('%table%', $table, $constraint_query);
     db_query($query);
-  }
+  }*/
 }
 
 /**
