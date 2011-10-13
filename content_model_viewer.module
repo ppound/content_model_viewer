@@ -415,7 +415,7 @@ function content_model_viewer($pid = NULL) {
     drupal_set_message(t('The Fedora repository server is currently unavailable. Please contact the site administrator.'), 'warning', FALSE);
     return '';
   }
-  if (!risearch_available()) {
+  if (function_exists('risearch_available') && !risearch_available()) {
     drupal_set_message(t('The Fedora resource index search is currently unavailable. Please contact the site administrator.'), 'warning', FALSE);
     return '';
   }
