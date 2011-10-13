@@ -4,7 +4,7 @@
  */
 function loadFlexPlayer(pid, dsid) {
     var base_url = $('#base_url').text();
-    var swfURL = base_url + '/fedora/repository/' + pid + '/' + dsid;
+    var swfURL = base_url + '/viewer/' + pid + '/' + dsid + '/download';
     var swfVersionStr = "10.0.0";
     var xiSwfUrlStr = "/sites/all/libraries/flexpaper/js/swfobject/expressInstall.swf";
     var flashvars = {
