@@ -20,6 +20,13 @@ function content_model_viewer_install() {
 }
 
 /**
+ * Implementation of hook_uninstall.
+ */
+function content_model_viewer_uninstall() {
+  drupal_uninstall_schema('content_model_viewer');
+}
+
+/**
  * Adds foreign key constraints for all settings tables. 
  * 
  * On Delete of a Settings all tables with foreign key constrains will cascade the deletes.
@@ -27,9 +34,9 @@ function content_model_viewer_install() {
 function content_model_viewer_add_foreign_key_constraints() {
   $table = CONTENT_MODEL_VIEWER_SETTINGS_TABLE;
   $constraint_query = <<<EOT
-  ALTER TABLE `%table%` ADD CONSTRAINT `%table%_model_id`
+  ALTER TABLE `{%table%}` ADD CONSTRAINT `{%table%}_model_id`
   FOREIGN KEY (`model_id`)
-  REFERENCES `$table` (`id`)
+  REFERENCES `{$table}` (`id`)
   ON DELETE CASCADE
   ON UPDATE NO ACTION
 EOT;
@@ -51,11 +58,7 @@ EOT;
  */
 function content_model_viewer_add_default_settings() {
   $row = new stdClass();
-  $row->id = CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID;
-  $row->pid = 'default'; // Not referenced anywhere a placeholder value, as it can't be NULL.
-  $row->view = 1; // Permit
-  $row->download = 1; // Permit
-  drupal_write_record(CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $row);
+  db_query("INSERT INTO {%s} (`id`, `pid`, `view`, `download`) VALUES ('%d', 'default', '1', '1')", CONTENT_MODEL_VIEWER_SETTINGS_TABLE, CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID);
 }
 
 /**
@@ -63,38 +66,27 @@ function content_model_viewer_add_default_settings() {
  */
 function content_model_viewer_set_default_rules() {
   // Hide Fedora Specific Datastreams.
-  $row = new stdClass();
-  $row->model_id = CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID;
-  $row->view = 0; // Prohibit
-  $row->download = 0; // Prohibit
+  $table = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE;
+  $model_id = CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID;
+  $rule = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT;
   $hidden = array('POLICY', 'DC', 'RELS-EXT', 'RELS-INT', 'ISLANDORACM', 'COLLECTION_POLICY');
-  foreach ($hidden as $hide) {
-    $row->dsid = $hide;
-    $row->type = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT;
-    drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULES_TABLE, $row);
+  foreach ($hidden as $dsid) {
+    db_query("INSERT INTO {%s} (`model_id`, `dsid`, `type`, `view`, `download`) VALUES ('%d', '%s', '%d', '0', '0')", $table, $model_id, $dsid, $rule);
   }
   // Redirect PDF's to SWF's
-  $row = new stdClass();
-  $row->model_id = CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID;
-  $row->src_dsid = '%dsid%.pdf';
-  $row->src_type = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT;
-  $row->dest_dsid = '%dsid%.swf';
-  $row->dest_type = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT;
-  drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE, $row);
-  $row = new stdClass();
-  $row->model_id = CONTENT_MODEL_VIEWER_DEFAULT_SETTINGS_MODEL_ID;
-  $row->mime = 'application/pdf';
-  $row->xpath = '/*[local-name() = "hasSWF"]/@rdf:resource';
-  $row->matching = '[^\/]*$';
-  $row->dest_type = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX;
-  drupal_write_record(CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE, $row);
-}
-
-/**
- * Implementation of hook_uninstall.
- */
-function content_model_viewer_uninstall() {
-  drupal_uninstall_schema('content_model_viewer');
+  $table = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_VIEW_DERIVED_RULES_TABLE;
+  $src_dsid = 'PDF';
+  $src_type = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT;
+  $dest_dsid = 'SWF';
+  $dest_type = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_EXACT;
+  db_query("INSERT INTO {%s} (`model_id`, `src_dsid`, `src_type`, `dest_dsid`, `dest_type`) VALUES ('%d', '%s', '%d', '%s', '%d')", $table, $model_id, $src_dsid, $src_type, $dest_dsid, $dest_type);
+  // RELS-INT
+  $table = CONTENT_MODEL_VIEWER_DATASTREAM_RELS_VIEW_DERIVED_RULES_TABLE;
+  $mime = 'application/pdf';
+  $xpath = '/*[local-name() = "hasSWF"]/@rdf:resource';
+  $matching = '[^\/]*$';
+  $type = CONTENT_MODEL_VIEWER_DATASTREAM_DSID_RULE_TYPE_REGEX;
+  db_query("INSERT INTO {%s} (`model_id`, `mime`, `xpath`, `matching`, `type`) VALUES ('%d', '%s', '%d', '%s', '%d')", $table, $model_id, $mime, $xpath, $matching, $type);
 }
 
 /**
