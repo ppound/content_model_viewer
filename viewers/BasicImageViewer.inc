@@ -42,7 +42,7 @@ class BasicImageViewer extends AbstractViewer {
    */
   public function render($pid, $dsid) {
     global $base_url;
-    $url = $base_url . '/fedora/repository/' . $pid . '/' . $dsid;
+    $url = $base_url . '/viewer/' . $pid . '/' . $dsid . '/download';
     return "<img src='$url'/>";
   }
 
