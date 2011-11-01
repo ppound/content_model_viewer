@@ -28,7 +28,6 @@ class Tree {
     //Get all the parents of this pid
     $this->getParents($this->pid);
 
-    
     //Build the tree    
     $tree = $this->buildTree($requestedPid);
 
@@ -51,8 +50,10 @@ class Tree {
 
     //Loop through members and build tree
     foreach($members as $k=>$arr){
-      $collection = new Collection($arr['pid']);
-      list($children, $total) = $collection->getMembers();
+      //Check to see if this node has children. 
+      //Need to optimize this call. has children function maybe??
+      //$collection = new Collection($arr['pid']);
+      //list($children, $total) = $collection->getMembers();
 
       $node['text'] = (empty($arr['label'])) ? $arr['pid'] : $arr['label']; 
       $node['link'] = $arr['link'];
@@ -67,12 +68,12 @@ class Tree {
       }//end if
 
       //If this node has children, recurse and build the child tree
-      if(!empty($children)){
+      //if(!empty($children)){
         $node['leaf'] = false;
         //$node['children'] = $this->buildTree($arr['pid']);
-      }else{
-        $node['leaf'] = true;
-      }//end if
+      //}else{
+      //  $node['leaf'] = true;
+      //}//end if
 
       //Add node to the data array
       $data[] = $node;
