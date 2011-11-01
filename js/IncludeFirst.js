@@ -22,6 +22,7 @@ Ext.onReady(function(){
       properties: $('#object_properties_url').text(),
       datastreams: $('#object_datastreams_url').text(),
       members: $('#object_members_url').text(),
+      treemembers: $('#object_treemembers_url').text(),
       purge: $('#object_purge_url').text()
     },
     datastream: {
@@ -98,6 +99,18 @@ Ext.onReady(function(){
       name: 'tn',
       type: 'string'
     }]
+  });
+  Ext.define('ContentModelViewer.models.treemembers', {
+    extend: 'Ext.data.Model',
+    fields: ['text', 'link','id','leaf','cls','children','parent'],
+    proxy: {
+      type: 'ajax',
+      url : ContentModelViewer.properties.url.object.treemembers,
+      reader: {
+        type: 'json',
+        root: 'data'
+      }  
+    }
   });
   Ext.define('ContentModelViewer.models.ObjectProperties', {
     extend: 'Ext.data.Model',
@@ -199,6 +212,18 @@ Ext.onReady(function(){
         root: 'data'
       }
     }
+  });
+  //{"text" : "Audi", "id" : 100, "leaf" : false, "cls" : "folder", "children" : []}
+  Ext.create('Ext.data.TreeStore', {
+    storeId:'treemembers',
+    model: ContentModelViewer.models.treemembers,
+    sorters: [{
+        property: 'leaf',
+        direction: 'ASC'
+      },{
+        property: 'text',
+        direction: 'ASC'
+    }]
   });
   Ext.create('Ext.data.Store', {
     storeId:'datastreams',
