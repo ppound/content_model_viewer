@@ -3,10 +3,7 @@ class Tree {
   private $pid = null; //pid from url
   private $root = null; //repository root pid
   private $node = null; //Node requested by tree 
-  private $path = '/'; //default path used for tree array key. 
-  private $tree = array(); //tree placeholder
-  private $pMap = array(); //parent map.
-  private $requestedNode = null;
+  private $parents = array(); //Parents of current $pid
 
   public function __construct($pid, $node=null) {
     //Set the PID
@@ -28,16 +25,15 @@ class Tree {
     //If it is not set or if it is root, then we want to build the tree based on the root node, otherwise build the tree for the passed node. 
     $requestedPid = (!isset($this->node) || $this->node == 'root') ? $this->root : $this->node;
 
-    //Store the nod requested by the tree
-    if($this->pid != $this->root && (!isset($this->node) || $this->node == 'root')){
-      $this->requetedNode = $this->pid;
-    }
+    //Get all the parents of this pid
+    $this->getParents($this->pid);
 
+    
     //Build the tree    
     $tree = $this->buildTree($requestedPid);
 
     //JSON encode the tree
-    $json = json_encode(array('success' => TRUE, 'data' => $tree));
+    $json = json_encode(array('success' => TRUE, 'data' => $tree, 'parents'=>$this->parents));
     
     return $json;
   }//end __construct();
@@ -61,41 +57,52 @@ class Tree {
       $node['text'] = (empty($arr['label'])) ? $arr['pid'] : $arr['label']; 
       $node['link'] = $arr['link'];
       $node['id'] = $arr['pid'];
-      $node['leaf'] = (isset($children)) ? false : true;
       $node['checked'] = false;
-      if($arr['pid'] == $this->pid){
+
+      //Check if this pid is in the parents array so we know whether to expand it or not. 
+      if(in_array($arr['pid'],$this->parents) === true){
         $node['expanded'] = true;
+      }else{
+        $node['expanded'] = false;
       }//end if
-      $node['parent'] = $pid;
-      if(isset($children)){
-        $node['children'] = $this->buildTree($arr['pid']);
+
+      //If this node has children, recurse and build the child tree
+      if(!empty($children)){
+        $node['leaf'] = false;
+        //$node['children'] = $this->buildTree($arr['pid']);
+      }else{
+        $node['leaf'] = true;
       }//end if
+
+      //Add node to the data array
       $data[] = $node;
     }//end for
     
     return $data;
   }//end get_treemembers();
 
-  /* TODO
-  * This function recurses through the tree to find the requested pid, then needs to expand each parent above.
-  * not yet working
+  /*
+  * This function queries the resource index to find all the parents of the requested pid. 
+  * When we are building the tree, we need to know the parents to know which nodes to expand.
   */
-  private function expandNodes($tree) {
-    //Check if root level nodes match requested pid and if so expand. 
-    foreach($tree as $key=>$arr){
-      if($arr['pid'] == $this->pid){
-        $tree[$k]['expanded'] = true;
-        return true;
-      }else{
-        if(isset($arr['children'])){
-          if($this->expandNodes($arr['children'])){
-            $tree[$k]['expanded'] = true;
-          }
-        }
-      }
-    }
+  private function getParents($pid) {
+    //Root is expanded by default so make sure the pid is not root
+    if($pid != $this->root) {
+      //Load the collection class
+      module_load_include('inc', 'content_model_viewer', 'Collection');
+      $collection = new Collection($pid);
 
-    return false;
-  }//end expandNodes();
+      //Get the parents of the current pid. If pid has multiple parents, this should be handled.
+      list($parent, $total) = $collection->getParent($pid);
+      foreach($parent as $k=>$arr) {
+        //Make sure we're not at the root pid, otherwise save the returned pid as a parent and check
+        //to see if it has a non-root level parent.
+        if($arr['pid'] != $this->root){
+          $this->parents[] = $arr['pid'];
+          $this->getParents($arr['pid']);
+        }//end if
+      }//end foreach
+    }//end if
+  }//end expandTree();
 }//end class Tree;
 ?>
