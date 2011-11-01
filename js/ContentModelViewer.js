@@ -1,7 +1,13 @@
 /**
  * Display the viewer.
  */
+
 Ext.onReady(function(){
+
+    Ext.state.Manager.setProvider(new Ext.state.CookieProvider({
+      expires: new Date(new Date().getTime()+(1000*60*60*24*7)), //7 days from now
+    }));
+
     Ext.QuickTips.init();
     var parent = $('#tabs-tabset').parent();
     if(parent.length) {
@@ -24,11 +30,28 @@ Ext.onReady(function(){
     if(ContentModelViewer.widgets.ManagePanel !== undefined) {
         tabs.push(Ext.create('ContentModelViewer.widgets.ManagePanel'));
     }
-    var viewer = Ext.create('Ext.tab.Panel', {
-        width: 740,
-        height: 800,
+
+    //Create layout for project and add tree menu and tab panel.
+    Ext.create('Ext.container.Container', {
         renderTo: 'content-model-viewer',
-        items: tabs
+        frame: true,
+        height: 800,
+        width: 960,
+        layout: {
+            type: 'border',
+        },
+        defaults: {
+            split: true,
+        },
+        items: [
+          Ext.create('ContentModelViewer.widgets.TreePanel'), 
+          {
+            xtype: 'tabpanel',
+            region: 'center',
+            width: 760,
+            height: 800,
+            activeTab: 0,
+            items: tabs 
+        }]
     });
-    viewer.show();
 });
