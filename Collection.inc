@@ -63,6 +63,12 @@ class Collection {
     return array($results, $count);
   }
 
+  public function getParent($pid) {
+    $results = $this->findParent($pid);
+    $results = $this->populate($results);
+    return array($results, $count);
+  }
+
   /**
    * Find the members of this collection based on type
    * 
@@ -81,6 +87,25 @@ class Collection {
         return $this->findAllMembers();
     }
   }
+
+   /** 
+   * Runs a SPARQL query and returns the results in a array.
+   * 
+   * @return array
+   */
+  private function findParent($pid) {
+    $query = 'select $object $title $model $created from <#ri>
+                             where ($object <info:fedora/fedora-system:def/model#label> $title
+                             and $object <fedora-model:hasModel> $model
+                             and $object <fedora-model:createdDate> $created
+                             and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+                             and (<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $object
+                             or <info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOf> $object))
+                             minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+                             minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
+                             order by $title';
+    return $this->query($query);
+  } 
 
   /**
    * Runs a SPARQL query and returns the results in a array.
