@@ -3,20 +3,15 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     uses: [
         'Ext.tree.Panel'
     ],
-    initComponent: function() {
-        Ext.apply(this, {
-            region: 'west', 
-            store:'treemembers',// Ext.data.StoreManager.lookup('treemembers'),
-            autoLoad: false,
-            root: 'data',
-            rootVisible: false,
-            collapsible: true,
-            collapseDirection: 'left',
-            title: 'Projects',
-            width: 200
-        });
-        this.callParent(this);
-    },
+    region: 'west', 
+    store:'treemembers',
+    autoLoad: false,
+    root: 'data',
+    rootVisible: false,
+    collapsible: true,
+    collapseDirection: 'left',
+    title: 'Projects',
+    width: 200,
     listeners: {
       itemdblclick: {
         fn: function(view, record, item, index, event) {
