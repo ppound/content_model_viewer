@@ -61,7 +61,7 @@ class Tree {
       $node['checked'] = false;
 
       //Check if this pid is in the parents array so we know whether to expand it or not. 
-      if(in_array($arr['pid'],$this->parents) === true){
+      if($arr['pid'] == $this->pid ||in_array($arr['pid'],$this->parents) === true){
         $node['expanded'] = true;
       }else{
         $node['expanded'] = false;
