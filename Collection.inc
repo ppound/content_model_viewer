@@ -63,6 +63,12 @@ class Collection {
     return array($results, $count);
   }
 
+  public function getTreeMembers() {
+    $results = $this->findMembers('all');
+    $results = $this->populate($results);
+    return $results;
+  }
+
   public function getParent($pid) {
     $results = $this->findParent($pid);
     $results = $this->populate($results);
