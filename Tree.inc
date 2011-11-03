@@ -46,19 +46,13 @@ class Tree {
 
     //Lookup members of this PID
     $collection = new Collection($pid);
-    list($members, $total) = $collection->getMembers();
+    $members = $collection->getTreeMembers();
 
     //Loop through members and build tree
     foreach($members as $k=>$arr){
-      //Check to see if this node has children. 
-      //Need to optimize this call. has children function maybe??
-      //$collection = new Collection($arr['pid']);
-      //list($children, $total) = $collection->getMembers();
-
       $node['text'] = (empty($arr['label'])) ? $arr['pid'] : $arr['label']; 
       $node['link'] = $arr['link'];
       $node['id'] = $arr['pid'];
-      $node['checked'] = false;
 
       //Check if this pid is in the parents array so we know whether to expand it or not. 
       if($arr['pid'] == $this->pid ||in_array($arr['pid'],$this->parents) === true){
@@ -67,13 +61,7 @@ class Tree {
         $node['expanded'] = false;
       }//end if
 
-      //If this node has children, recurse and build the child tree
-      //if(!empty($children)){
-        $node['leaf'] = false;
-        //$node['children'] = $this->buildTree($arr['pid']);
-      //}else{
-      //  $node['leaf'] = true;
-      //}//end if
+      $node['leaf'] = false;
 
       //Add node to the data array
       $data[] = $node;
