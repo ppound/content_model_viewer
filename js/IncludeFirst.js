@@ -102,7 +102,7 @@ Ext.onReady(function(){
   });
   Ext.define('ContentModelViewer.models.treemembers', {
     extend: 'Ext.data.Model',
-    fields: ['text', 'link','id','leaf','cls','children','parent'],
+    fields: ['text', 'link','id','leaf','children','dsid','view'],
     proxy: {
       type: 'ajax',
       url : ContentModelViewer.properties.url.object.treemembers,
