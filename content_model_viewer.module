@@ -533,6 +533,13 @@ function content_model_viewer_members($pid) {
    */
 }
 
+
+/**
+ * Generate JSON to pass to EXT.js tree panel based on PID.
+ * 
+ * @param string $pid 
+ *   The PID of the Fedora Object
+ */
 function content_model_viewer_treemembers($pid) {
   module_load_include('inc','content_model_viewer','Tree');
   $tree = new Tree($pid,$_GET['node']);
@@ -540,66 +547,6 @@ function content_model_viewer_treemembers($pid) {
 
   echo $json;
 }
-
-/**
- * Build JSON response containing all collections and members.
- * 
- * @param string $pid 
- */
-/*
-function content_model_viewer_treemembers($pid) {
-  $root = variable_get('fedora_repository_pid', 'islandora:root');
-
-  if(!isset($_GET['node']) || $_GET['node'] == 'root'){
-    $gpid = $root;
-  }else{
-    $gpid = $_GET['node'];
-  }
-  $path = '/';
-
-  //Build the entire tree
-  $tree = content_model_viewer_get_treemembers($gpid, null, $pid, $path);
-
-  echo json_encode(array('success' => TRUE, 'data' => $tree));
-  exit();
-}
-
-//Recursive function to build tree
-function content_model_viewer_get_treemembers($pid, $parent=null, $requestedpid, $path){
-  module_load_include('inc', 'content_model_viewer', 'Collection');
-  $collection = new Collection($pid);
-  list($members, $total) = $collection->getMembers();
-
-  foreach($members as $k=>$arr){
-    $collection = new Collection($arr['pid']);
-    list($children, $total) = $collection->getMembers();
-    $path = $path.$parent.'/'.$arr['pid'].'/';
-
-    if(!empty($children)){
-      $data[$path] = array(
-        'text'=>(empty($arr['label'])) ? '&lt;no-title&gt;' : $arr['label'], 
-        'link'=>$arr['link'],
-        'id'=>$arr['pid'],
-        'leaf'=>false,
-        'checked'=>($arr['pid'] == $requestedpid) ? true : false,
-        'parent'=>$parent, 
-        'expanded'=>($arr['pid'] == $requestedpid || $arr['pid'] == $parent) ? true : false,
-        'children'=>content_model_viewer_get_treemembers($arr['pid'],$arr['pid'],$requestedpid, $path)
-      ); 
-    }else{
-      $data[$path] = array(
-        'text'=>(empty($arr['label'])) ? '&lt;no-title&gt;' : $arr['label'], 
-        'link'=>$arr['link'],
-        'id'=>$arr['pid'],
-        'leaf'=>true,
-        'checked'=>($arr['pid'] == $requestedpid || $arr['pid'] == $parent) ? true : false,
-        'parent'=>$parent
-      );
-    }//end if
-  }//end for
-  return $data;
-}//end get_treemembers();
-*/
 
 /**
  * Get/Set data stream properties for the given Fedora Object.
