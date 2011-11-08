@@ -53,12 +53,16 @@ class Tree {
       $node['text'] = (empty($arr['label'])) ? $arr['pid'] : $arr['label']; 
       $node['link'] = $arr['link'];
       $node['id'] = $arr['pid'];
+      $node['dsid'] = $arr['dsid'];
+      $node['view'] = $arr['view'];
 
       //Check if this pid is in the parents array so we know whether to expand it or not. 
       if($arr['pid'] == $this->pid ||in_array($arr['pid'],$this->parents) === true){
         $node['expanded'] = true;
+        $node['cls'] = 'x-tree-bold';
       }else{
         $node['expanded'] = false;
+        $node['cls'] = '';
       }//end if
 
       $node['leaf'] = false;
