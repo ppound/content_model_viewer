@@ -138,5 +138,6 @@
 .content-model-viewer {
   margin-top: 1em;
 }
-.x-tree-icon { display: none !important; }
+/*.x-tree-icon { display: none !important; }*/
 
+.x-tree-bold div{ font-weight: bold; }
