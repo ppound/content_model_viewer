@@ -11,32 +11,35 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     collapsible: true,
     collapseDirection: 'left',
     title: 'Projects',
-    width: 200,
+    width: 250,
     useArrows: true,
     listeners: {
-      itemclick: {
+      itemdblclick: {
         fn: function(view, record, item, index, event) {
             //record is the data node that was clicked
             //item is the html dom element in the tree that was clicked
             //index is the index of the node relative to its parent
-
             link = record.data.link;
             window.location = link;
         }
       },
-      /*itemclick: function(view, record, item, index, e){
+      itemclick: function(view, record, item, index, e){
         selected_node = record;
-        if(record) {
-          button = Ext.getCmp('viewer-view-file1');
+        /*if(record) {
+          button = Ext.getCmp('viewer-tree-view');
           button.enable();
           //record.get('view') ? button.enable() : button.disable(); 
-        }//end if
-      },*/
+        }//end if*/
+      },
       selectionchange: function(view, selections, options) {
         var button, record = selections[0];
         if(record) {
-          button = Ext.getCmp('viewer-view-file1');
-          record.get('id') ? button.enable() : button.disable();
+          overviewButton = Ext.getCmp('viewer-tree-overview');
+          manageButton = Ext.getCmp('viewer-tree-manage');
+          resourcesButton = Ext.getCmp('viewer-tree-resources');
+          record.get('id') ? overviewButton.enable() : overviewButton.disable();
+          record.get('id') ? manageButton.enable() : manageButton.disable();
+          record.get('id') ? resourcesButton.enable() : resourcesButton.disable();
         }   
       }
     },
@@ -45,16 +48,40 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
       dock: 'top',
       items: [{
           xtype: 'button',
-          text: 'View',
+          text: 'Overview',
           cls: 'x-btn-text-icon',
           iconCls: 'view-datastream-icon',
           disabled: true,
-          id: 'viewer-view-file1',
+          id: 'viewer-tree-overview',
           handler : function() {
-            var record = selected_node.data.id;
-            ContentModelViewer.functions.selectDatastreamRecord(record);
-            ContentModelViewer.functions.viewSelectedDatastreamRecord();
+            var record = selected_node.data.link + '#overview';
+            window.location = record;
           }   
+        },
+        {
+          xtype: 'button',
+          text: 'Resources',
+          cls: 'x-btn-text-icon',
+          iconCls: 'view-datastream-icon',
+          disabled: true,
+          id: 'viewer-tree-resources',
+          handler : function() {
+            var record = selected_node.data.link + '#collection';
+            window.location = record;
+          }   
+        },
+        {
+          xtype: 'button',
+          text: 'Manage',
+          cls: 'x-btn-text-icon',
+          iconCls: 'edit-datastream-icon',
+          disabled: true,
+          id: 'viewer-tree-manage',
+          handler : function() {
+            var record = selected_node.data.link + '#manage';
+
+            window.location = record;
+          } 
         }
       ]
     }]
