@@ -50,7 +50,13 @@ class Tree {
 
     //Loop through members and build tree
     foreach($members as $k=>$arr){
-      $node['text'] = (empty($arr['label'])) ? $arr['pid'] : $arr['label']; 
+      $node['text'] = (empty($arr['label'])) ? $arr['pid'] : $arr['label'];
+      if($arr['relatedCount'] > 0) {
+        $node['text'] .= ' ('.$arr['relatedCount'].')';
+        $node['leaf'] = false;
+      }else{
+        $node['leaf'] = true;
+      }//end if
       $node['link'] = $arr['link'];
       $node['id'] = $arr['pid'];
       $node['dsid'] = $arr['dsid'];
@@ -65,7 +71,7 @@ class Tree {
         $node['cls'] = '';
       }//end if
 
-      $node['leaf'] = false;
+      //$node['leaf'] = false;
 
       //Add node to the data array
       $data[] = $node;
