@@ -18,11 +18,11 @@ Ext.onReady(function(){
     }
     var tabs = [];
     // Create Tabs for each of the Panels if they are defined 
-    if(ContentModelViewer.widgets.CollectionPanel !== undefined) {
-        tabs.push(Ext.create('ContentModelViewer.widgets.CollectionPanel'));
-    }
     if(ContentModelViewer.widgets.OverviewPanel !== undefined) {
         tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel'));
+    }
+    if(ContentModelViewer.widgets.CollectionPanel !== undefined) {
+        tabs.push(Ext.create('ContentModelViewer.widgets.CollectionPanel'));
     }
     if(ContentModelViewer.widgets.ViewerPanel !== undefined) {
         tabs.push(Ext.create('ContentModelViewer.widgets.ViewerPanel'));
@@ -48,10 +48,29 @@ Ext.onReady(function(){
           {
             xtype: 'tabpanel',
             region: 'center',
+            id: 'cmvtabpanel',
             width: 760,
             height: 800,
             activeTab: 0,
-            items: tabs 
+            items: tabs,
+            listeners: {
+              afterrender: function(){
+                var token = window.location.hash.substr(1);
+                if ( token && this.isVisible(token)) {
+                    this.setActiveTab(token);
+                }//end if
+              }//end afterRender
+            } 
         }]
     });
+
+    if ( 'onhashchange' in window ) {
+      window.onhashchange = function() {
+        var token = window.location.hash.substr(1);
+        var tabpanel = Ext.getCmp('cmvtabpanel');
+        if (token && tabpanel.isVisible(token)) {
+          tabpanel.setActiveTab(token);
+        }//end if
+      }
+    }
 });
