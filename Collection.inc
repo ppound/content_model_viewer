@@ -64,7 +64,13 @@ class Collection {
   }
 
   public function getTreeMembers() {
-    $query = 'select $object $title $model $created count( select $pid from <#ri> where $pid <fedora-rels-ext:isMemberOfCollection> $object )
+    $query = 'select $object $title $model $created 
+    count(
+      select $pid 
+      from <#ri> 
+      where ($pid <fedora-rels-ext:isMemberOfCollection> $object 
+      or $pid <fedora-rels-ext:isMemberOf> $object )
+    )
     from <#ri>
     where ($object <info:fedora/fedora-system:def/model#label> $title
     and $object <fedora-model:hasModel> $model
@@ -210,7 +216,8 @@ class Collection {
           $pid = substr($path->query('sparql:object/@uri', $result)->item(0)->value, 12); // 12 characteres in "info:fedora/"
           $label = $path->query('sparql:title', $result)->item(0)->textContent;
           $created = $path->query('sparql:created', $result)->item(0)->textContent;
-          $ret[] = array('pid' => $pid, 'label' => $label, 'created' => $created);
+          $relatedCount = $path->query('sparql:k0',$result)->item(0)->textContent;
+          $ret[] = array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount);
         }
       }
       return $ret;
