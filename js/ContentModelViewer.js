@@ -36,7 +36,7 @@ Ext.onReady(function(){
         renderTo: 'content-model-viewer',
         frame: true,
         height: 800,
-        width: 960,
+        width: 940,
         layout: {
             type: 'border',
         },
