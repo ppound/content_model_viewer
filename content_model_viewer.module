@@ -495,18 +495,21 @@ function content_model_viewer($pid = NULL) {
  * @return string
  */
 function content_model_viewer_overview($pid) {
-  $viewer = content_model_viewer_get_registered_content_model_viewer($pid);
-  try {
-    $data = $viewer->render();
-    $func = $viewer->getInitializationFunction();
-    $javascript = drupal_add_js(NULL, NULL, 'header');
-    $settings = call_user_func_array('array_merge_recursive', $javascript['setting']);
-    unset($settings['ahah']['']);
-    echo json_encode(array('success' => TRUE, 'data' => $data, 'func' => $func, 'settings' => $settings));
-  } catch (Exception $e) {
-    drupal_set_message($e->getMessage());
-  }
-  exit();
+ $viewer = content_model_viewer_get_registered_content_model_viewer($pid);
+ try {
+   $data = $viewer->render();
+   $func = $viewer->getInitializationFunction();
+   $javascript = drupal_add_js(NULL, NULL, 'header');
+   $settings = $javascript['setting'];
+   if(isset($settings)){
+     $settings = call_user_func_array('array_merge_recursive', $javascript['setting']);
+     unset($settings['ahah']['']);
+   }
+   echo json_encode(array('success' => TRUE, 'data' => $data, 'func' => $func, 'settings' => $settings));
+ } catch (Exception $e) {
+   drupal_set_message($e->getMessage());
+ }
+ exit();
 }
 
 /**
