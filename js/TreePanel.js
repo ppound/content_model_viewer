@@ -14,7 +14,7 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
     width: 250,
     useArrows: true,
     listeners: {
-      itemdblclick: {
+      itemclick: {
         fn: function(view, record, item, index, event) {
             //record is the data node that was clicked
             //item is the html dom element in the tree that was clicked
@@ -23,15 +23,10 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
             window.location = link;
         }
       },
-      itemclick: function(view, record, item, index, e){
+      /*itemclick: function(view, record, item, index, e){
         selected_node = record;
-        /*if(record) {
-          button = Ext.getCmp('viewer-tree-view');
-          button.enable();
-          //record.get('view') ? button.enable() : button.disable(); 
-        }//end if*/
-      },
-      selectionchange: function(view, selections, options) {
+      },*/
+      /*selectionchange: function(view, selections, options) {
         var button, record = selections[0];
         if(record) {
           overviewButton = Ext.getCmp('viewer-tree-overview');
@@ -41,9 +36,9 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
           record.get('id') ? manageButton.enable() : manageButton.disable();
           record.get('id') ? resourcesButton.enable() : resourcesButton.disable();
         }   
-      }
+      }*/
     },
-    dockedItems: [{
+    /*dockedItems: [{
       xtype: 'toolbar',
       dock: 'top',
       items: [{
@@ -84,5 +79,5 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
           } 
         }
       ]
-    }]
+    }]*/
 });
