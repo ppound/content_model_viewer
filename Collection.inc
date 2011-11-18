@@ -64,44 +64,27 @@ class Collection {
   }
 
   public function getTreeMembers() {
-    $query = 'select $object $title $model $created
-    count(
-      select $pid
-      from <#ri>
-      where  $object <fedora-model:hasModel> $sub_model
-    and $sub_model <fedora-model:hasModel> $sub_parent_model
-    and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
-    and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-    and ($pid <fedora-rels-ext:isMemberOfCollection> $object
-      or $pid <fedora-rels-ext:isMemberOf> $object )
-    )
-    from <#ri>
-    where ($object <info:fedora/fedora-system:def/model#label> $title
-    and $object <fedora-model:hasModel> $model
-    and $object <fedora-model:createdDate> $created
-    and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-    and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/'. $this->pid.'>
-    or $object <fedora-rels-ext:isMemberOf> <info:fedora/'. $this->pid .'>))
-    minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-    minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-    order by $title'; 
-    /*$query = 'select $object $title $model $created 
-    count(
-      select $pid 
-      from <#ri> 
-      where ($pid <fedora-rels-ext:isMemberOfCollection> $object 
-      or $pid <fedora-rels-ext:isMemberOf> $object )
-    )
-    from <#ri>
-    where ($object <info:fedora/fedora-system:def/model#label> $title
-    and $object <fedora-model:hasModel> $model
-    and $object <fedora-model:createdDate> $created
-    and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-    and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
-    or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>)) 
-    minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-    minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-    order by $title';*/
+   $query = 'select $object $title $model $created 
+   count(
+     select $pid
+     from <#ri>
+     where  $object <fedora-model:hasModel> $sub_model
+   and $sub_model <fedora-model:hasModel> $sub_parent_model
+   and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
+   and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+   and ($pid <fedora-rels-ext:isMemberOfCollection> $object
+     or $pid <fedora-rels-ext:isMemberOf> $object )
+   )
+   from <#ri>
+   where ($object <info:fedora/fedora-system:def/model#label> $title
+   and $object <fedora-model:hasModel> $model
+   and $object <fedora-model:createdDate> $created
+   and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+   and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/'. $this->pid.'>
+   or $object <fedora-rels-ext:isMemberOf> <info:fedora/'. $this->pid .'>))
+   minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+   minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
+   order by $title';
     $results = $this->query($query);
     $results = $this->populate($results);
     return $results;
