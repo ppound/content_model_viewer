@@ -1,12 +1,16 @@
 $theme-name: 'gray';
-$base-color: #ccc;
+$base-color: #EEEEEE;
 
 //panel
-$panel-header-background-gradient: color-stops(#F0F0F0, #D7D7D7);
-$panel-border-color: #D0D0D0;
-$panel-header-color: #333;
-
-$panel-frame-background-color: #f1f1f1;
+$panel-header-background-gradient: color-stops(#017DAE, #017DAE, #0173A4, #015f90);
+$panel-border-color: #CCC;
+$panel-header-color: #FFF;
+$panel-frame-background-color: #EEEEEE;
+$panel-header-border-width: 1px;
+$panel-header-border-style: solid;
+$panel-header-inner-border: false;
+$panel-header-padding: 6px 4px 7px 5px !default;
+$panel-header-background-color: #017DAE;
 
 //window
 $window-background-color: #e8e8e8;
@@ -48,13 +52,44 @@ $boundlist-border-color: #b5b8c8;
 $accordion-header-background-color: #e5e5e5;
 
 //tabs
-$tab-base-color: #eaeaea;
-$tab-color-active: #333333;
+$tab-base-color: #017DAE;
+$tab-bottom-border-width: 1px;
 
-$tab-background-gradient: color-stops(#dcdcdc, #eaeaea);
+$tab-background-gradient: color-stops(#017DAE, #017DAE, #0173A4, #015f90);
 $tab-background-gradient-over: 'tab-over' !default;
-$tab-background-gradient-active: color-stops(#ffffff, #eaeaea);
+$tab-background-gradient-active: color-stops(#2e6078, #33657d, #2f657e, #12506d, #034564, #004362, #004261, #003b57);
 $tab-background-gradient-disabled: 'tab-disabled' !default;
+
+$tab-color: #FFF;
+$tab-color-over: #FFF;
+$tab-color-active: #FFF;
+$tab-color-disabled: #FFF;
+
+//tab borders
+$tab-inner-border: false !default;
+$tab-top-border-radius: 0 0 0 0;
+$tab-top-border-width: 0 0 0 0;
+$tab-bottom-border-width: 0 0px 0px 0px !default;
+
+$tab-height: 25px;
+$tab-spacing: 0px;
+
+//tab bar strip
+$tabbar-background-gradient: color-stops(#017DAE, #017DAE, #0173A4, #015f90);
+$tabbar-strip-height: 1px;
+$tabbar-strip-background-color: #017DAE;
+$tabbar-top-strip-border-width: 0px 0px 0 !default;
+$tabbar-bottom-strip-border-width: 0 1px 1px !default;
+
+//tab bar body border and padding
+$tabbar-top-body-border-width: 1px 1px 1px !default;
+$tabbar-top-body-padding: 1px 0 3px !default;
+$tabbar-top-plain-body-border-width: 0 !default;
+$tabbar-top-plain-body-padding: 0 0 3px !default;
+$tabbar-bottom-body-border-width: 0 1px 1px !default;
+$tabbar-bottom-body-padding: 3px 0 1px !default;
+$tabbar-bottom-plain-body-border-width: 0 !default;
+$tabbar-bottom-plain-body-padding: 3px 0 0 !default;
 
 //buttons
 $button-default-base-color: #f8f8f8;
