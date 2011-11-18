@@ -10,7 +10,12 @@ class Tree {
     $this->pid = $pid;
 
     //Set the node
+    if($node != 'root' && !empty($node)){
+      $node = substr($node,0,-8);
+    };
+
     $this->node = $node;
+
 
     //Set the root
     $this->root = variable_get('fedora_repository_pid', 'islandora:root');
@@ -58,7 +63,8 @@ class Tree {
         $node['leaf'] = true;
       }//end if
       $node['link'] = $arr['link'];
-      $node['id'] = $arr['pid'];
+      $node['id'] = $arr['pid'].'|||'.rand(10000,99999);
+      $node['pid'] = $arr['pid'];
       $node['dsid'] = $arr['dsid'];
       $node['view'] = $arr['view'];
 
