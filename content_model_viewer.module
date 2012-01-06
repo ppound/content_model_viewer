@@ -42,7 +42,7 @@ function content_model_viewer_menu() {
     'page callback' => 'content_model_viewer_treemembers',
     'page arguments' => array(1),
     'access arguments' => array(PERM_CONTENT_MODEL_VIEWER_VIEW_OBJECTS),
-    'type' => MENU_CALLBACK, 
+    'type' => MENU_CALLBACK,
   );
   $items['viewer/%/properties'] = array(
     'page callback' => 'content_model_viewer_properties',
@@ -311,13 +311,14 @@ function content_model_viewer_register_content_models_for_viewer() {
  *   the default content model viewer.
  */
 function content_model_viewer_get_registered_content_model_viewer($pid) {
-  $model_pid = content_model_viewer_get_content_model_pid($pid);
-  $models = module_invoke_all('register_content_models_for_viewer');
-  foreach ($models as $key => $model) {
-    if ($key == $model_pid) {
-      module_load_include($model['type'], $model['module'], $model['file']);
-      $class = $model['class'];
-      return new $class($pid);
+  if (($model_pid = content_model_viewer_get_content_model_pid($pid)) != FALSE) {
+    $models = module_invoke_all('register_content_models_for_viewer');
+    foreach ($models as $key => $model) {
+      if ($key == $model_pid) {
+        module_load_include($model['type'], $model['module'], $model['file']);
+        $class = $model['class'];
+        return new $class($pid);
+      }
     }
   }
   module_load_include('inc', 'content_model_viewer', 'models/Default');
@@ -334,7 +335,7 @@ function content_model_viewer_get_registered_content_model_viewer($pid) {
 function content_model_viewer_get_content_model_pid($pid) {
   module_load_include('inc', 'fedora_repository', 'ContentModel');
   $content_model = ContentModel::loadFromObject($pid);
-  return $content_model->pid;
+  return $content_model ? $content_model->pid : FALSE;
 }
 
 /**
@@ -495,21 +496,21 @@ function content_model_viewer($pid = NULL) {
  * @return string
  */
 function content_model_viewer_overview($pid) {
- $viewer = content_model_viewer_get_registered_content_model_viewer($pid);
- try {
-   $data = $viewer->render();
-   $func = $viewer->getInitializationFunction();
-   $javascript = drupal_add_js(NULL, NULL, 'header');
-   $settings = $javascript['setting'];
-   if(isset($settings)){
-     $settings = call_user_func_array('array_merge_recursive', $javascript['setting']);
-     unset($settings['ahah']['']);
-   }
-   echo json_encode(array('success' => TRUE, 'data' => $data, 'func' => $func, 'settings' => $settings));
- } catch (Exception $e) {
-   drupal_set_message($e->getMessage());
- }
- exit();
+  $viewer = content_model_viewer_get_registered_content_model_viewer($pid);
+  try {
+    $data = $viewer->render();
+    $func = $viewer->getInitializationFunction();
+    $javascript = drupal_add_js(NULL, NULL, 'header');
+    $settings = $javascript['setting'];
+    if (isset($settings)) {
+      $settings = call_user_func_array('array_merge_recursive', $javascript['setting']);
+      unset($settings['ahah']['']);
+    }
+    echo json_encode(array('success' => TRUE, 'data' => $data, 'func' => $func, 'settings' => $settings));
+  } catch (Exception $e) {
+    drupal_set_message($e->getMessage());
+  }
+  exit();
 }
 
 /**
@@ -536,7 +537,6 @@ function content_model_viewer_members($pid) {
    */
 }
 
-
 /**
  * Generate JSON to pass to EXT.js tree panel based on PID.
  * 
@@ -544,8 +544,8 @@ function content_model_viewer_members($pid) {
  *   The PID of the Fedora Object
  */
 function content_model_viewer_treemembers($pid) {
-  module_load_include('inc','content_model_viewer','Tree');
-  $tree = new Tree($pid,$_GET['node']);
+  module_load_include('inc', 'content_model_viewer', 'Tree');
+  $tree = new Tree($pid, $_GET['node']);
   $json = $tree->getTree();
 
   echo $json;
