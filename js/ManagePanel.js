@@ -1,13 +1,17 @@
 Ext.onReady(function(){
+  var properties = ContentModelViewer.properties;
+  var url = ContentModelViewer.properties.url;
+  
   Ext.define('ContentModelViewer.widgets.FileUpload', {
     extend: 'Ext.form.field.File',
     xtype: 'filefield',
     name: 'file',
     fieldLabel: 'File'
-  })
+  });
     
   Ext.define('ContentModelViewer.widgets.ManagePanel', {
     extend: 'Ext.panel.Panel',
+    alias: 'widget.managepanel',
     itemId: 'manage',
     title: 'Manage',
     layout: {
@@ -79,14 +83,12 @@ Ext.onReady(function(){
           text: 'Save Changes',
           formBind: true, // Only enabled once the form is valid
           handler: function(button) {
+            var pid = this.findParentByType('managepanel').pid;
             button.up('form').getForm().submit({
-              url: ContentModelViewer.properties.url.object.properties,
+              url: url.object.properties(pid),
               waitMsg: 'Saving Data...',
               success: function(form, action) {
-                var store = Ext.data.StoreManager.lookup('objectProperties');
-                var record = store.first();
-                record.set(action.result.data);
-                form.loadRecord(record);
+                // @todo revert the fields if submit fails.
               }
             });
           }
@@ -116,9 +118,10 @@ Ext.onReady(function(){
         }],
         listeners: {
           afterrender: function(form) {
+            var pid = this.findParentByType('managepanel').pid;
             form.getForm().load({
               method: 'GET',
-              url: ContentModelViewer.properties.url.object.properties,
+              url: url.object.properties(pid),
               waitMsg: 'Loading...'
             });
           }
@@ -195,7 +198,7 @@ Ext.onReady(function(){
             record.get('view') ? button.enable() : button.disable();
             button = Ext.getCmp('download-datastream');
             record.get('download') ? button.enable() : button.disable();
-            // Load some info into the preview panel.
+          // Load some info into the preview panel.
           }
         }      
       },
@@ -301,8 +304,10 @@ Ext.onReady(function(){
                     text: 'Add',
                     formBind: true, // Only enabled once the form is valid
                     handler: function(button) {
+                      var pid = this.findParentByType('managepanel').pid;
+                      var dsid = properties.dsid;
                       button.up('form').getForm().submit({
-                        url: ContentModelViewer.properties.url.datastream.add,
+                        url: url.datastream.add(pid, dsid),
                         waitMsg: 'Creating...',
                         success: function(form, action) {
                           var pager = Ext.getCmp('datastream-pager');
@@ -350,11 +355,11 @@ Ext.onReady(function(){
                 if(choice == 'yes') {
                   var selectionModel = grid.getSelectionModel();
                   if(selectionModel.hasSelection()) {
+                    var pid = this.findParentByType('managepanel').pid;
                     var record = selectionModel.selected.first();
                     var dsid = record.get('dsid');
-                    var url = ContentModelViewer.properties.url.datastream.purge(dsid);
                     Ext.Ajax.request({
-                      url: url,
+                      url: url.datastream.purge(pid, dsid),
                       method: 'POST',
                       success: function(response){
                         var pager = Ext.getCmp('datastream-pager');
@@ -387,7 +392,7 @@ Ext.onReady(function(){
               var dsid = form.down('input[name="dsid"]');
               dsid.set({
                 value: record.get('dsid')
-                });
+              });
               var action = form.down('input[name="action"]');
               action.set({
                 value: 'edit'
@@ -406,12 +411,12 @@ Ext.onReady(function(){
             var grid = this.up('gridpanel');
             var selectionModel = grid.getSelectionModel();
             if(selectionModel.hasSelection()) {
+              var pid = this.findParentByType('managepanel').pid;
               var record = selectionModel.selected.first();
               var dsid = record.get('dsid');
-              var url = ContentModelViewer.properties.url.datastream.download(dsid);
               var form = Ext.get("datastream-download-form");
               form.set({
-                action: url
+                action: url.datastream.download(pid, dsid)
               });
               document.forms["datastream-download-form"].submit();
             }
@@ -441,5 +446,5 @@ Ext.onReady(function(){
         displayInfo: true
       }]
     }]
-  })
+  });
 });

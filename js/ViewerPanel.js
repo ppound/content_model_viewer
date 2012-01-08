@@ -1,26 +1,31 @@
 Ext.onReady(function(){
+  var url = ContentModelViewer.properties.url;
   Ext.define('ContentModelViewer.widgets.ViewerPanel', {
     extend: 'Ext.panel.Panel',
+    alias: 'widget.viewerpanel',
+    constructor: function(config) {
+      this.callParent(arguments);
+      var content = Ext.create('Ext.panel.Panel', {
+        xtype: 'panel',
+        region: 'center',
+        id: 'datastream-viewer',
+        autoScroll: true,
+        loader: {
+          url: url.datastream.view(config.pid, config.dsid),
+          renderer: 'html',
+          loadMask: true,
+          autoLoad: true,
+          success: ContentModelViewer.functions.callDatastreamViewFunction
+        }
+      });
+      this.add(content);
+    },
     itemId: 'viewer',
     title: 'Viewer',
     layout: {
       type: 'border'
     },
     items: [{
-      xtype: 'panel',
-      region: 'center',
-      id: 'datastream-viewer',
-      autoScroll: true,
-      loader: {
-        url: ContentModelViewer.properties.url.datastream.view(ContentModelViewer.properties.dsid),
-        renderer: 'html',
-        loadMask: true,
-        autoLoad: true,
-        success: function() {
-          ContentModelViewer.functions.callDatastreamViewFunction();
-        }
-      }
-    }, {
       xtype: 'panel',
       title: 'Files',
       width: 260,
@@ -55,12 +60,13 @@ Ext.onReady(function(){
           disabled: true,
           id: 'viewer-download-file',
           handler : function() {
+            var pid = this.findParentByType('viewerpanel').pid;
             var view = this.up('panel').down('dataview');
             var selectionModel = view.getSelectionModel();
             if(selectionModel.hasSelection()) {
               var record = selectionModel.selected.first();
               var dsid = record.get('dsid');
-              var url = ContentModelViewer.properties.url.datastream.download(dsid);
+              var url = url.datastream.download(pid, dsid);
               var form = Ext.get("datastream-download-form");
               form.set({
                 action: url

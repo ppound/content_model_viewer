@@ -22,7 +22,7 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
             link = record.data.link;
             window.location = link;
         }
-      },
+      }
       /*itemclick: function(view, record, item, index, e){
         selected_node = record;
       },*/
@@ -37,7 +37,7 @@ Ext.define('ContentModelViewer.widgets.TreePanel', {
           record.get('id') ? resourcesButton.enable() : resourcesButton.disable();
         }   
       }*/
-    },
+    }
     /*dockedItems: [{
       xtype: 'toolbar',
       dock: 'top',

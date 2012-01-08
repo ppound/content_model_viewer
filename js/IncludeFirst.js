@@ -2,182 +2,237 @@
  * Create Namespaces
  */
 Ext.ns('ContentModelViewer');
+Ext.ns('ContentModelViewer.setup');
 Ext.ns('ContentModelViewer.properties');
+Ext.ns('ContentModelViewer.functions');
 Ext.ns('ContentModelViewer.models');
 Ext.ns('ContentModelViewer.widgets');
-
 /**
- * Grab properties from properties stored in the HTML 
+ * Removes islandora generated HTML and replaces it with the required Content Model viewer HTML.
  */
-Ext.onReady(function(){
-  /**
-     * Set Properties
-     */
-  ContentModelViewer.properties.pid = $('#pid').text();
-  ContentModelViewer.properties.dsid = $('#dsid').text();
-  ContentModelViewer.properties.viewFunction = $('#view_function').text();
-  ContentModelViewer.properties.url = {
-    object: {
-      overview: $('#object_overview_url').text(),
-      properties: $('#object_properties_url').text(),
-      datastreams: $('#object_datastreams_url').text(),
-      members: $('#object_members_url').text(),
-      treemembers: $('#object_treemembers_url').text(),
-      purge: $('#object_purge_url').text()
-    },
-    datastream: {
-      add: $('#datastream_add_url').text(),
-      purge: function(dsid) {
-        var url = $('#datastream_purge_url').text();
-        return url.replace('/dsid/', '/'+dsid+'/');
-      },
-      properties: function(dsid) {
-        var url = $('#datastream_add_url').text();
-        return url.replace('/dsid/', '/'+dsid+'/');
-      },
-      download: function(dsid) {
-        var url = $('#datastream_download_url').text();
-        return url.replace('/dsid/', '/'+dsid+'/');
-      },
-      view: function(dsid) {
-        var url = $('#datastream_view_url').text();
-        return url.replace('/dsid/', '/'+dsid+'/');
+ContentModelViewer.setup.initContentArea = function() {
+  var parent = $('#tabs-tabset').parent();
+  if(parent.length) {
+    var content_model_viewer = $('#content-model-viewer');
+    var content = content_model_viewer.remove();
+    parent.empty();
+    parent.append(content);    
+  }
+}
+/**
+ * Initialize ExtJS features.
+ */
+ContentModelViewer.setup.initExtJSFeatures = function() {
+  var expirationDateTime = new Date().getTime()+(1000*60*60*24*7); // 7 days from now
+  Ext.state.Manager.setProvider(new Ext.state.CookieProvider({
+    expires: new Date(expirationDateTime) 
+  }));
+  Ext.QuickTips.init();
+}
+/**
+ * Set up events on global objects such as the window or document.
+ */
+ContentModelViewer.setup.setUpGlobalEvents = function() {
+  if ( 'onhashchange' in window ) {
+    window.onhashchange = function() {
+      var token = window.location.hash.substr(1);
+      var tabpanel = Ext.getCmp('cmvtabpanel');
+      if (token && tabpanel.isVisible(token)) {
+        tabpanel.setActiveTab(token);
       }
     }
-  };
+  }
+}
+/**
+ * Set up the properties for the Content Model Viewer
+ */
+ContentModelViewer.setup.initProperties = function() {
+  // Local Variables
+  var properties = ContentModelViewer.properties;
   /**
-     * Define Functions
-     */
+   * Create a function for generating a url from a store url and a pid.
+   */
+  var url_replace_pid_func = function(id) {
+    var url = $(id).text();
+    return function(pid) {
+      return url.replace('/pid/', '/'+pid+'/');
+    }
+  };
+  /** 
+   * Create a function for generating a url from a store url and a pid/dsid.
+   */
+  var url_replace_pid_dsid_func = function(id) {
+    var url = $(id).text();
+    return function(pid, dsid) {
+      url = url.replace('/pid/', '/'+pid+'/');
+      return url.replace('/dsid/', '/'+dsid+'/');
+    }
+  };
+  //------------
+  // Properties
+  //------------
+  properties.pid = $('#pid').text();
+  properties.dsid = $('#dsid').text();
+  properties.viewFunction = $('#view_function').text();
+  properties.url = { // Functions to generate AJAX Callback URL
+    object: {
+      overview: url_replace_pid_func('#object_overview_url'),
+      properties: url_replace_pid_func('#object_properties_url'),
+      datastreams: url_replace_pid_func('#object_datastreams_url'),
+      members: url_replace_pid_func('#object_members_url'),
+      treemembers: url_replace_pid_func('#object_treemembers_url'),
+      purge: url_replace_pid_func('#object_purge_url')
+    },
+    datastream: {
+      add: url_replace_pid_dsid_func('#datastream_add_url'),
+      purge: url_replace_pid_dsid_func('#datastream_purge_url'),
+      properties: url_replace_pid_dsid_func('#datastream_properties_url'),
+      download: url_replace_pid_dsid_func('#datastream_download_url'),
+      view: url_replace_pid_dsid_func('#datastream_view_url')
+    }
+  };
+}
+/**
+ * Defines functions to be used by the Content Model Viewer.
+ */
+ContentModelViewer.setup.defineFunctions = function() {
+  var properties = ContentModelViewer.properties;
+  var url = properties.url;
   ContentModelViewer.functions = {
     selectDatastreamRecord: function(record) {
-      ContentModelViewer.properties.dsid = record.get('view');
-      ContentModelViewer.properties.viewFunction = record.get('view_function');
+      properties.dsid = record.get('view');
+      properties.viewFunction = record.get('view_function');
     },
     viewSelectedDatastreamRecord: function() {
       var viewer = Ext.getCmp('datastream-viewer');
       var loader = viewer.getLoader();
       loader.load({
-        url: ContentModelViewer.properties.url.datastream.view(ContentModelViewer.properties.dsid)
+        url: url.datastream.view(properties.pid, properties.dsid)
       });
       var viewerPanel = viewer.up('panel');
       var tabpanel = viewer.up('tabpanel');
       tabpanel.setActiveTab(viewerPanel);
     },
     callDatastreamViewFunction: function() {
-      var pid = ContentModelViewer.properties.pid;
-      var dsid = ContentModelViewer.properties.dsid;
-      var view_function = ContentModelViewer.properties.viewFunction;
+      var pid = properties.pid;
+      var dsid = properties.dsid;
+      var view_function = properties.viewFunction;
       if(view_function) {
         eval(view_function)(pid, dsid);
       }
     }
   }
-  /**
-     * Define Models.
-     */
+}
+/**
+ * Defines models that repersent Fedora objects/data streams.
+ */
+ContentModelViewer.setup.defineModels = function() {
+  // Local Variables
+  var properties = ContentModelViewer.properties;
+  var url = properties.url, pid = properties.pid, dsid = properties.dsid;
   Ext.define('ContentModelViewer.models.FedoraObject', {
     extend: 'Ext.data.Model',
     fields: [{
-      name: 'link',  
-      type: 'string'
-    }, {
-      name: 'label',  
-      type: 'string'
-    }, {
-      name: 'description',   
-      type: 'string'
-    }, {
-      name: 'owner', 
-      type: 'string'
-    }, {
-      name: 'created', 
-      type: 'string'
-    }, {
-      name: 'modified', 
-      type: 'string'
-    }, {
-      name: 'tn',
-      type: 'string'
-    }]
+        name: 'link',  
+        type: 'string'
+      }, {
+        name: 'label',  
+        type: 'string'
+      }, {
+        name: 'description',   
+        type: 'string'
+      }, {
+        name: 'owner', 
+        type: 'string'
+      }, {
+        name: 'created', 
+        type: 'string'
+      }, {
+        name: 'modified', 
+        type: 'string'
+      }, {
+        name: 'tn',
+        type: 'string'
+      }]
   });
   Ext.define('ContentModelViewer.models.treemembers', {
     extend: 'Ext.data.Model',
     fields: ['id','text', 'link','pid','leaf','children'],
     proxy: {
       type: 'ajax',
-      url : ContentModelViewer.properties.url.object.treemembers,
+      url : url.object.treemembers(pid),
       reader: {
         type: 'json',
         root: 'data'
-      },
+      }
     }
   });
   Ext.define('ContentModelViewer.models.ObjectProperties', {
     extend: 'Ext.data.Model',
     fields: [{
-      name: 'label',  
-      type: 'string'
-    }, {
-      name: 'state',   
-      type: 'string'
-    }, {
-      name: 'owner', 
-      type: 'string'
-    }, {
-      name: 'created', 
-      type: 'string'
-    }, {
-      name: 'modified', 
-      type: 'string'
-    },],
+        name: 'label',  
+        type: 'string'
+      }, {
+        name: 'state',   
+        type: 'string'
+      }, {
+        name: 'owner', 
+        type: 'string'
+      }, {
+        name: 'created', 
+        type: 'string'
+      }, {
+        name: 'modified', 
+        type: 'string'
+      },],
     validations: [{
-      type: 'inclusion', 
-      field: 'state',
-      list: ['Active', 'Inactive', 'Deleted']
-    }]
+        type: 'inclusion', 
+        field: 'state',
+        list: ['Active', 'Inactive', 'Deleted']
+      }]
   });
   Ext.define('ContentModelViewer.models.Datastream', {
     extend: 'Ext.data.Model',
     idProperty: 'dsid',
     fields: [{
-      name: 'dsid',  
-      type: 'string'
-    }, {
-      name: 'label',  
-      type: 'string'
-    }, {
-      name: 'state',   
-      type: 'string'
-    }, {
-      name: 'created', 
-      type: 'string'
-    }, {
-      name: 'mime', 
-      type: 'string'
-    }, {
-      name: 'view', 
-      type: 'string'
-    }, {
-      name: 'download', 
-      type: 'string'
-    }, {
-      name: 'tn', 
-      type: 'string'
-    }, {
-      name: 'view_function', 
-      type: 'string'
-    }, {
-      name: 'edit', 
-      type: 'bool'
-    }],
+        name: 'dsid',  
+        type: 'string'
+      }, {
+        name: 'label',  
+        type: 'string'
+      }, {
+        name: 'state',   
+        type: 'string'
+      }, {
+        name: 'created', 
+        type: 'string'
+      }, {
+        name: 'mime', 
+        type: 'string'
+      }, {
+        name: 'view', 
+        type: 'string'
+      }, {
+        name: 'download', 
+        type: 'string'
+      }, {
+        name: 'tn', 
+        type: 'string'
+      }, {
+        name: 'view_function', 
+        type: 'string'
+      }, {
+        name: 'edit', 
+        type: 'bool'
+      }],
     validations: [{
-      type: 'inclusion', 
-      field: 'state',   
-      list: ['A', 'I']
-    }],
+        type: 'inclusion', 
+        field: 'state',   
+        list: ['A', 'I']
+      }],
     proxy: {
       type: 'rest',
-      url : ContentModelViewer.properties.url.object.datastreams,
+      url : url.object.datastreams(pid, dsid),
       reader: {
         type: 'json',
         root: 'data',
@@ -185,49 +240,78 @@ Ext.onReady(function(){
       }
     }
   });
+}
+/**
+ * Create stores.
+ */
+ContentModelViewer.setup.createStores = function() {
+  var properties = ContentModelViewer.properties, models = ContentModelViewer.models;
+  var url = properties.url, pid = properties.pid, dsid = properties.dsid;
   /**
-   * Create Stores
+   * Collection Members
    */
   Ext.create('Ext.data.Store', {
     storeId:'members',
-    model: ContentModelViewer.models.FedoraObject,
+    model: models.FedoraObject,
     autoLoad: true,
     autoSync: true,
     pageSize: 5,
     remoteSort: true,
     remoteFilter: true,
     sorters: [{
-      property : 'label',
-      direction: 'ASC'
-    }],
+        property : 'label',
+        direction: 'ASC'
+      }],
     filters: [{
-      property: 'label',
-      value: null
-    }],
+        property: 'label',
+        value: null
+      }],
     proxy: {
       type: 'ajax',
-      url : ContentModelViewer.properties.url.object.members,
+      url : url.object.members(pid),
       reader: {
         type: 'json',
         root: 'data'
       }
     }
   });
-  //{"text" : "Audi", "id" : 100, "leaf" : false, "cls" : "folder", "children" : []}
+  /**
+   * Tree Store
+   */
   Ext.create('Ext.data.TreeStore', {
     storeId:'treemembers',
-    model: ContentModelViewer.models.treemembers,
+    model: models.treemembers,
     sorters: [{
         property: 'leaf',
         direction: 'ASC'
       },{
         property: 'text',
         direction: 'ASC'
-    }]
+      }]
   });
+  /**
+   * Object Properties
+   */
+  Ext.create('Ext.data.Store', {
+    storeId:'objectProperties',
+    model: models.ObjectProperties,
+    autoLoad: true,
+    proxy: {
+      type: 'ajax',
+      url: url.object.properties(pid),
+      reader: {
+        type: 'json',
+        root: 'data',
+        successProperty: 'success'
+      }
+    }
+  });
+  /**
+   * Datastreams rendered in the Manage panel
+   */
   Ext.create('Ext.data.Store', {
     storeId:'datastreams',
-    model: ContentModelViewer.models.Datastream,
+    model: models.Datastream,
     autoLoad: true,
     autoSync: true,
     pageSize: 15,
@@ -243,14 +327,17 @@ Ext.onReady(function(){
       }
     }
   });
+  /**
+   * Data streams rendered in the Files panel.
+   */
   Ext.create('Ext.data.Store', {
     storeId:'files',
-    model: ContentModelViewer.models.Datastream,
+    model: models.Datastream,
     autoLoad: true,
     pageSize: 4,
     proxy: {
       type: 'rest',
-      url : ContentModelViewer.properties.url.object.datastreams,
+      url : url.object.datastreams(pid, dsid),
       extraParams: {
         filter: true
       },
@@ -261,4 +348,16 @@ Ext.onReady(function(){
       }
     }
   });
+}
+
+/**
+ * Document Ready: Main
+ */
+Ext.onReady(function(){
+  // Local Variables
+  var setup = ContentModelViewer.setup;
+  setup.initProperties();
+  setup.defineFunctions();
+  setup.defineModels();
+  setup.createStores();
 });

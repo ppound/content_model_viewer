@@ -394,19 +394,19 @@ function template_preprocess_content_model_viewer(array &$variables) {
   $variables['view_function'] = 'loadFlexPlayer';
   $variables['paths'] = array(
     'object' => array(
-      'overview' => "viewer/$pid/overview",
-      'properties' => "viewer/$pid/properties",
-      'datastreams' => "viewer/$pid/datastreams",
-      'members' => "viewer/$pid/members",
-      'treemembers' => "viewer/$pid/treemembers",
-      'purge' => "viewer/$pid/purge"
+      'overview' => "viewer/pid/overview",
+      'properties' => "viewer/pid/properties",
+      'datastreams' => "viewer/pid/datastreams",
+      'members' => "viewer/pid/members",
+      'treemembers' => "viewer/pid/treemembers",
+      'purge' => "viewer/pid/purge"
     ),
     'datastream' => array(
-      'add' => "viewer/$pid/add",
-      'purge' => "viewer/$pid/dsid/purge",
-      'properties' => "viewer/$pid/dsid/properties",
-      'download' => "viewer/$pid/dsid/download",
-      'view' => "viewer/$pid/dsid/view"
+      'add' => "viewer/pid/add",
+      'purge' => "viewer/pid/dsid/purge",
+      'properties' => "viewer/pid/dsid/properties",
+      'download' => "viewer/pid/dsid/download",
+      'view' => "viewer/pid/dsid/view"
     )
   );
 }
@@ -448,7 +448,7 @@ function content_model_viewer($pid = NULL) {
   else {
     /* Load ExtJS */
     $ext_path = $path . '/lib/ext';
-//drupal_add_js($ext_path . '/ext-all.js');
+    //drupal_add_js($ext_path . '/ext-all.js');
     drupal_add_js($ext_path . '/ext-all-debug-w-comments.js');
     drupal_add_css($path . '/css/Clear.css');
     drupal_add_css($ext_path . '/resources/css/ext-all-gray.css', 'theme', 'all');

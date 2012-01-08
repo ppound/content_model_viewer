@@ -1,18 +1,45 @@
 Ext.onReady(function(){
+  // Local variables
+  var url = ContentModelViewer.properties.url;  
   Ext.define('ContentModelViewer.widgets.OverviewPanel', {
     extend: 'Ext.panel.Panel',
+    alias: 'widget.overviewpanel',
+    constructor: function(config) {
+      this.callParent(arguments);
+      var content = Ext.create('Ext.panel.Panel', {
+        html: '<div>Loading...</div>',
+        autoScroll: true,
+        region: 'center',
+        loader: {
+          url: url.object.overview(config.pid),
+          renderer: function(loader, response, active) {
+            var json = Ext.JSON.decode(response.responseText);
+            loader.getTarget().update(json.data);
+            if(json.settings !== null) { // Update settings.
+              jQuery.extend(Drupal.settings, json.settings);
+              Drupal.attachBehaviors();
+            }
+            if(json.func) {
+              eval(json.func)();
+            }
+            return true;
+          },
+          autoLoad: true
+        }
+      });
+      this.add(content);
+    },
     itemId: 'overview',
     title: 'Overview',
     layout: {
       type: 'border'
     },
-    items: [{
+    items: [/*{
       xtype: 'panel',
       autoScroll: true,
       html: '<div>Loading...</div>',
       loader: {
-        url: ContentModelViewer.properties.url.object.overview,
-        //renderer: 'data',
+        url: url.object.overview(pid),
         renderer: function(loader, response, active) {
           var json = Ext.JSON.decode(response.responseText);
           loader.getTarget().update(json.data);
@@ -33,7 +60,7 @@ Ext.onReady(function(){
         }
       },
       region: 'center'
-    }, {
+    },*/ {
       xtype: 'panel',
       title: 'Files',
       width: 260,
@@ -68,12 +95,13 @@ Ext.onReady(function(){
           disabled: true,
           id: 'overview-download-file',
           handler : function() {
+            var pid = this.findParentByType('overviewpanel').pid;
             var view = this.up('panel').down('dataview');
             var selectionModel = view.getSelectionModel();
             if(selectionModel.hasSelection()) {
               var record = selectionModel.selected.first();
               var dsid = record.get('dsid');
-              var url = ContentModelViewer.properties.url.datastream.download(dsid);
+              var url = url.datastream.download(pid, dsid);
               var form = Ext.get("datastream-download-form");
               form.set({
                 action: url
