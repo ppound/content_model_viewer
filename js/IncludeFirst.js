@@ -68,10 +68,12 @@ ContentModelViewer.setup.initProperties = function() {
       return url.replace('/dsid/', '/'+dsid+'/');
     }
   };
-  //------------
-  // Properties
-  //------------
+  // Set properties @todo get collection/focused from URL # if possible.
   properties.pid = $('#pid').text();
+  properties.pids = {  
+    collection: properties.pid,
+    focused: properties.pid
+  }
   properties.dsid = $('#dsid').text();
   properties.viewFunction = $('#view_function').text();
   properties.url = { // Functions to generate AJAX Callback URL
@@ -99,6 +101,12 @@ ContentModelViewer.setup.defineFunctions = function() {
   var properties = ContentModelViewer.properties;
   var url = properties.url;
   ContentModelViewer.functions = {
+    setCollectionPid: function(pid) {
+      properties.pids.collection = pid;
+    },
+    setFocusedPid: function(pid) {
+      properties.pids.focused = pid;
+    },
     selectDatastreamRecord: function(record) {
       properties.dsid = record.get('view');
       properties.viewFunction = record.get('view_function');
@@ -133,27 +141,27 @@ ContentModelViewer.setup.defineModels = function() {
   Ext.define('ContentModelViewer.models.FedoraObject', {
     extend: 'Ext.data.Model',
     fields: [{
-        name: 'link',  
-        type: 'string'
-      }, {
-        name: 'label',  
-        type: 'string'
-      }, {
-        name: 'description',   
-        type: 'string'
-      }, {
-        name: 'owner', 
-        type: 'string'
-      }, {
-        name: 'created', 
-        type: 'string'
-      }, {
-        name: 'modified', 
-        type: 'string'
-      }, {
-        name: 'tn',
-        type: 'string'
-      }]
+      name: 'link',  
+      type: 'string'
+    }, {
+      name: 'label',  
+      type: 'string'
+    }, {
+      name: 'description',   
+      type: 'string'
+    }, {
+      name: 'owner', 
+      type: 'string'
+    }, {
+      name: 'created', 
+      type: 'string'
+    }, {
+      name: 'modified', 
+      type: 'string'
+    }, {
+      name: 'tn',
+      type: 'string'
+    }]
   });
   Ext.define('ContentModelViewer.models.treemembers', {
     extend: 'Ext.data.Model',
@@ -170,66 +178,66 @@ ContentModelViewer.setup.defineModels = function() {
   Ext.define('ContentModelViewer.models.ObjectProperties', {
     extend: 'Ext.data.Model',
     fields: [{
-        name: 'label',  
-        type: 'string'
-      }, {
-        name: 'state',   
-        type: 'string'
-      }, {
-        name: 'owner', 
-        type: 'string'
-      }, {
-        name: 'created', 
-        type: 'string'
-      }, {
-        name: 'modified', 
-        type: 'string'
-      },],
+      name: 'label',  
+      type: 'string'
+    }, {
+      name: 'state',   
+      type: 'string'
+    }, {
+      name: 'owner', 
+      type: 'string'
+    }, {
+      name: 'created', 
+      type: 'string'
+    }, {
+      name: 'modified', 
+      type: 'string'
+    },],
     validations: [{
-        type: 'inclusion', 
-        field: 'state',
-        list: ['Active', 'Inactive', 'Deleted']
-      }]
+      type: 'inclusion', 
+      field: 'state',
+      list: ['Active', 'Inactive', 'Deleted']
+    }]
   });
   Ext.define('ContentModelViewer.models.Datastream', {
     extend: 'Ext.data.Model',
     idProperty: 'dsid',
     fields: [{
-        name: 'dsid',  
-        type: 'string'
-      }, {
-        name: 'label',  
-        type: 'string'
-      }, {
-        name: 'state',   
-        type: 'string'
-      }, {
-        name: 'created', 
-        type: 'string'
-      }, {
-        name: 'mime', 
-        type: 'string'
-      }, {
-        name: 'view', 
-        type: 'string'
-      }, {
-        name: 'download', 
-        type: 'string'
-      }, {
-        name: 'tn', 
-        type: 'string'
-      }, {
-        name: 'view_function', 
-        type: 'string'
-      }, {
-        name: 'edit', 
-        type: 'bool'
-      }],
+      name: 'dsid',  
+      type: 'string'
+    }, {
+      name: 'label',  
+      type: 'string'
+    }, {
+      name: 'state',   
+      type: 'string'
+    }, {
+      name: 'created', 
+      type: 'string'
+    }, {
+      name: 'mime', 
+      type: 'string'
+    }, {
+      name: 'view', 
+      type: 'string'
+    }, {
+      name: 'download', 
+      type: 'string'
+    }, {
+      name: 'tn', 
+      type: 'string'
+    }, {
+      name: 'view_function', 
+      type: 'string'
+    }, {
+      name: 'edit', 
+      type: 'bool'
+    }],
     validations: [{
-        type: 'inclusion', 
-        field: 'state',   
-        list: ['A', 'I']
-      }],
+      type: 'inclusion', 
+      field: 'state',   
+      list: ['A', 'I']
+    }],
     proxy: {
       type: 'rest',
       url : url.object.datastreams(pid, dsid),
@@ -259,13 +267,13 @@ ContentModelViewer.setup.createStores = function() {
     remoteSort: true,
     remoteFilter: true,
     sorters: [{
-        property : 'label',
-        direction: 'ASC'
-      }],
+      property : 'label',
+      direction: 'ASC'
+    }],
     filters: [{
-        property: 'label',
-        value: null
-      }],
+      property: 'label',
+      value: null
+    }],
     proxy: {
       type: 'ajax',
       url : url.object.members(pid),
@@ -282,12 +290,12 @@ ContentModelViewer.setup.createStores = function() {
     storeId:'treemembers',
     model: models.treemembers,
     sorters: [{
-        property: 'leaf',
-        direction: 'ASC'
-      },{
-        property: 'text',
-        direction: 'ASC'
-      }]
+      property: 'leaf',
+      direction: 'ASC'
+    },{
+      property: 'text',
+      direction: 'ASC'
+    }]
   });
   /**
    * Object Properties

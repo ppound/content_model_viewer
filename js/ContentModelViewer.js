@@ -6,59 +6,71 @@ Ext.onReady(function(){
   // Local Variables
   var setup = ContentModelViewer.setup;
   var properties = ContentModelViewer.properties;
+  var widgets = ContentModelViewer.widgets;
+  var pid = properties.pid,
+  collectionPid = properties.pids.collection, 
+  focusedPid = properties.pids.focused, 
+  dsid = properties.dsid;
+  
   // Init system
   setup.initContentArea();
   setup.initExtJSFeatures();
-  // Create tabbed interface
-  var pid = properties.pid;
-  var dsid = properties.dsid;
-  // Defined a major/minor pid?
-  
+  /**
+   * @todo set the Collection PID/Focuse PID from #URL
+   * Assuming we can get the Collection PID, and Focus PID from the #URL
+   */
   var tabs = [];
-  // Create Tabs for each of the Panels if they are defined 
-  if(ContentModelViewer.widgets.OverviewPanel !== undefined) {
-    tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel', {
-      title:'Concept Overview',
-      pid:pid
-    }));
+  if(widgets.OverviewPanel !== undefined) {
+    if(true) { // @todo test if it is a Concept.
+      tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel', {
+        title:'Concept Overview',
+        itemId: 'concept-overview',
+        pid: pid
+      }));
+    }
   }
-  if(ContentModelViewer.widgets.CollectionPanel !== undefined) {
+  if(widgets.CollectionPanel !== undefined) {
     tabs.push(Ext.create('ContentModelViewer.widgets.CollectionPanel', {
-      pid:pid
+      pid: collectionPid
     }));
   }
-  if(ContentModelViewer.widgets.ViewerPanel !== undefined) {
+  if(widgets.OverviewPanel !== undefined) {
+    if(focusedPid) { // @todo check if should render
+      tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel', {
+        title:'Resource Overview',
+        pid: focusedPid
+      }));
+    }
+  }
+  if(widgets.ViewerPanel !== undefined) {
     tabs.push(Ext.create('ContentModelViewer.widgets.ViewerPanel', {
-      pid:pid,
+      pid:focusedPid,
       dsid:dsid
     }));
   }
-  if(ContentModelViewer.widgets.ManagePanel !== undefined) {
+  if(widgets.ManagePanel !== undefined) {
     tabs.push(Ext.create('ContentModelViewer.widgets.ManagePanel', {
-      pid:pid
+      pid:focusedPid
     }));
   }
-
-  //Create layout for project and add tree menu and tab panel.
-  ContentModelViewer.container = Ext.create('Ext.container.Container', {
+  // Create container for Application
+  ContentModelViewer.container =  Ext.create('Ext.container.Container', {
     renderTo: 'content-model-viewer',
-    frame: true,
     height: 800,
     width: 920,
-    layout: {
-      type: 'border'
-    },
+    frame: true,
     defaults: {
       split: true
     },
-    items: [
-    Ext.create('ContentModelViewer.widgets.TreePanel'), {
+    layout: {
+      type: 'border'
+    },
+    items: [Ext.create('ContentModelViewer.widgets.TreePanel'), {
       xtype: 'tabpanel',
       region: 'center',
       id: 'cmvtabpanel',
       width: 760,
       height: 800,
-      activeTab: 0,
       items: tabs,
       listeners: {
         afterrender: function(){
@@ -69,6 +81,6 @@ Ext.onReady(function(){
         }
       } 
     }]
-  });
+  }); 
   setup.setUpGlobalEvents();
 });
