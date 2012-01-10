@@ -126,11 +126,6 @@ Ext.onReady(function(){
             });
           }
         }
-      }, {
-        xtype: 'panel',
-        title: 'Datastream Preview',
-        region: 'east',
-        width: 350
       }]
     }, {
       xtype: 'gridpanel',

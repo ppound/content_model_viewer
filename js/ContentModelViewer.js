@@ -18,6 +18,7 @@ Ext.onReady(function(){
   // Create Tabs for each of the Panels if they are defined 
   if(ContentModelViewer.widgets.OverviewPanel !== undefined) {
     tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel', {
+      title:'Concept Overview',
       pid:pid
     }));
   }
