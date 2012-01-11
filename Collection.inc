@@ -221,7 +221,8 @@ class Collection {
           $label = $path->query('sparql:title', $result)->item(0)->textContent;
           $created = $path->query('sparql:created', $result)->item(0)->textContent;
           $relatedCount = $path->query('sparql:k0',$result)->item(0)->textContent;
-          $ret[] = array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount);
+          $model = substr($path->query('sparql:model/@uri', $result)->item(0)->value, 15); // strip "info:fedora/si:"
+          $ret[] = array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount, 'model' => $model);
         }
       }
       return $ret;
@@ -373,6 +374,7 @@ class Collection {
       $result['link'] = "$base_url/fedora/repository/$pid";
       $result['tn'] = $image_path . '/object.png';
       $result['description'] = $this->getDescription($pid);
+      $result['model'] = $result['model'];
     }
     return $results;
   }
