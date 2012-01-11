@@ -67,6 +67,7 @@ class Tree {
       $node['pid'] = $arr['pid'];
       $node['dsid'] = $arr['dsid'];
       $node['view'] = $arr['view'];
+      $node['iconCls'] = $arr['model'];
 
       //Check if this pid is in the parents array so we know whether to expand it or not. 
       if($arr['pid'] == $this->pid ||in_array($arr['pid'],$this->parents) === true){
