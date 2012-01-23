@@ -1,7 +1,5 @@
 <?php
 
-// $Id$
-
 /**
  * @file
  *
@@ -64,27 +62,30 @@ class Collection {
   }
 
   public function getTreeMembers() {
-   $query = 'select $object $title $model $created 
-   count(
-     select $pid
-     from <#ri>
-     where  $object <fedora-model:hasModel> $sub_model
-   and $sub_model <fedora-model:hasModel> $sub_parent_model
-   and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
-   and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-   and ($pid <fedora-rels-ext:isMemberOfCollection> $object
-     or $pid <fedora-rels-ext:isMemberOf> $object )
-   )
-   from <#ri>
-   where ($object <info:fedora/fedora-system:def/model#label> $title
-   and $object <fedora-model:hasModel> $model
-   and $object <fedora-model:createdDate> $created
-   and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-   and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/'. $this->pid.'>
-   or $object <fedora-rels-ext:isMemberOf> <info:fedora/'. $this->pid .'>))
-   minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-   minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-   order by $title';
+    $query = 'select $object $title $model $created $parent_model
+    count(
+      select $pid
+      from <#ri>
+      where  $object <fedora-model:hasModel> $sub_model
+    and $sub_model <fedora-model:hasModel> $sub_parent_model
+    and $sub_parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
+    and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+    and ($pid <fedora-rels-ext:isMemberOfCollection> $object
+      or $pid <fedora-rels-ext:isMemberOf> $object )
+    )
+    from <#ri>
+    where ($object <info:fedora/fedora-system:def/model#label> $title
+    and $object <fedora-model:hasModel> $model
+    and $model <fedora-model:hasModel> $parent_model
+    and $parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
+    and $object <fedora-model:createdDate> $created
+    and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+    and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
+    or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
+    minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+    minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
+    minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
+    order by $title';
     $results = $this->query($query);
     $results = $this->populate($results);
     return $results;
@@ -115,15 +116,16 @@ class Collection {
     }
   }
 
-   /** 
+  /**
    * Runs a SPARQL query and returns the results in a array.
    * 
    * @return array
    */
   private function findParent($pid) {
-    $query = 'select $object $title $model $created from <#ri>
+    $query = 'select $object $title $model $parent_model $created from <#ri>
                              where ($object <info:fedora/fedora-system:def/model#label> $title
                              and $object <fedora-model:hasModel> $model
+                             and $model <fedora-model:hasModel> $parent_model
                              and $object <fedora-model:createdDate> $created
                              and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
                              and (<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $object
@@ -132,7 +134,7 @@ class Collection {
                              minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
                              order by $title';
     return $this->query($query);
-  } 
+  }
 
   /**
    * Runs a SPARQL query and returns the results in a array.
@@ -140,15 +142,17 @@ class Collection {
    * @return array
    */
   private function findAllMembers() {
-    $query = 'select $object $title $model $created from <#ri>
+    $query = 'select $object $title $model $parent_model $created from <#ri>
                              where ($object <info:fedora/fedora-system:def/model#label> $title
                              and $object <fedora-model:hasModel> $model
+                             and $model <fedora-model:hasModel> $parent_model
                              and $object <fedora-model:createdDate> $created
                              and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
                              and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
                              or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
                              minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
                              minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
+                             minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
                              order by $title';
     return $this->query($query);
   }
@@ -220,9 +224,12 @@ class Collection {
           $pid = substr($path->query('sparql:object/@uri', $result)->item(0)->value, 12); // 12 characteres in "info:fedora/"
           $label = $path->query('sparql:title', $result)->item(0)->textContent;
           $created = $path->query('sparql:created', $result)->item(0)->textContent;
-          $relatedCount = $path->query('sparql:k0',$result)->item(0)->textContent;
-          $model = substr($path->query('sparql:model/@uri', $result)->item(0)->value, 15); // strip "info:fedora/si:"
-          $ret[] = array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount, 'model' => $model);
+          $relatedCount = $path->query('sparql:k0', $result)->item(0)->textContent;
+          $model = substr($path->query('sparql:model/@uri', $result)->item(0)->value, 12); // 12 characteres in "info:fedora/"
+          $parent_model = substr($path->query('sparql:parent_model/@uri', $result)->item(0)->value, 12);
+          $collection_model = 'islandora:collectionCModel';
+          $is_collection = ($model == $collection_model || $parent_model == $collection_model) ? TRUE : FALSE; // Is a islandora:collectionCModel or is a immediate decendant of a child of islandora:collectionCModel
+          $ret[] = array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount, 'model' => $model, 'parent_model' => $parent_model, 'isCollection' => $is_collection);
         }
       }
       return $ret;
