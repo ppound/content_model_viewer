@@ -76,6 +76,7 @@ ContentModelViewer.setup.initProperties = function() {
   }
   properties.dsid = $('#dsid').text();
   properties.viewFunction = $('#view_function').text();
+  properties.isCollection = $('#is_collection').text() == 'true' ? true : false;
   properties.url = { // Functions to generate AJAX Callback URL
     object: {
       overview: url_replace_pid_func('#object_overview_url'),

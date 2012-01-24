@@ -21,7 +21,7 @@ Ext.onReady(function(){
    */
   var tabs = [];
   if(widgets.OverviewPanel !== undefined) {
-    if(true) { // @todo test if it is a Concept.
+    if(properties.isCollection) {
       tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel', {
         title:'Concept Overview',
         itemId: 'concept-overview',
@@ -35,7 +35,7 @@ Ext.onReady(function(){
     }));
   }
   if(widgets.OverviewPanel !== undefined) {
-    if(focusedPid) { // @todo check if should render
+    if(!properties.isCollection) {
       tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel', {
         title:'Resource Overview',
         pid: focusedPid

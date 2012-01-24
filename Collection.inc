@@ -34,6 +34,58 @@ class Collection {
   protected $default;
 
   /**
+   * Determines if the given pid is a Collection. An object is considered a 
+   * collection if it's model is self::COLLECTION_MODEL or its parent model has this as a model.
+   * 
+   * @return boolean
+   *   TRUE if the given object is a Collection FALSE otherwise.
+   */
+  public static function isCollection($pid) {
+    module_load_include('inc', 'fedora_repository', 'ContentModel');
+    if (($content_model = ContentModel::loadFromObject($pid)) !== FALSE) {
+      return self::isModelCollection($content_model->pid);
+    }
+    return FALSE;
+  }
+
+  /**
+   * Given the objects Model and Parent Models determine if its a Collection object.
+   * 
+   * @param string $model
+   * 
+   * @return boolean
+   *   TRUE if this is a collection object FALSE otherwise.
+   */
+  private static function isModelCollection($model) {
+    /**
+     * Is a islandora:collectionCModel or is a 
+     * immediate decendant of a child of islandora:collectionCModel
+     */
+    return ($model == self::COLLECTION_MODEL || self::isParentModelCollection($model));
+  }
+
+  /**
+   * Determines if one of the parent models of the given model are collection objects.
+   * 
+   * @param string $model 
+   * 
+   * @return boolean
+   *   TRUE if this model's parent model is a collection object FALSE otherwise.
+   */
+  private static function isParentModelCollection($model) {
+    module_load_include('inc', 'fedora_repository', 'ContentModel');
+    module_load_include('inc', 'fedora_repository', 'ObjectHelper');
+    $object_helper = new ObjectHelper();
+    $content_models = $object_helper->get_content_models_list($model);
+    foreach ($content_models as $content_model) {
+      if ($content_model->pid == self::COLLECTION_MODEL) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Create a Collection class.
    * 
    * @param string $pid 
@@ -53,16 +105,16 @@ class Collection {
   }
 
   /**
+   * Looks at POST data for properties and lists all members based on those properties.
    * 
    * @return array
    */
   public function getMembers() {
-
     $offset = isset($_REQUEST['start']) ? $_REQUEST['start'] : 0;
     $limit = isset($_REQUEST['limit']) ? $_REQUEST['limit'] : 5;
     $filter = isset($_REQUEST['filter']) ? json_decode($_REQUEST['filter']) : $this->default['filter'];
     $sort = isset($_REQUEST['sort']) ? json_decode($_REQUEST['sort']) : $this->default['sort'];
-    $results = $this->findMembers('all');
+    $results = $this->findMembers();
     $results = $this->filter($results, $filter);
     $results = $this->sort($results, $sort);
     list($results, $count) = $this->limit($results, $offset, $limit);
@@ -100,29 +152,15 @@ class Collection {
     return $results;
   }
 
+  /**
+   *
+   * @param type $pid
+   * @return type 
+   */
   public function getParent($pid) {
     $results = $this->findParent($pid);
     $results = $this->populate($results);
     return array($results, $count);
-  }
-
-  /**
-   * Find the members of this collection based on type
-   * 
-   * @param string $type
-   * 
-   * @return array 
-   */
-  private function findMembers($type) {
-    switch ($type) {
-      case 'collections':
-        return $this->findMemberCollections();
-      case 'objects':
-        return $this->findMemberObjects();
-      case 'all':
-      default:
-        return $this->findAllMembers();
-    }
   }
 
   /**
@@ -150,7 +188,7 @@ class Collection {
    * 
    * @return array
    */
-  private function findAllMembers() {
+  private function findMembers() {
     $query = 'select $object $title $model $created from <#ri>
                              where ($object <info:fedora/fedora-system:def/model#label> $title
                              and $object <fedora-model:hasModel> $model
@@ -160,46 +198,6 @@ class Collection {
                              or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
                              minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
                              minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-                             order by $title';
-    return $this->query($query);
-  }
-
-  /**
-   * Runs a SPARQL query and returns the results in a array.
-   * 
-   * @return array
-   */
-  private function findMemberObjects() {
-    $query = 'select $object $title $model $parent_model $created from <#ri>
-                             where ($object <info:fedora/fedora-system:def/model#label> $title
-                             and $object <fedora-model:createdDate> $created
-                             and $object <fedora-model:hasModel> $model
-                             and $model <fedora-model:hasModel> $parent_model
-                             and $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-                             and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-                             and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
-                             or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
-                             minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-                             order by $title';
-    return $this->query($query);
-  }
-
-  /**
-   * Runs a SPARQL query and returns the results in a array.
-   * 
-   * @return array
-   */
-  private function findMemberCollections() {
-    $query = 'select $object $title $model $parent_model $created from <#ri>
-                             where ($object <info:fedora/fedora-system:def/model#label> $title
-                             and $object <fedora-model:createdDate> $created
-                             and $object <fedora-model:hasModel> $model
-                             and $model <fedora-model:hasModel> $parent_model
-                             and $parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
-                             and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-                             and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
-                             or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
-                             minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>  
                              order by $title';
     return $this->query($query);
   }
@@ -262,8 +260,7 @@ class Collection {
     $relatedCount = $this->getQueryResultValue('sparql:k0', $result, $path);
     $model = $this->getQueryResultValue('sparql:model/@uri', $result, $path);
     $model = substr($model, self::MODEL_PREFIX_LENGTH);
-    $is_collection = $this->isCollectionObject($model);
-    return array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount, 'model' => $model, 'isCollection' => $is_collection);
+    return array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount, 'model' => $model);
   }
 
   /**
@@ -284,43 +281,6 @@ class Collection {
       }
     }
     return NULL;
-  }
-
-  /**
-   * Given the objects Model and Parent Models determine if its a Collection object.
-   * 
-   * @param string $model
-   * 
-   * @return boolean
-   *   TRUE if this is a collection object FALSE otherwise.
-   */
-  private function isCollectionObject($model) {
-    /**
-     * Is a islandora:collectionCModel or is a 
-     * immediate decendant of a child of islandora:collectionCModel
-     */
-    return ($model == self::COLLECTION_MODEL || $this->parentModelIsCollectionModel($model));
-  }
-
-  /**
-   * Determines if one of the parent models of the given model are collection objects.
-   * 
-   * @param string $model 
-   * 
-   * @return boolean
-   *   TRUE if this model's parent model is a collection object FALSE otherwise.
-   */
-  private function parentModelIsCollectionModel($model) {
-    module_load_include('inc', 'fedora_repository', 'ContentModel');
-    module_load_include('inc', 'fedora_repository', 'ObjectHelper');
-    $object_helper = new ObjectHelper();
-    $content_models = $object_helper->get_content_models_list($model);
-    foreach ($content_models as $content_model) {
-      if ($content_model->pid == self::COLLECTION_MODEL) {
-        return TRUE;
-      }
-    }
-    return FALSE;
   }
 
   /**
@@ -466,7 +426,7 @@ class Collection {
       $result['link'] = "$base_url/fedora/repository/$pid";
       $result['tn'] = $image_path . '/object.png';
       $result['description'] = $this->getDescription($pid);
-      $result['model'] = $result['model'];
+      $result['isCollection'] = self::isModelCollection($result['model']);
     }
     return $results;
   }
