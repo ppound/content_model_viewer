@@ -9,6 +9,15 @@
  * 
  */
 class Collection {
+  /**
+   * 12 characters in "info:fedora/"
+   */
+  const MODEL_PREFIX_LENGTH = 12;
+  /**
+   * The definitive collection model, an object is considered a collection if it has this as a model
+   * or its parent model has this as a model.
+   */
+  const COLLECTION_MODEL = 'islandora:collectionCModel';
 
   /**
    * The pid of this Collection.
@@ -142,17 +151,15 @@ class Collection {
    * @return array
    */
   private function findAllMembers() {
-    $query = 'select $object $title $model $parent_model $created from <#ri>
+    $query = 'select $object $title $model $created from <#ri>
                              where ($object <info:fedora/fedora-system:def/model#label> $title
                              and $object <fedora-model:hasModel> $model
-                             and $model <fedora-model:hasModel> $parent_model
                              and $object <fedora-model:createdDate> $created
                              and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
                              and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
                              or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
                              minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
                              minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-                             minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
                              order by $title';
     return $this->query($query);
   }
@@ -210,31 +217,110 @@ class Collection {
     $collection = new CollectionClass();
     $results = $collection->getRelatedObjects($this->pid, 1000000, NULL, $query);
     $results = trim($results);
-    $ret = array();
     if ($results != '') {
       $document = new DOMDocument();
       $document->loadXML($results);
       $path = new DOMXPath($document);
       $path->registerNamespace('sparql', 'http://www.w3.org/2001/sw/DataAccess/rf1/result');
       $results = $path->query('//sparql:result');
-      $count = $results->length;
-      if ($count > 0) {
-        for ($i = 0; $i < $count; $i++) {
-          $result = $results->item($i);
-          $pid = substr($path->query('sparql:object/@uri', $result)->item(0)->value, 12); // 12 characteres in "info:fedora/"
-          $label = $path->query('sparql:title', $result)->item(0)->textContent;
-          $created = $path->query('sparql:created', $result)->item(0)->textContent;
-          $relatedCount = $path->query('sparql:k0', $result)->item(0)->textContent;
-          $model = substr($path->query('sparql:model/@uri', $result)->item(0)->value, 12); // 12 characteres in "info:fedora/"
-          $parent_model = substr($path->query('sparql:parent_model/@uri', $result)->item(0)->value, 12);
-          $collection_model = 'islandora:collectionCModel';
-          $is_collection = ($model == $collection_model || $parent_model == $collection_model) ? TRUE : FALSE; // Is a islandora:collectionCModel or is a immediate decendant of a child of islandora:collectionCModel
-          $ret[] = array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount, 'model' => $model, 'parent_model' => $parent_model, 'isCollection' => $is_collection);
-        }
-      }
-      return $ret;
+      $num_results = $results->length;
+      return ($num_results > 0) ? $this->processQueryResults($results, $path) : array();
+    }
+    return array();
+  }
+
+  /**
+   * Process the returned query results and generate the appropriate array of values for each result.
+   * 
+   * @param array $results 
+   * 
+   * @return array
+   */
+  private function processQueryResults(DOMNodeList $results, DOMXPath $path) {
+    $ret = array();
+    $count = $results->length;
+    for ($i = 0; $i < $count; $i++) {
+      $ret[] = $this->processQueryResult($results->item($i), $path);
     }
     return $ret;
+  }
+
+  /**
+   * Processes a single query result returning some basic properties for the object.
+   * 
+   * @param DOMNode $result
+   * @param DOMXPath $path
+   * 
+   * @return array
+   *   Basic properties of the object/query result.
+   */
+  private function processQueryResult(DOMNode $result, DOMXPath $path) {
+    $pid = $this->getQueryResultValue('sparql:object/@uri', $result, $path);
+    $pid = substr($pid, self::MODEL_PREFIX_LENGTH);
+    $label = $this->getQueryResultValue('sparql:title', $result, $path);
+    $created = $this->getQueryResultValue('sparql:created', $result, $path);
+    $relatedCount = $this->getQueryResultValue('sparql:k0', $result, $path);
+    $model = $this->getQueryResultValue('sparql:model/@uri', $result, $path);
+    $model = substr($model, self::MODEL_PREFIX_LENGTH);
+    $is_collection = $this->isCollectionObject($model);
+    return array('pid' => $pid, 'label' => $label, 'created' => $created, 'relatedCount' => $relatedCount, 'model' => $model, 'isCollection' => $is_collection);
+  }
+
+  /**
+   *
+   * @param string $field
+   * @param DOMNode $result
+   * @param DOMXPath $path 
+   */
+  private function getQueryResultValue($field, DOMNode $result, DOMXPath $path) {
+    $results = $path->query($field, $result);
+    if ($results && $results->length > 0) {
+      $result = $results->item(0);
+      switch (get_class($result)) {
+        case 'DOMAttr':
+          return $result->value;
+        case 'DOMElement':
+          return $result->nodeValue;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Given the objects Model and Parent Models determine if its a Collection object.
+   * 
+   * @param string $model
+   * 
+   * @return boolean
+   *   TRUE if this is a collection object FALSE otherwise.
+   */
+  private function isCollectionObject($model) {
+    /**
+     * Is a islandora:collectionCModel or is a 
+     * immediate decendant of a child of islandora:collectionCModel
+     */
+    return ($model == self::COLLECTION_MODEL || $this->parentModelIsCollectionModel($model));
+  }
+
+  /**
+   * Determines if one of the parent models of the given model are collection objects.
+   * 
+   * @param string $model 
+   * 
+   * @return boolean
+   *   TRUE if this model's parent model is a collection object FALSE otherwise.
+   */
+  private function parentModelIsCollectionModel($model) {
+    module_load_include('inc', 'fedora_repository', 'ContentModel');
+    module_load_include('inc', 'fedora_repository', 'ObjectHelper');
+    $object_helper = new ObjectHelper();
+    $content_models = $object_helper->get_content_models_list($model);
+    foreach ($content_models as $content_model) {
+      if ($content_model->pid == self::COLLECTION_MODEL) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -377,7 +463,6 @@ class Collection {
     $image_path = '/' . $module_path . '/images';
     foreach ($results as &$result) {
       $pid = $result['pid'];
-      $content_model_pid = $this->getContentModelPid($pid);
       $result['link'] = "$base_url/fedora/repository/$pid";
       $result['tn'] = $image_path . '/object.png';
       $result['description'] = $this->getDescription($pid);
