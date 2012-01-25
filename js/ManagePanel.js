@@ -395,7 +395,7 @@ Ext.onReady(function(){
               document.forms["datastream-edit-form"].submit();              
             }
           }
-        },  {
+        }, {
           xtype: 'button',
           text: 'Download',
           disabled: true,

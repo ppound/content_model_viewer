@@ -2,6 +2,11 @@ Ext.onReady(function(){
   Ext.define('ContentModelViewer.widgets.ViewerPanel', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.viewerpanel',
+    config: {
+      pid: 'required',
+      dsid: 'optional',
+      viewFunction: 'optional'
+    },
     constructor: function(config) {
       this.callParent(arguments);
       var viewer = Ext.create('ContentModelViewer.widgets.DatastreamViewerPanel', {
@@ -18,9 +23,15 @@ Ext.onReady(function(){
       this.add(files);
     },
     title: 'Viewer',
+    id: 'viewerpanel',
     itemId: 'viewer',
     layout: {
       type: 'border'
+    },
+    setPid: function(pid) {
+      this.pid = pid;
+      var files = this.getComponent('files');
+      files.setPid(pid);
     }
   });
 });

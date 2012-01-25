@@ -138,13 +138,11 @@ Ext.onReady(function(){
           var record = selections[0];
           var pid = record.get('pid');
           var isCollection = record.get('isCollection');
-          if(func.isPidFocused(pid)) { // Already Focused Traverse.
-            func.setCollectionPid(pid);
-          }
-          else {
-            func.setFocusedPid(pid, isCollection);
-          }
-        } 
+          func.setFocusedPid(pid, isCollection);
+        },
+        itemdblclick: function(view, record) {
+          // @todo 
+        }
       }
     }]
   });

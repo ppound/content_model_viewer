@@ -55,7 +55,8 @@ ContentModelViewer.setup.initProperties = function() {
   var url_replace_pid_func = function(id) {
     var url = $(id).text();
     return function(pid) {
-      return url.replace('/pid/', '/'+pid+'/');
+      var temp = url;
+      return temp.replace('/pid/', '/'+pid+'/');
     }
   };
   /** 
@@ -64,8 +65,9 @@ ContentModelViewer.setup.initProperties = function() {
   var url_replace_pid_dsid_func = function(id) {
     var url = $(id).text();
     return function(pid, dsid) {
-      url = url.replace('/pid/', '/'+pid+'/');
-      return url.replace('/dsid/', '/'+dsid+'/');
+      var temp = url;
+      temp = temp.replace('/pid/', '/'+pid+'/');
+      return temp.replace('/dsid/', '/'+dsid+'/');
     }
   };
   // Set properties @todo get collection/focused from URL # if possible.
@@ -135,8 +137,11 @@ ContentModelViewer.setup.defineFunctions = function() {
         }
       }
       else {
-        
-    }
+        var viewer = Ext.getCmp('viewerpanel');
+        viewer.setPid(pid);
+        //var manage = Ext.getCmp('managepanel');
+        //manage.setPid(pid);
+      }
     },
     isPidFocused: function(pid) {
       return properties.pids.focused == pid;

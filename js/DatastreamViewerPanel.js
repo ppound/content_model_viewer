@@ -8,6 +8,7 @@ Ext.onReady(function(){
       this.load(config.pid, config.dsid, config.viewFunction);
     },
     id: 'datastream-viewer', // Should never overwrite, we should only create this panel once in the viewer.
+    itemId: 'datastream-viewer',
     loader: {
       url: 'undefined',
       renderer: 'html',
@@ -26,7 +27,6 @@ Ext.onReady(function(){
           }
         }
       });
-      
     },
     view: function(pid, dsid, viewFunction) {
       this.load(pid, dsid, viewFunction);

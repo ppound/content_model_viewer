@@ -3,13 +3,13 @@ Ext.onReady(function(){
     extend: 'Ext.panel.Panel',
     alias: 'widget.filespanel',
     config: {
-      pid: 'remeber to pass in'
+      pid: 'required'
     },
     constructor: function(config) {
       this.callParent(arguments);
       var properties = ContentModelViewer.properties;
       var url = properties.url;
-      var store = Ext.create('Ext.data.Store', {
+      var store = this.store = Ext.create('Ext.data.Store', {
         model: ContentModelViewer.models.Datastream,
         autoLoad: true,
         pageSize: 4,
@@ -105,6 +105,24 @@ Ext.onReady(function(){
       this.add(datastreams);
       this.addDocked(toolbar);
       this.addDocked(pager);
+    },
+    setPid: function(pid) {
+      var properties = ContentModelViewer.properties;
+      var url = properties.url;
+      this.pid = pid;
+      this.store.setProxy({
+        type: 'rest',
+        url : url.object.datastreams(pid),
+        extraParams: {
+          filter: true
+        },
+        reader: {
+          type: 'json',
+          root: 'data',
+          totalProperty: 'total'
+        }
+      });
+      this.store.load();
     },
     getSelected: function() {
       var datastreams = this.getComponent('datastreams');
