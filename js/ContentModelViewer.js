@@ -38,6 +38,7 @@ Ext.onReady(function(){
     if(!properties.isCollection) {
       tabs.push(Ext.create('ContentModelViewer.widgets.OverviewPanel', {
         title:'Resource Overview',
+        itemId: 'resource-overview',
         pid: focusedPid
       }));
     }

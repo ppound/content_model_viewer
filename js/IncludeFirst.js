@@ -70,7 +70,7 @@ ContentModelViewer.setup.initProperties = function() {
   };
   // Set properties @todo get collection/focused from URL # if possible.
   properties.pid = $('#pid').text();
-  properties.pids = {  
+  properties.pids = {
     collection: properties.pid,
     focused: properties.pid
   }
@@ -102,12 +102,34 @@ ContentModelViewer.setup.defineFunctions = function() {
   var properties = ContentModelViewer.properties;
   var url = properties.url;
   ContentModelViewer.functions = {
+    // This pid determines whats shown in the tree and if the ConceptOverview is shown
     setCollectionPid: function(pid) {
       properties.pids.collection = pid;
     },
-    setFocusedPid: function(pid) {
+    // Determines whats shown in viewer/manage
+    setFocusedPid: function(pid, isCollection) {
       properties.pids.focused = pid;
-      alert(pid);
+      if(!isCollection) {
+        var tabpanel = Ext.getCmp('cmvtabpanel');
+        var resourceOverview = tabpanel.getComponent('resource-overview');
+        if(!resourceOverview) { // Create
+          var index = properties.isCollection ? 2 : 1;
+          tabpanel.insert(index, Ext.create('ContentModelViewer.widgets.OverviewPanel', {
+            title:'Resource Overview',
+            itemId: 'resource-overview',
+            pid: pid
+          }));
+        }
+        else { // Reload
+          resourceOverview; // Get proxy and reload.
+        }
+      }
+      else {
+        
+      }
+    },
+    isPidFocused: function(pid) {
+      return properties.pids.focused == pid;
     },
     selectDatastreamRecord: function(record) {
       properties.dsid = record.get('view');

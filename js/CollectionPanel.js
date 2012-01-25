@@ -134,8 +134,16 @@ Ext.onReady(function(){
         }),
       listeners: {
         selectionchange: function(view, selections, options) {
+          var func = ContentModelViewer.functions;
           var record = selections[0];
-          ContentModelViewer.functions.setFocusedPid(record.get('pid'));
+          var pid = record.get('pid');
+          var isCollection = record.get('isCollection');
+          if(func.isPidFocused(pid)) { // Already Focused Traverse.
+            func.setCollectionPid(pid);
+          }
+          else {
+            func.setFocusedPid(pid, isCollection);
+          }
         } 
       }
     }]
