@@ -409,11 +409,7 @@ Ext.onReady(function(){
               var pid = this.findParentByType('managepanel').pid;
               var record = selectionModel.selected.first();
               var dsid = record.get('dsid');
-              var form = Ext.get("datastream-download-form");
-              form.set({
-                action: url.datastream.download(pid, dsid)
-              });
-              document.forms["datastream-download-form"].submit();
+              ContentModelViewer.functions.downloadDatastream(pid, dsid);
             }
           }
         }, {
@@ -429,7 +425,7 @@ Ext.onReady(function(){
             if(selectionModel.hasSelection()) {
               var record = selectionModel.selected.first();
               var pid = record.get('pid'), dsid = record.get('view'), func = record.get('view_function');
-              Ext.getCmp('datastream-viewer').view(record.get('pid'), record.get('dsid'), record.get('viewFunction'));
+              Ext.getCmp('datastream-viewer').view(pid, dsid, func);
             }
           }
         }]

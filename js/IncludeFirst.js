@@ -102,6 +102,16 @@ ContentModelViewer.setup.defineFunctions = function() {
   var properties = ContentModelViewer.properties;
   var url = properties.url;
   ContentModelViewer.functions = {
+    /**
+     * Download Datastream using hidden html form that is rendered with the Viewer.tpl.php
+     */
+    downloadDatastream: function(pid, dsid) {
+      var form = Ext.get("datastream-download-form");
+      form.set({
+        action: url.datastream.download(pid, dsid)
+      });
+      document.forms["datastream-download-form"].submit();
+    },
     // This pid determines whats shown in the tree and if the ConceptOverview is shown
     setCollectionPid: function(pid) {
       properties.pids.collection = pid;
@@ -126,7 +136,7 @@ ContentModelViewer.setup.defineFunctions = function() {
       }
       else {
         
-      }
+    }
     },
     isPidFocused: function(pid) {
       return properties.pids.focused == pid;

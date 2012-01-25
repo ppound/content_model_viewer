@@ -92,11 +92,7 @@ Ext.onReady(function(){
             var filesPanel = this.findParentByType('filespanel');
             var record = filesPanel.getSelected();
             if(record) {
-              var form = Ext.get("datastream-download-form");
-              form.set({
-                action: url.datastream.download(filesPanel.pid, record.get('dsid'))
-              });
-              document.forms["datastream-download-form"].submit(); // Expected to comedown with the drupal template.
+              ContentModelViewer.functions.downloadDatastream(filesPanel.pid, record.get('dsid'));
             }
           }
         }]
