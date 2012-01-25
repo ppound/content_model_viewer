@@ -11,7 +11,8 @@ Ext.onReady(function(){
         viewFunction: config.viewFunction
       });
       var files = Ext.create('ContentModelViewer.widgets.FilesPanel', {
-        region: 'east'
+        region: 'east',
+        pid: config.pid
       });
       this.add(viewer);
       this.add(files);

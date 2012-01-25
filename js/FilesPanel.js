@@ -28,30 +28,31 @@ Ext.onReady(function(){
         emptyText: 'No Files Available',
         deferEmptyText: false,
         itemTpl: new Ext.XTemplate(
-        '<tpl for=".">',
-        '   <div class="file-item">',
-        '       <div class="file-item-dsid">{[fm.ellipsis(values.dsid, 30, true)]}</div>',
-        '       <img class="file-item-img file-item-show-view" src="{tn}"></img>',
-        '       <tpl if="this.showLabel(label)">',
-        '           <div class="file-item-label">{[fm.ellipsis(values.label, 30, true)]}</div>',
-        '       </tpl>',
-        '   </div>',
-        '</tpl>',
-        {
-          compiled: true,
-          disableFormats: true,
-          showLabel: function(label) {
-            return jQuery.trim(label) != '';
-          }
-        }),
+          '<tpl for=".">',
+          '   <div class="file-item">',
+          '       <div class="file-item-dsid">{[fm.ellipsis(values.dsid, 30, true)]}</div>',
+          '       <img class="file-item-img file-item-show-view" src="{tn}"></img>',
+          '       <tpl if="this.showLabel(label)">',
+          '           <div class="file-item-label">{[fm.ellipsis(values.label, 30, true)]}</div>',
+          '       </tpl>',
+          '   </div>',
+          '</tpl>',
+          {
+            compiled: true,
+            disableFormats: true,
+            showLabel: function(label) {
+              return jQuery.trim(label) != '';
+            }
+          }),
         listeners: {
           selectionchange: function(view, selections, options) {
             var filesPanel = this.findParentByType('filespanel');
+            var toolbar = filesPanel.getComponent('toolbar');
             var button, record = selections[0];
             if(record) {
-              button = filesPanel. Ext.getCmp('viewer-view-file');
+              button = toolbar.getComponent('view');
               record.get('view') ? button.enable() : button.disable();
-              button = Ext.getCmp('viewer-download-file');
+              button = toolbar.getComponent('download');
               record.get('download') ? button.enable() : button.disable();
             }
           } 
@@ -65,63 +66,64 @@ Ext.onReady(function(){
     collapsed: false,
     split: true,
     dockedItems: [{
-        xtype: 'toolbar',
-        dock: 'top',
-        items: [{
-            xtype: 'button',
-            text: 'View',
-            cls: 'x-btn-text-icon',
-            iconCls: 'view-datastream-icon',
-            disabled: true,
-            id: 'viewer-view-file',
-            handler : function() {
-              var filesPanel = this.findParentByType('filespanel');
-              var view = filesPanel.down('dataview');
-              var selectionModel = view.getSelectionModel();
-              if(selectionModel.hasSelection()) {
-                var record = selectionModel.selected.first();
-                filesPanel.dsid = record.get('view');
-                filesPanel.viewFunction = record.get('view_function');
-                // @todo make this a function of the datastream viewer.
-                var viewer = Ext.getCmp('datastream-viewer');
-                var loader = viewer.getLoader();
-                loader.load({
-                  url: url.datastream.view(filesPanel.pid, filesPanel.dsid)
-                });
-                // @todo add focus function to tabpanel section.
-                var viewerPanel = viewer.up('panel');
-                var tabpanel = viewer.up('tabpanel');
-                tabpanel.setActiveTab(viewerPanel);
-              }
-            }
-          }, {
-            xtype: 'button',
-            text: 'Download',
-            cls: 'x-btn-text-icon',
-            iconCls: 'download-datastream-icon',
-            disabled: true,
-            id: 'viewer-download-file',
-            handler : function() {
-              var filesPanel = this.findParentByType('filespanel');
-              var view = filesPanel.down('dataview');
-              var selectionModel = view.getSelectionModel();
-              if(selectionModel.hasSelection()) {
-                var record = selectionModel.selected.first();
-                var dsid = record.get('dsid');
-                var url = url.datastream.download(pid, dsid);
-                var form = Ext.get("datastream-download-form");
-                form.set({
-                  action: url
-                });
-                document.forms["datastream-download-form"].submit();
-              }
-            }
-          }]
-      },{
-        xtype: 'pagingtoolbar',
-        store: Ext.data.StoreManager.lookup('files'),   // same store GridPanel is using
-        dock: 'bottom'
+      xtype: 'toolbar',
+      dock: 'top',
+      itemId: 'toolbar',
+      items: [{
+        xtype: 'button',
+        text: 'View',
+        cls: 'x-btn-text-icon',
+        iconCls: 'view-datastream-icon',
+        itemId: 'view',
+        disabled: true,
+        handler : function() {
+          var filesPanel = this.findParentByType('filespanel');
+          var view = filesPanel.down('dataview');
+          var selectionModel = view.getSelectionModel();
+          if(selectionModel.hasSelection()) {
+            var record = selectionModel.selected.first();
+            filesPanel.dsid = record.get('view');
+            filesPanel.viewFunction = record.get('view_function');
+            // @todo make this a function of the datastream viewer.
+            var viewer = Ext.getCmp('datastream-viewer');
+            var loader = viewer.getLoader();
+            loader.load({
+              url: url.datastream.view(filesPanel.pid, filesPanel.dsid)
+            });
+            // @todo add focus function to tabpanel section.
+            var viewerPanel = viewer.up('panel');
+            var tabpanel = viewer.up('tabpanel');
+            tabpanel.setActiveTab(viewerPanel);
+          }
+        }
+      }, {
+        xtype: 'button',
+        text: 'Download',
+        cls: 'x-btn-text-icon',
+        iconCls: 'download-datastream-icon',
+        itemId: 'download',
+        disabled: true,
+        handler : function() {
+          var filesPanel = this.findParentByType('filespanel');
+          var view = filesPanel.down('dataview');
+          var selectionModel = view.getSelectionModel();
+          if(selectionModel.hasSelection()) {
+            var record = selectionModel.selected.first();
+            var dsid = record.get('dsid');
+            var url = url.datastream.download(pid, dsid);
+            var form = Ext.get("datastream-download-form");
+            form.set({
+              action: url
+            });
+            document.forms["datastream-download-form"].submit();
+          }
+        }
       }]
+    },{
+      xtype: 'pagingtoolbar',
+      store: Ext.data.StoreManager.lookup('files'),   // same store GridPanel is using
+      dock: 'bottom'
+    }]
   });
 });
 /*
