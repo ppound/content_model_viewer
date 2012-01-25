@@ -107,6 +107,7 @@ ContentModelViewer.setup.defineFunctions = function() {
     },
     setFocusedPid: function(pid) {
       properties.pids.focused = pid;
+      alert(pid);
     },
     selectDatastreamRecord: function(record) {
       properties.dsid = record.get('view');
@@ -142,6 +143,9 @@ ContentModelViewer.setup.defineModels = function() {
   Ext.define('ContentModelViewer.models.FedoraObject', {
     extend: 'Ext.data.Model',
     fields: [{
+      name: 'pid',  
+      type: 'string'
+    },{
       name: 'link',  
       type: 'string'
     }, {
@@ -162,6 +166,9 @@ ContentModelViewer.setup.defineModels = function() {
     }, {
       name: 'tn',
       type: 'string'
+    }, {
+      name: 'isCollection',
+      type: 'boolean'
     }]
   });
   Ext.define('ContentModelViewer.models.treemembers', {

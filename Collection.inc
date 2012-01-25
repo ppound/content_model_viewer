@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  *
@@ -159,7 +158,13 @@ class Collection {
    */
   public function getParent($pid) {
     $results = $this->findParent($pid);
-    $results = $this->populate($results);
+    $count = count($results);
+    return array($results, $count);
+  }
+
+  public function getParents($pid) {
+    $results = $this->findParents($pid);
+    $count = count($results);
     return array($results, $count);
   }
 
@@ -169,10 +174,9 @@ class Collection {
    * @return array
    */
   private function findParent($pid) {
-    $query = 'select $object $title $model $parent_model $created from <#ri>
+    $query = 'select $object $title $model $created from <#ri>
                              where ($object <info:fedora/fedora-system:def/model#label> $title
                              and $object <fedora-model:hasModel> $model
-                             and $model <fedora-model:hasModel> $parent_model
                              and $object <fedora-model:createdDate> $created
                              and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
                              and (<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $object
@@ -180,6 +184,13 @@ class Collection {
                              minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
                              minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
                              order by $title';
+    return $this->query($query);
+  }
+
+  private function findParents($pid) {
+    $query = 'select $subject $object from <#ri> 
+                            where walk(<info:fedora/' . $pid . '> <fedora-rels-ext:isMemberOfCollection> $object
+                            and $subject <fedora-rels-ext:isMemberOfCollection> $object)';
     return $this->query($query);
   }
 

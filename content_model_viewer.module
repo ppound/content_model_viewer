@@ -547,9 +547,9 @@ function content_model_viewer_members($pid) {
  */
 function content_model_viewer_treemembers($pid) {
   module_load_include('inc', 'content_model_viewer', 'Tree');
-  $tree = new Tree($pid, $_GET['node']);
+  $node = isset($_GET['node']) ? $_GET['node'] : NULL;
+  $tree = new Tree($pid, $node);
   $json = $tree->getTree();
-
   echo $json;
 }
 

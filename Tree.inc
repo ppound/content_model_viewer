@@ -76,39 +76,50 @@ class Tree {
    */
   private function buildTree($pid) {
     module_load_include('inc', 'content_model_viewer', 'Collection');
-    // Lookup members of this PID  
     $collection = new Collection($pid);
     $members = $collection->getTreeMembers();
-    // Loop through members and build tree
     foreach ($members as $member) {
-      $node['text'] = (empty($member['label'])) ? $member['pid'] : $member['label'];
-      if ($member['relatedCount'] > 0) {
-        $node['text'] .= ' (' . $member['relatedCount'] . ')';
-        $node['leaf'] = false;
-      }
-      else {
-        $node['leaf'] = true;
-      }
-      $node['link'] = $member['link'];
-      $node['id'] = $member['pid'] . '|||' . rand(10000, 99999);
-      $node['pid'] = $member['pid'];
-      $node['dsid'] = $member['dsid'];
-      $node['view'] = $member['view'];
-      $node['iconCls'] = preg_replace('/^[^:]*\:/', '', $member['model']); // Strip the namespace
-      // Check if this pid is in the parents array so we know whether to expand it or not. 
-      if ($member['pid'] == $this->pid || in_array($member['pid'], $this->parents) === true) {
-        $node['expanded'] = true;
-        $node['cls'] = 'x-tree-bold';
-      }
-      else {
-        $node['expanded'] = false;
-        $node['cls'] = '';
-      }
-      //$node['leaf'] = false;
-      // Add node to the data array
-      $data[] = $node;
+      $data[] = $this->createNode($member);
     }
     return $data;
+  }
+
+  /**
+   * Create a node in the tree with the given object properties.
+   * 
+   * @param array $member
+   *   The object properties for the given member of some parent collection.
+   * 
+   * @return array
+   *   A node definition for the given object properties.
+   */
+  private function createNode(array $member) {
+    $node = array();
+    $has_children = $member['relatedCount'] > 0;
+    $node['leaf'] = !$has_children;
+    $node['text'] = (empty($member['label'])) ? $member['pid'] : $member['label'];
+    $node['text'] .= $has_children ? ' (' . $member['relatedCount'] . ')' : '';
+    $node['link'] = $member['link'];
+    $node['id'] = $member['pid'] . '|||' . rand(10000, 99999);
+    $node['pid'] = $member['pid'];
+    $node['dsid'] = isset($member['dsid']) ? $member['dsid'] : NULL;
+    $node['view'] = isset($member['view']) ? $member['view'] : NULL;
+    $node['iconCls'] = preg_replace('/^[^:]*\:/', '', $member['model']); // Strip the namespace
+    $node['expanded'] = $this->shouldExpandNode($member['pid']);
+    $node['cls'] = $node['expanded'] ? 'x-tree-bold' : '';
+    return $node;
+  }
+
+  /**
+   * Should the node be expanded in the display?
+   * 
+   * @param string $pid
+   *   The node in question.
+   * @return boolean
+   *   TRUE if it should be expanded FALSE otherwise.
+   */
+  private function shouldExpandNode($pid) {
+    return ($pid == $this->pid || in_array($pid, $this->parents) === true);
   }
 
   /**
@@ -124,6 +135,13 @@ class Tree {
       module_load_include('inc', 'content_model_viewer', 'Collection');
       $collection = new Collection($pid);
       // Get the parents of the current pid. If pid has multiple parents, this should be handled.
+      list($parent, $total) = $collection->getParents($pid);
+      foreach ($parent as $k => $arr) {
+        if ($arr['pid'] != $this->root) {
+          $this->parents[] = $arr['pid'];
+        }
+      }
+      return;
       list($parent, $total) = $collection->getParent($pid);
       foreach ($parent as $k => $arr) {
         // Make sure we're not at the root pid, otherwise save the returned pid as a parent and check

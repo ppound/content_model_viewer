@@ -110,20 +110,19 @@ Ext.onReady(function(){
     items: [{
       xtype: 'dataview',
       store: Ext.data.StoreManager.lookup('members'),
-      itemSelector: 'div.file-item',
+      itemSelector: 'div.x-dataview-item',
       emptyText: 'No Files Available',
       deferEmptyText: false,
       itemTpl: new Ext.XTemplate(
         '<tpl for=".">',
-        '   <div class="member-item">',
-        '       <a href="{link}">',
-        '           <img class="member-item-img" src="{tn}"></img>',
-        '       </a>',
-        '       <a href="{link}">',
-        '       <h2 class="member-item-label">{label}</h2>',
-        '       </a><br/>',
-        '       <div class="member-item-description">{[fm.ellipsis(values.description, 400, true)]}</div>',
-        '   </div>',
+        ' <div class="member-item">',
+        '  <span style="float:left;text-align:center">',
+        '   <img class="member-item-img" src="{tn}"></img>',
+        '   <a href="{link}">&lt;link&gt;</a>',
+        '  </span>',
+        '  <h2 class="member-item-label">{label}</h2>',
+        '  <div class="member-item-description">{[fm.ellipsis(values.description, 400, true)]}</div>',
+        ' </div>',
         '</tpl>',
         {
           compiled: true,
@@ -132,7 +131,13 @@ Ext.onReady(function(){
             var empty = jQuery.trim(label) == '';
             return empty ? 'Default Label: (Please notify an administrator to provide a label)' : label;
           }
-        })
+        }),
+      listeners: {
+        selectionchange: function(view, selections, options) {
+          var record = selections[0];
+          ContentModelViewer.functions.setFocusedPid(record.get('pid'));
+        } 
+      }
     }]
   });
 });
