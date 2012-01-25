@@ -88,7 +88,7 @@ Ext.onReady(function(){
               url: url.object.properties(pid),
               waitMsg: 'Saving Data...',
               success: function(form, action) {
-                // @todo revert the fields if submit fails.
+              // @todo revert the fields if submit fails.
               }
             });
           }
@@ -428,8 +428,8 @@ Ext.onReady(function(){
             var selectionModel = grid.getSelectionModel();
             if(selectionModel.hasSelection()) {
               var record = selectionModel.selected.first();
-              ContentModelViewer.functions.selectDatastreamRecord(record);
-              ContentModelViewer.functions.viewSelectedDatastreamRecord();
+              var pid = record.get('pid'), dsid = record.get('view'), func = record.get('view_function');
+              Ext.getCmp('datastream-viewer').view(record.get('pid'), record.get('dsid'), record.get('viewFunction'));
             }
           }
         }]

@@ -9,6 +9,23 @@ Ext.onReady(function(){
       this.callParent(arguments);
       var properties = ContentModelViewer.properties;
       var url = properties.url;
+      var store = Ext.create('Ext.data.Store', {
+        model: ContentModelViewer.models.Datastream,
+        autoLoad: true,
+        pageSize: 4,
+        proxy: {
+          type: 'rest',
+          url : url.object.datastreams(config.pid),
+          extraParams: {
+            filter: true
+          },
+          reader: {
+            type: 'json',
+            root: 'data',
+            totalProperty: 'total'
+          }
+        }
+      });
       var datastreams = Ext.create('Ext.view.View', {
         itemId: 'datastreams',
         itemSelector: 'div.file-item',
@@ -31,23 +48,7 @@ Ext.onReady(function(){
               return jQuery.trim(label) != '';
             }
           }),
-        store: Ext.create('Ext.data.Store', {
-          model: ContentModelViewer.models.Datastream,
-          autoLoad: true,
-          pageSize: 4,
-          proxy: {
-            type: 'rest',
-            url : url.object.datastreams(config.pid),
-            extraParams: {
-              filter: true
-            },
-            reader: {
-              type: 'json',
-              root: 'data',
-              totalProperty: 'total'
-            }
-          }
-        }),
+        store: store,
         listeners: {
           selectionchange: function(view, selections, options) {
             var filesPanel = this.findParentByType('filespanel');
@@ -62,7 +63,52 @@ Ext.onReady(function(){
           } 
         }    
       });
+      var toolbar = Ext.create('Ext.toolbar.Toolbar', {
+        dock: 'top',
+        itemId: 'toolbar',
+        items: [{
+          xtype: 'button',
+          text: 'View',
+          itemId: 'view',
+          cls: 'x-btn-text-icon',
+          iconCls: 'view-datastream-icon',
+          disabled: true,
+          handler : function() {
+            var filesPanel = this.findParentByType('filespanel');
+            var record = filesPanel.getSelected();
+            if(record) {
+              var dsid = record.get('view'), func = record.get('view_function');
+              Ext.getCmp('datastream-viewer').view(filesPanel.pid, dsid, func);
+            }
+          }
+        }, {
+          xtype: 'button',
+          text: 'Download',
+          cls: 'x-btn-text-icon',
+          iconCls: 'download-datastream-icon',
+          itemId: 'download',
+          disabled: true,
+          handler : function() {
+            var filesPanel = this.findParentByType('filespanel');
+            var record = filesPanel.getSelected();
+            if(record) {
+              var form = Ext.get("datastream-download-form");
+              form.set({
+                action: url.datastream.download(filesPanel.pid, record.get('dsid'))
+              });
+              document.forms["datastream-download-form"].submit(); // Expected to comedown with the drupal template.
+            }
+          }
+        }]
+      });
+      var pager = Ext.create('Ext.toolbar.Paging', {
+        dock: 'bottom',
+        xtype: 'pagingtoolbar',
+        store: store
+      });
       this.add(datastreams);
+      this.addDocked(toolbar);
+      this.addDocked(pager);
     },
     getSelected: function() {
       var datastreams = this.getComponent('datastreams');
@@ -77,8 +123,8 @@ Ext.onReady(function(){
     width: 260,
     collapsible: true,
     collapsed: false,
-    split: true,
-    dockedItems: [{
+    split: true
+  /*dockedItems: [{
       xtype: 'toolbar',
       dock: 'top',
       itemId: 'toolbar',
@@ -94,7 +140,7 @@ Ext.onReady(function(){
           var record = filesPanel.getSelected();
           if(record) {
             var dsid = record.get('view'), func = record.get('view_function');
-            Ext.getCmp('datastream-viewer').view(filesPanel.pid, dsid, func);            
+            Ext.getCmp('datastream-viewer').view(filesPanel.pid, dsid, func);
           }
         }
       }, {
@@ -121,6 +167,6 @@ Ext.onReady(function(){
       xtype: 'pagingtoolbar',
       store: Ext.data.StoreManager.lookup('files'),   // same store GridPanel is using
       dock: 'bottom'
-    }]
+    }]*/
   });
 });
