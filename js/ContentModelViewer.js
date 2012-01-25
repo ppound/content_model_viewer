@@ -10,7 +10,8 @@ Ext.onReady(function(){
   var pid = properties.pid,
   collectionPid = properties.pids.collection, 
   focusedPid = properties.pids.focused, 
-  dsid = properties.dsid;
+  dsid = properties.dsid,
+  viewFunction = properties.viewFunction;
   
   // Init system
   setup.initContentArea();
@@ -46,7 +47,8 @@ Ext.onReady(function(){
   if(widgets.ViewerPanel !== undefined) {
     tabs.push(Ext.create('ContentModelViewer.widgets.ViewerPanel', {
       pid:focusedPid,
-      dsid:dsid
+      dsid:dsid,
+      viewFunction:viewFunction
     }));
   }
   if(widgets.ManagePanel !== undefined) {

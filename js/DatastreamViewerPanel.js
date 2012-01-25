@@ -5,23 +5,33 @@ Ext.onReady(function(){
     autoScroll: true,
     constructor: function(config) {
       this.callParent(arguments);
-//      // @todo first auto load.
+      this.load(config.pid, config.dsid, config.viewFunction);
     },
-    config: {
-      loader: {
-        renderer: 'html',
-        loadMask: true,
-        autoLoad: true
-      }
+    id: 'datastream-viewer', // Should never overwrite, we should only create this panel once in the viewer.
+    loader: {
+      url: 'undefined',
+      renderer: 'html',
+      successful: 'alert',
+      loadMask: true
     },
-    view: function(pid, dsid, viewFunction) {
+    load: function(pid, dsid, viewFunction) {
       var properties = ContentModelViewer.properties;
       var url = properties.url;
       var loader = this.getLoader();
       loader.load({
         url: url.datastream.view(pid, dsid),
-        success: viewFunction
+        success: function() {
+          if(viewFunction) {
+            eval(viewFunction)(pid, dsid);
+          }
+        }
       });
+      
+    },
+    view: function(pid, dsid, viewFunction) {
+      this.load(pid, dsid, viewFunction);
+      var viewerPanel = this.findParentByType('viewerpanel');
+      Ext.getCmp('cmvtabpanel').setActiveTab(viewerPanel);
     }
   });
 });
