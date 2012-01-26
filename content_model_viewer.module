@@ -475,6 +475,8 @@ function content_model_viewer($pid = NULL) {
       }
     }
     if ($show_manage_panel) {
+      drupal_add_js($js_path . '/ObjectPropertiesPanel.js');
+      drupal_add_js($js_path . '/DatastreamPropertiesPanel.js');
       drupal_add_js($js_path . '/ManagePanel.js');
     }
     if (content_model_viewer_is_object_collection($pid) || content_model_viewer_object_has_members($pid) || content_model_viewer_object_has_collection_model($pid)) {

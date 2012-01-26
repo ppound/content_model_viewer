@@ -138,49 +138,5 @@ Ext.onReady(function(){
     collapsible: true,
     collapsed: false,
     split: true
-  /*dockedItems: [{
-      xtype: 'toolbar',
-      dock: 'top',
-      itemId: 'toolbar',
-      items: [{
-        xtype: 'button',
-        text: 'View',
-        cls: 'x-btn-text-icon',
-        iconCls: 'view-datastream-icon',
-        itemId: 'view',
-        disabled: true,
-        handler : function() {
-          var filesPanel = this.findParentByType('filespanel');
-          var record = filesPanel.getSelected();
-          if(record) {
-            var dsid = record.get('view'), func = record.get('view_function');
-            Ext.getCmp('datastream-viewer').view(filesPanel.pid, dsid, func);
-          }
-        }
-      }, {
-        xtype: 'button',
-        text: 'Download',
-        cls: 'x-btn-text-icon',
-        iconCls: 'download-datastream-icon',
-        itemId: 'download',
-        disabled: true,
-        handler : function() {
-          var url = ContentModelViewer.properties.url;
-          var filesPanel = this.findParentByType('filespanel');
-          var record = filesPanel.getSelected();
-          if(record) {
-            var form = Ext.get("datastream-download-form");
-            form.set({
-              action: url.datastream.download(filesPanel.pid, record.get('dsid'))
-            });
-            document.forms["datastream-download-form"].submit(); // Expected to comedown with the drupal template.
-          }
-        }
-      }]
-    },{
-      xtype: 'pagingtoolbar',
-      store: Ext.data.StoreManager.lookup('files'),   // same store GridPanel is using
-      dock: 'bottom'
-    }]*/
   });
 });

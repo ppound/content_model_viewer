@@ -89,7 +89,7 @@ ContentModelViewer.setup.initProperties = function() {
       purge: url_replace_pid_func('#object_purge_url')
     },
     datastream: {
-      add: url_replace_pid_dsid_func('#datastream_add_url'),
+      add: url_replace_pid_func('#datastream_add_url'),
       purge: url_replace_pid_dsid_func('#datastream_purge_url'),
       properties: url_replace_pid_dsid_func('#datastream_properties_url'),
       download: url_replace_pid_dsid_func('#datastream_download_url'),
