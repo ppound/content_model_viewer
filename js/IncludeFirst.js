@@ -117,10 +117,13 @@ ContentModelViewer.setup.defineFunctions = function() {
     // This pid determines whats shown in the tree and if the ConceptOverview is shown
     setCollectionPid: function(pid) {
       properties.pids.collection = pid;
+      var collection = Ext.getCmp('collectionpanel');
+      collection.setPid(pid);
     },
     // Determines whats shown in viewer/manage
     setFocusedPid: function(pid, isCollection) {
       properties.pids.focused = pid;
+      var viewer = Ext.getCmp('viewerpanel'), manage = Ext.getCmp('managepanel');
       if(!isCollection) {
         var tabpanel = Ext.getCmp('cmvtabpanel');
         var resourceOverview = tabpanel.getComponent('resource-overview');
@@ -132,16 +135,9 @@ ContentModelViewer.setup.defineFunctions = function() {
             pid: pid
           }));
         }
-        else { // Reload
-          resourceOverview; // Get proxy and reload.
-        }
       }
-      else {
-        var viewer = Ext.getCmp('viewerpanel');
-        viewer.setPid(pid);
-        var manage = Ext.getCmp('managepanel');
-        manage.setPid(pid);
-      }
+      viewer.setPid(pid);
+      manage.setPid(pid);
     },
     isPidFocused: function(pid) {
       return properties.pids.focused == pid;

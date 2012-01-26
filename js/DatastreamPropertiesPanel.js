@@ -43,6 +43,7 @@ Ext.onReady(function(){
           totalProperty: 'total'
         }
       });
+      // @todo fix where not render and needs to load.
       this.store.load();
     },
     getSelected: function() {
