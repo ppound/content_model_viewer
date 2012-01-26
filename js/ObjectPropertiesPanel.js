@@ -12,11 +12,14 @@ Ext.onReady(function(){
     },
     setPid: function(pid) {
       this.pid = pid;
-      this.getComponent('form').load({
-        method: 'GET',
-        waitMsg: 'Loading...',
-        url: ContentModelViewer.properties.url.object.properties(pid)
-      });
+      var form = this.getComponent('form');
+      if(form.rendered) {
+        form.load({
+          method: 'GET',
+          waitMsg: 'Loading...',
+          url: ContentModelViewer.properties.url.object.properties(pid)
+        });
+      }
     },
     dockedItems: [{
       xtype: 'toolbar',
