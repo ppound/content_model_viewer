@@ -30,6 +30,7 @@ Ext.onReady(function(){
       });
     },
     setPid: function(pid) {
+      this.pid = pid;
       this.store.setProxy({
         type: 'rest',
         url : ContentModelViewer.properties.url.object.datastreams(pid),

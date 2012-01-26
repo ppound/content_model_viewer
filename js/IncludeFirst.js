@@ -139,8 +139,8 @@ ContentModelViewer.setup.defineFunctions = function() {
       else {
         var viewer = Ext.getCmp('viewerpanel');
         viewer.setPid(pid);
-        //var manage = Ext.getCmp('managepanel');
-        //manage.setPid(pid);
+        var manage = Ext.getCmp('managepanel');
+        manage.setPid(pid);
       }
     },
     isPidFocused: function(pid) {

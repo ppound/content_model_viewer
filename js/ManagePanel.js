@@ -22,7 +22,8 @@ Ext.onReady(function(){
       this.getComponent('properties').setPid(pid);
       this.getComponent('datastreams').setPid(pid);
     },
-    itemId: 'managepanel',
+    id: 'managepanel',
+    itemId: 'manage',
     title: 'Manage',
     layout: {
       type: 'border'
