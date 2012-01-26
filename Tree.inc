@@ -135,13 +135,13 @@ class Tree {
       module_load_include('inc', 'content_model_viewer', 'Collection');
       $collection = new Collection($pid);
       // Get the parents of the current pid. If pid has multiple parents, this should be handled.
-      list($parent, $total) = $collection->getParents($pid);
+      /*list($parent, $total) = $collection->getParents($pid);
       foreach ($parent as $k => $arr) {
         if ($arr['pid'] != $this->root) {
           $this->parents[] = $arr['pid'];
         }
       }
-      return;
+      return;*/
       list($parent, $total) = $collection->getParent($pid);
       foreach ($parent as $k => $arr) {
         // Make sure we're not at the root pid, otherwise save the returned pid as a parent and check
