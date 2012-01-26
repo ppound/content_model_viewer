@@ -11,7 +11,12 @@ Ext.onReady(function(){
       type: 'border'
     },
     setPid: function(pid) {
-    // @todo reload the data in the form.
+      this.pid = pid;
+      this.getComponent('form').load({
+        method: 'GET',
+        waitMsg: 'Loading...',
+        url: ContentModelViewer.properties.url.object.properties(pid)
+      });
     },
     dockedItems: [{
       xtype: 'toolbar',
@@ -39,13 +44,13 @@ Ext.onReady(function(){
     }],
     items: [{
       title: 'Object Properties',
+      itemId: 'form',
       xtype: 'form',
       region: 'center',
       height: 245,
       bodyPadding: 10,
       waitMsgTarget: true,
       reader: Ext.create('Ext.data.reader.Json', {
-        type: 'json',
         model: 'ContentModelViewer.models.ObjectProperties',
         root: 'data',
         successProperty: 'success'
@@ -110,10 +115,10 @@ Ext.onReady(function(){
       listeners: {
         afterrender: function(form) {
           var pid = this.findParentByType('objectpropertiespanel').pid;
-          form.getForm().load({
+          form.load({
             method: 'GET',
-            url: ContentModelViewer.properties.url.object.properties(pid),
-            waitMsg: 'Loading...'
+            waitMsg: 'Loading...',
+            url: ContentModelViewer.properties.url.object.properties(pid)
           });
         }
       }

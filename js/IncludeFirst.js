@@ -342,65 +342,6 @@ ContentModelViewer.setup.createStores = function() {
       direction: 'ASC'
     }]
   });
-  /**
-   * Object Properties
-   */
-  Ext.create('Ext.data.Store', {
-    storeId:'objectProperties',
-    model: models.ObjectProperties,
-    autoLoad: true,
-    proxy: {
-      type: 'ajax',
-      url: url.object.properties(pid),
-      reader: {
-        type: 'json',
-        root: 'data',
-        successProperty: 'success'
-      }
-    }
-  });
-  /**
-   * Datastreams rendered in the Manage panel
-   */
-  Ext.create('Ext.data.Store', {
-    storeId:'datastreams',
-    model: models.Datastream,
-    autoLoad: true,
-    autoSync: true,
-    pageSize: 15,
-    listeners: {
-      write: function(store, operation) {
-        var records = operation.getRecords();
-        if(operation.wasSuccessful()) {
-          for (var i = 0; i < records.length; i++) {
-            var record = records[i];
-            record.commit();
-          }
-        }
-      }
-    }
-  });
-  /**
-   * Data streams rendered in the Files panel.
-   */
-  Ext.create('Ext.data.Store', {
-    storeId:'files',
-    model: models.Datastream,
-    autoLoad: true,
-    pageSize: 4,
-    proxy: {
-      type: 'rest',
-      url : url.object.datastreams(pid, dsid),
-      extraParams: {
-        filter: true
-      },
-      reader: {
-        type: 'json',
-        root: 'data',
-        totalProperty: 'total'
-      }
-    }
-  });
 }
 
 /**
