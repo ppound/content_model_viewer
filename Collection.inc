@@ -201,15 +201,17 @@ class Collection {
    */
   private function findMembers() {
     $query = 'select $object $title $model $created from <#ri>
-                             where ($object <info:fedora/fedora-system:def/model#label> $title
-                             and $object <fedora-model:hasModel> $model
-                             and $object <fedora-model:createdDate> $created
-                             and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-                             and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
-                             or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
-                             minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-                             minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-                             order by $title';
+                where ($object <info:fedora/fedora-system:def/model#label> $title
+                and $object <fedora-model:hasModel> $model
+                and $object <fedora-model:createdDate> $created
+                and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+                and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
+                or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
+                minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+                minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
+                minus $parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
+                minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
+                order by $title';
     return $this->query($query);
   }
 
