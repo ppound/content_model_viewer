@@ -392,7 +392,7 @@ function template_preprocess_content_model_viewer(array &$variables) {
   $variables['is_collection'] = Collection::isCollection($pid) ? 'true' : 'false';
   $variables['label'] = $item->objectProfile->objLabel;
   $variables['base_url'] = $base_url;
-  $variables['dsid'] = 'SWF';
+  $variables['dsid'] = 'SWF'; // Default viewer.
   $variables['view_function'] = 'loadFlexPlayer';
   $variables['paths'] = array(
     'object' => array(

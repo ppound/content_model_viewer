@@ -100,6 +100,7 @@ Ext.onReady(function(){
       });
       var pager = Ext.create('Ext.toolbar.Paging', {
         dock: 'bottom',
+        itemId: 'pager',
         xtype: 'pagingtoolbar',
         store: store
       });
@@ -123,7 +124,9 @@ Ext.onReady(function(){
           totalProperty: 'total'
         }
       });
-      this.store.load();
+      var pager = this.getComponent('pager');
+      pager.doRefresh();
+      //this.store.load();
     },
     getSelected: function() {
       var datastreams = this.getComponent('datastreams');
