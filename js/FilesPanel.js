@@ -7,6 +7,7 @@ Ext.onReady(function(){
     },
     constructor: function(config) {
       this.callParent(arguments);
+      this.collapsed = true;
       var properties = ContentModelViewer.properties;
       var url = properties.url;
       var store = this.store = Ext.create('Ext.data.Store', {
@@ -136,7 +137,6 @@ Ext.onReady(function(){
     itemId: 'files',
     width: 260,
     collapsible: true,
-    collapsed: true,
     split: true
   });
 });
