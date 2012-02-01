@@ -34,9 +34,6 @@ Ext.onReady(function(){
       this.store.setProxy({
         type: 'rest',
         url : ContentModelViewer.properties.url.object.datastreams(pid),
-        extraParams: {
-          filter: false
-        },
         reader: {
           type: 'json',
           root: 'data',
