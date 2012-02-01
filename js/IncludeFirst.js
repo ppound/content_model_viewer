@@ -135,6 +135,9 @@ ContentModelViewer.setup.defineFunctions = function() {
             pid: pid
           }));
         }
+        else {
+          resourceOverview.setPid(pid);
+        }
       }
       viewer.setPid(pid);
       manage.setPid(pid);

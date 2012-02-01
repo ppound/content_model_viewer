@@ -10,6 +10,7 @@ Ext.onReady(function(){
       var url = ContentModelViewer.properties.url;  
       var content = Ext.create('Ext.panel.Panel', {
         html: '<div>Loading...</div>',
+        itemId: 'content',
         autoScroll: true,
         region: 'center',
         loader: {
@@ -35,6 +36,17 @@ Ext.onReady(function(){
       });
       this.add(content);
       this.add(files);
+    },
+    setPid: function(pid) {
+      this.pid = pid;
+      var files = this.getComponent('files');
+      files.setPid(pid);
+      var content = this.getComponent('content');
+      var loader = content.getLoader();
+      var url = ContentModelViewer.properties.url;
+      loader.load({
+        url: url.object.overview(pid)
+      });
     },
     itemId: 'overview',
     title: 'Overview',
