@@ -136,7 +136,7 @@ Ext.onReady(function(){
     itemId: 'files',
     width: 260,
     collapsible: true,
-    collapsed: false,
+    collapsed: true,
     split: true
   });
 });
