@@ -25,6 +25,9 @@ Ext.onReady(function(){
             root: 'data',
             totalProperty: 'total'
           }
+        },
+        listeners: {
+          load: (config.onLoad) ? config.onLoad : function() {}
         }
       });
       var datastreams = Ext.create('Ext.view.View', {
@@ -126,7 +129,7 @@ Ext.onReady(function(){
       });
       var pager = this.getComponent('pager');
       pager.doRefresh();
-      //this.store.load();
+    //this.store.load();
     },
     getSelected: function() {
       var datastreams = this.getComponent('datastreams');

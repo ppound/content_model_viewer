@@ -17,7 +17,8 @@ Ext.onReady(function(){
       });
       var files = Ext.create('ContentModelViewer.widgets.FilesPanel', {
         region: 'east',
-        pid: config.pid
+        pid: config.pid,
+        onLoad: this.onLoad
       });
       this.add(viewer);
       this.add(files);
@@ -32,6 +33,17 @@ Ext.onReady(function(){
       this.pid = pid;
       var files = this.getComponent('files');
       files.setPid(pid);
+    },
+    onLoad: function(store, records, successful, operation, eOpts) {
+      for(var i in records) {
+        var record = records[i];
+        if(record.get('default')) {
+          var pid = Ext.getCmp('viewerpanel').pid;
+          var dsid = record.get('dsid');
+          var viewFunction = record.get('view_function');
+          Ext.getCmp('datastream-viewer').view(pid, dsid, viewFunction); 
+        }
+      }
     }
   });
 });

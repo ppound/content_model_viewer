@@ -276,6 +276,9 @@ ContentModelViewer.setup.defineModels = function() {
     }, {
       name: 'edit', 
       type: 'bool'
+    }, {
+      name: 'default', 
+      type: 'bool'
     }],
     validations: [{
       type: 'inclusion', 
