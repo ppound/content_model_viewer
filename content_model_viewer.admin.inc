@@ -216,7 +216,7 @@ function content_model_viewer_datastream_default_rules_form(array &$form_state, 
         '#options' => array(0 => 'Prohibit', 1 => 'Permit'),
         '#default_value' => $download,
       ),
-      'default' => array(
+      'default_datastream' => array(
         '#type' => 'textfield',
         '#title' => t('Default Datastream To Display in the Viewer'),
         '#description' => t('If the given Datastream ID exists in the object it will be displayed first in the viewer.'),
@@ -241,12 +241,16 @@ function content_model_viewer_datastream_default_rules_form(array &$form_state, 
  */
 function content_model_viewer_datastream_default_rules_form_submit(array $form, array &$form_state) {
   if (isset($form_state['clicked_button']['#model_id'])) {
+    $model_id = $form_state['clicked_button']['#model_id'];
+    $values = $form_state['values'];
     $update = array(
-      'view' => $form_state['values']['view'],
-      'download' => $form_state['values']['download'],
+      array('view', '%d', $values['view']),
+      array('download', '%d', $values['download']),
+      array('default_datastream', '%s', $values['default_datastream'])
     );
-    foreach ($update as $column => $value) {
-      db_query('UPDATE {%s} SET %s = "%d" where id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $column, $value, $form_state['clicked_button']['#model_id']);
+    foreach ($update as $properties) {
+      list($column, $type, $value) = $properties;
+      db_query("UPDATE {%s} SET %s = '$type' where id = '%d'", CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $column, $value, $model_id);
     }
   }
 }

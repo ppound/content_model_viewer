@@ -401,7 +401,9 @@ class DatastreamProperties {
    *   TRUE if it should be displayed FALSE otherwise.
    */
   private function isDefault($dsid) {
-    return TRUE;
+    $model_id = content_model_viewer_get_model_id($this->item->pid); // Custom or Default Settings.
+    $default_datastream = db_result(db_query('SELECT default_datastream FROM {%s} WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $model_id));
+    return $default_datastream == $dsid;
   }
 
   /**
