@@ -10,6 +10,22 @@
 module_load_include('inc', 'content_model_viewer', 'content_model_viewer.db');
 
 /**
+ * Implements hook_update_N().
+ */
+function content_model_viewer_update_6000(&$sandbox) {
+  $ret = array();
+  $spec = array(
+    'description' => t('The default DSID to display in the viewer.'),
+    'type' => 'varchar',
+    'length' => 64,
+    'not null' => TRUE,
+    'default' => 'SWF',
+  );
+  db_add_field($ret, CONTENT_MODEL_VIEWER_SETTINGS_TABLE, 'default', $spec);
+  return $ret;
+}
+
+/**
  * Implementation of hook_install.
  */
 function content_model_viewer_install() {
@@ -274,6 +290,13 @@ function content_model_viewer_schema() {
         'type' => 'varchar',
         'length' => 64,
         'not null' => TRUE
+      ),
+      'default' => array(
+        'description' => t('The default DSID to display in the viewer.'),
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => 'SWF'
       ),
       'view' => array(
         'description' => t('TRUE if the user is allowed to view datastreams that match this rule FALSE otherwise.'),
