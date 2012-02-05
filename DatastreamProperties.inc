@@ -271,6 +271,7 @@ class DatastreamProperties {
         'created' => $created,
         'edit' => $this->canEditDatastream($dsid),
         'view' => $view,
+        'default' => $this->isDefault($dsid), // Displayed by default.
         'view_function' => $view_function,
         'download' => $download,
         'tn' => $this->getThumbnail($dsid, $mime)
@@ -389,6 +390,18 @@ class DatastreamProperties {
    */
   private function hasViewer($mime) {
     return content_model_viewer_get_viewer_properties($mime) != NULL;
+  }
+
+  /**
+   * Checks if this datastream should be displayed by default in the viewer panel.
+   * 
+   * @param string $dsid 
+   *   The datastream in question.
+   * @return boolean
+   *   TRUE if it should be displayed FALSE otherwise.
+   */
+  private function isDefault($dsid) {
+    return TRUE;
   }
 
   /**

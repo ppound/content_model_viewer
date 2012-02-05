@@ -95,7 +95,7 @@ Ext.onReady(function(){
             }
           }, '->', {
             xtype: 'button',
-            text: 'Add to this Collection',
+            text: 'Add resources',
             handler: function(button, event) {
               var form = Ext.get("datastream-edit-form");
               form.set({
