@@ -193,6 +193,7 @@ function content_model_viewer_delete_setting(array $form, array &$form_state) {
 function content_model_viewer_datastream_default_rules_form(array &$form_state, $model_id = 1) {
   $view = db_result(db_query('SELECT view FROM {%s} WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $model_id));
   $download = db_result(db_query('SELECT download FROM {%s} WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $model_id));
+  $default_datastream = db_result(db_query('SELECT default_datastream FROM {%s} WHERE id = "%d"', CONTENT_MODEL_VIEWER_SETTINGS_TABLE, $model_id));
   return array(
     'datastreams' => array(
       '#type' => 'fieldset',
@@ -214,6 +215,12 @@ function content_model_viewer_datastream_default_rules_form(array &$form_state, 
         '#description' => t('If no MIME type or Datastream ID rules match below then this defines if the end user is able to download the Datastream or not.'),
         '#options' => array(0 => 'Prohibit', 1 => 'Permit'),
         '#default_value' => $download,
+      ),
+      'default' => array(
+        '#type' => 'textfield',
+        '#title' => t('Default Datastream To Display in the Viewer'),
+        '#description' => t('If the given Datastream ID exists in the object it will be displayed first in the viewer.'),
+        '#default_value' => $default_datastream,
       ),
       'submit' => array(
         '#type' => 'submit',

@@ -21,7 +21,7 @@ function content_model_viewer_update_6000(&$sandbox) {
     'not null' => TRUE,
     'default' => 'SWF',
   );
-  db_add_field($ret, CONTENT_MODEL_VIEWER_SETTINGS_TABLE, 'default', $spec);
+  db_add_field($ret, CONTENT_MODEL_VIEWER_SETTINGS_TABLE, 'default_datastream', $spec);
   return $ret;
 }
 
@@ -291,7 +291,7 @@ function content_model_viewer_schema() {
         'length' => 64,
         'not null' => TRUE
       ),
-      'default' => array(
+      'default_datastream' => array(
         'description' => t('The default DSID to display in the viewer.'),
         'type' => 'varchar',
         'length' => 64,
