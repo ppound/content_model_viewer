@@ -42,8 +42,10 @@ Ext.onReady(function(){
           var dsid = record.get('dsid');
           var viewFunction = record.get('view_function');
           Ext.getCmp('datastream-viewer').view(pid, dsid, viewFunction); 
+          return;
         }
       }
+      Ext.getCmp('datastream-viewer').update('No Viewer Avaliable');
     }
   });
 });
