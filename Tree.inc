@@ -106,7 +106,7 @@ class Tree {
     $node['view'] = isset($member['view']) ? $member['view'] : NULL;
     $node['iconCls'] = preg_replace('/^[^:]*\:/', '', $member['model']); // Strip the namespace
     $node['expanded'] = $this->shouldExpandNode($member['pid']);
-    $node['cls'] = $node['expanded'] ? 'x-tree-bold' : '';
+    //$node['cls'] = $node['expanded'] ? 'x-tree-bold' : '';
     return $node;
   }
 
@@ -129,6 +129,7 @@ class Tree {
    * @param string $pid 
    */
   private function getParents($pid) {
+    return;//Thorny does not want the auto expand so just do this for now in case he wants it back
     // Root is expanded by default so make sure the pid is not root
     if ($pid != $this->root) {
       // Load the collection class

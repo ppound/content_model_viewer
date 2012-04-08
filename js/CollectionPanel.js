@@ -98,8 +98,11 @@ Ext.onReady(function(){
             text: 'Add resources',
             handler: function(button, event) {
               var form = Ext.get("datastream-edit-form");
+	      var tempUrl = window.location.toString();
+	      var index = tempUrl.indexOf('/fedora/repository');
+	      tempUrl = tempUrl.substr(0,index)+'/fedora/repository/'+ContentModelViewer.properties.pids.focused;
               form.set({
-                action: window.location // Same Spot.
+                action: tempUrl  //window.location // 
               });
               var action = form.down('input[name="action"]');
               action.set({
@@ -165,7 +168,7 @@ Ext.onReady(function(){
               window.location = link;
             }
             else {
-              func.setCollectionPid(pid, isCollection);
+              func.setCollectionPid(pid);
             }
           }
         }

@@ -25,7 +25,6 @@ class Collection {
    * @var string
    */
   protected $pid;
-
   /**
    * Named default properties.
    * 
@@ -211,19 +210,19 @@ class Collection {
                         and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
                         or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
                         order by $title';
-    /*$query = 'select $object $title $model $parent_model $created from <#ri>
-                where ($object <info:fedora/fedora-system:def/model#label> $title
-                and $object <fedora-model:hasModel> $model
-                and $model <fedora-model:hasModel> $parent_model
-                and $object <fedora-model:createdDate> $created
-                and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
-                and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
-                or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
-                minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
-                minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-                minus $parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
-                minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
-                order by $title';*/
+    /* $query = 'select $object $title $model $parent_model $created from <#ri>
+      where ($object <info:fedora/fedora-system:def/model#label> $title
+      and $object <fedora-model:hasModel> $model
+      and $model <fedora-model:hasModel> $parent_model
+      and $object <fedora-model:createdDate> $created
+      and $object <fedora-model:state> <info:fedora/fedora-system:def/model#Active>
+      and ($object <fedora-rels-ext:isMemberOfCollection> <info:fedora/' . $this->pid . '>
+      or $object <fedora-rels-ext:isMemberOf> <info:fedora/' . $this->pid . '>))
+      minus $model <mulgara:is> <info:fedora/fedora-system:FedoraObject-3.0>
+      minus $model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
+      minus $parent_model <mulgara:is> <info:fedora/islandora:collectionCModel>
+      minus $parent_model <mulgara:is> <info:fedora/fedora-system:ContentModel-3.0>
+      order by $title'; */
     return $this->query($query);
   }
 
@@ -470,12 +469,15 @@ class Collection {
     $default_description = 'Default Description, Check this object\'s metadata and ensure a description is present.';
     $item = new Fedora_Item($pid);
     $dc = $item->get_datastream_dissemination('DC');
-    $document = new DOMDocument();
-    $document->loadXML($dc);
-    $xpath = new DOMXPath($document);
-    $xpath->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
-    $results = $xpath->query('//dc:description');
-    $count = $results->length;
+    $count = 0;
+    if (isset($dc)) {
+      $document = new DOMDocument();
+      $document->loadXML($dc);
+      $xpath = new DOMXPath($document);
+      $xpath->registerNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+      $results = $xpath->query('//dc:description');
+      $count = $results->length;
+    }
     if ($count > 0) {
       $description = '';
       for ($i = 0; $i < $count; $i++) {

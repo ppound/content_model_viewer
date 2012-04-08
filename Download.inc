@@ -56,7 +56,7 @@ function get_fedora_user_and_password() {
 function get_fedora_datastream_url($pid, $dsid, $version = NULL) {
   $fedora_base_url = variable_get('fedora_base_url', 'http://localhost:8080/fedora');
   $dsid = ($version) ? "$dsid/$version" : $dsid;
-  return $fedora_base_url . '/get/' . $pid . '/' . $dsid;
+  return $fedora_base_url . '/objects/' . $pid . '/datastreams/' . $dsid . '/content';
 }
 
 /**
